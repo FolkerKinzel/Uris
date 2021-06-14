@@ -1,4 +1,4 @@
-# FolkerKinzel.VCards
+# FolkerKinzel.URIs
 .NET library to read, write and convert VCF files that match the vCard standards 2.1, 3.0 and 4.0.
 
 It enables you
