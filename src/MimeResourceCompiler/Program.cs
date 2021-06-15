@@ -6,15 +6,10 @@ namespace MapCreations
     {
         static void Main(string[] args)
         {
-            Run();
-        }
-
-
-        private static void Run()
-        {
+            string outDir;
             try
             {
-                Creator.CreateLookup(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory));
+                outDir = Compiler.CreateResources(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory));
             }
             catch(Exception e)
             {
@@ -24,9 +19,11 @@ namespace MapCreations
                 Console.ResetColor();
 
                 Environment.Exit(-1);
+                return;
             }
 
-            Console.WriteLine("Successfully created.");
+            Console.WriteLine($"Mime resources successfully created at {outDir}.");
         }
+
     }
 }

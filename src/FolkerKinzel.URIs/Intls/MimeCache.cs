@@ -12,12 +12,14 @@ namespace FolkerKinzel.URIs.Intls
         private const string RESOURCE_NAME = "FolkerKinzel.MimeTypes.Resources.Mime.csv";
         private const string DEFAULT_MIME_TYPE = "application/octet-stream";
         private const string DEFAULT_FILE_TYPE_EXTENSION = "bin";
+        private const string MIME_CACHE_NAME = "mime";
+        private const string EXTENSION_CACHE_NAME = "extensions";
 
-        internal static string GetMimeType(string fileTypeExtension)
+        internal static string GetMimeType(string fileTypeExtension, double cacheLifeTime)
         {
-            Dictionary<string, string> dic = cache.GetOrAdd("mime", CreateMimeTypeCache, DateTimeOffset.Now + TimeSpan.FromMinutes(10));
+            Dictionary<string, string> dic = cache.GetOrAdd(MIME_CACHE_NAME, CacheProvider.CreateMimeTypeCache, DateTimeOffset.UtcNow + TimeSpan.FromMinutes(cacheLifeTime));
 
-            if(dic.ContainsKey(fileTypeExtension))
+            if (dic.ContainsKey(fileTypeExtension))
             {
                 return dic[fileTypeExtension];
             }
@@ -26,7 +28,7 @@ namespace FolkerKinzel.URIs.Intls
 
             using Stream? stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(RESOURCE_NAME);
 
-            if(stream is null)
+            if (stream is null)
             {
                 return DEFAULT_MIME_TYPE;
             }
@@ -34,13 +36,14 @@ namespace FolkerKinzel.URIs.Intls
             using var reader = new StreamReader(stream);
 
             string? line;
-            while((line = reader.ReadLine()) is not null)
+            while ((line = reader.ReadLine()) is not null)
             {
                 int separatorIndex = line.IndexOf(' ');
 
                 ReadOnlySpan<char> span = line.AsSpan(separatorIndex + 1);
 
-                if(span.Equals(fileTypeExtension, StringComparison.OrdinalIgnoreCase))
+
+                if (span.Equals(fileTypeExtension.AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     string mime = line.Substring(0, separatorIndex);
                     dic[fileTypeExtension] = mime;
@@ -53,18 +56,18 @@ namespace FolkerKinzel.URIs.Intls
         }
 
 
-        internal static string GetFileTypeExtension(string mimeType)
+        internal static string GetFileTypeExtension(string mimeType, double cacheLifeTime)
         {
-            Dictionary<string, string> dic = cache.GetOrAdd("extensions", CreateFyleTypeCache, DateTimeOffset.Now + TimeSpan.FromMinutes(10));
+            Dictionary<string, string> dic = cache.GetOrAdd(EXTENSION_CACHE_NAME, CacheProvider.CreateFyleTypeCache, DateTimeOffset.UtcNow + TimeSpan.FromMinutes(cacheLifeTime));
 
-            if(dic.ContainsKey(mimeType))
+            if (dic.ContainsKey(mimeType))
             {
                 return dic[mimeType];
             }
 
             using Stream? stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(RESOURCE_NAME);
 
-            if(stream is null)
+            if (stream is null)
             {
                 return DEFAULT_MIME_TYPE;
             }
@@ -72,13 +75,13 @@ namespace FolkerKinzel.URIs.Intls
             using var reader = new StreamReader(stream);
 
             string? line;
-            while((line = reader.ReadLine()) is not null)
+            while ((line = reader.ReadLine()) is not null)
             {
                 int separatorIndex = line.IndexOf(' ');
 
                 ReadOnlySpan<char> span = line.AsSpan(0, separatorIndex);
 
-                if(span.Equals(mimeType, StringComparison.OrdinalIgnoreCase))
+                if (span.Equals(mimeType.AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     string fileType = line.Substring(separatorIndex + 1);
                     dic[mimeType] = fileType;
@@ -91,50 +94,7 @@ namespace FolkerKinzel.URIs.Intls
         }
 
 
-        private static Dictionary<string, string> CreateMimeTypeCache()
-        {
-            return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        }
-
-
-        private static Dictionary<string, string> CreateFyleTypeCache()
-        {
-            return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-            {
-                {".json", "application/json" },
-                {".doc","application/msword" },
-                {".pdf","application/pdf" },
-                {".pgp","application/pgp-encrypted" },
-                {".sig","application/pgp-signature" },
-                {".ai","application/postscript" },
-                {".ps","application/postscript" },
-                {".rtf","application/rtf" },
-                {".xls","application/vnd.ms-excel" },
-                {".chm","application/vnd.ms-htmlhelp" },
-                {".ppt","application/vnd.ms-powerpoint" },
-                {".xps", "application/vnd.ms-xpsdocument" }
-                //{"", "" };
-                //{"", "" };
-                //{"", "" };
-                //{"", "" };
-                //{"", "" };
-                //{"", "" };
-                //{"", "" };
-                //{"", "" };
-                //{"", "" };
-                //{"", "" };
-                //{"", "" };
-                //{"", "" };
-                //{"", "" };
-                //{"", "" };
-                //{"", "" };
-                //{"", "" };
-                //{"", "" };
-                //{"", "" };
-                //{"", "" };
-                //{"", "" };
-
-            };
-        }
+        private static DateTimeOffset ComputeExpirationTime(double cacheLifeTime)
+            => DateTimeOffset.UtcNow + TimeSpan.FromMinutes(cacheLifeTime);
     }
 }
