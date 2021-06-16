@@ -2,35 +2,43 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using FolkerKinzel.URIs.Properties;
 using LazyCache;
 
 namespace FolkerKinzel.URIs.Intls
 {
     internal static class MimeCache
     {
+        private static readonly Lazy<Dictionary<string, long>> Index = new(IndexFactory.CreateIndex, false);
         private static readonly IAppCache cache = new CachingService();
-        private const string RESOURCE_NAME = "FolkerKinzel.MimeTypes.Resources.Mime.csv";
+        private const string RESOURCE_NAME = "FolkerKinzel.URIs.Resources.Mime.csv";
         private const string DEFAULT_MIME_TYPE = "application/octet-stream";
         private const string DEFAULT_FILE_TYPE_EXTENSION = "bin";
         private const string MIME_CACHE_NAME = "mime";
         private const string EXTENSION_CACHE_NAME = "extensions";
 
+
+        internal static void TestIndex()
+        {
+            var dic = Index.Value;
+        }
+
         internal static string GetMimeType(string fileTypeExtension, double cacheLifeTime)
         {
-            Dictionary<string, string> dic = cache.GetOrAdd(MIME_CACHE_NAME, CacheProvider.CreateMimeTypeCache, DateTimeOffset.UtcNow + TimeSpan.FromMinutes(cacheLifeTime));
+            Dictionary<string, string> dic = cache.GetOrAdd(MIME_CACHE_NAME, CacheFactory.CreateMimeTypeCache, ComputeExpirationTime(cacheLifeTime));
 
             if (dic.ContainsKey(fileTypeExtension))
             {
                 return dic[fileTypeExtension];
             }
 
-            var names = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+            //var names = Assembly.GetExecutingAssembly().GetManifestResourceNames();
 
             using Stream? stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(RESOURCE_NAME);
 
             if (stream is null)
             {
-                return DEFAULT_MIME_TYPE;
+                throw new InvalidDataException(string.Format(Res.ResourceNotFound, RESOURCE_NAME));
             }
 
             using var reader = new StreamReader(stream);
@@ -58,7 +66,7 @@ namespace FolkerKinzel.URIs.Intls
 
         internal static string GetFileTypeExtension(string mimeType, double cacheLifeTime)
         {
-            Dictionary<string, string> dic = cache.GetOrAdd(EXTENSION_CACHE_NAME, CacheProvider.CreateFyleTypeCache, DateTimeOffset.UtcNow + TimeSpan.FromMinutes(cacheLifeTime));
+            Dictionary<string, string> dic = cache.GetOrAdd(EXTENSION_CACHE_NAME, CacheFactory.CreateFyleTypeCache, ComputeExpirationTime(cacheLifeTime));
 
             if (dic.ContainsKey(mimeType))
             {

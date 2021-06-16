@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace FolkerKinzel.URIs
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public static class CacheProvider
+    public static class CacheFactory
     {
         internal static Dictionary<string, string> CreateMimeTypeCache()
         {

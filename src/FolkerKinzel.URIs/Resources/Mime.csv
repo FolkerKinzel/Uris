@@ -30,7 +30,6 @@ application/java-archive .jar
 application/java-serialized-object .ser
 application/java-vm .class
 application/javascript .js
-application/json .json
 application/jsonml+json .jsonml
 application/lost+xml .lostxml
 application/mac-binhex40 .hqx
@@ -51,7 +50,6 @@ application/mods+xml .mods
 application/mp21 .m21
 application/mp21 .mp21
 application/mp4 .mp4s
-application/msword .doc
 application/msword .dot
 application/mxf .mxf
 application/oda .oda
@@ -64,7 +62,6 @@ application/onenote .onetmp
 application/onenote .onepkg
 application/oxps .oxps
 application/patch-ops-error+xml .xer
-application/pdf .pdf
 application/pgp-encrypted .pgp
 application/pgp-signature .asc
 application/pgp-signature .sig
@@ -96,7 +93,6 @@ application/rpki-manifest .mft
 application/rpki-roa .roa
 application/rsd+xml .rsd
 application/rss+xml .rss
-application/rtf .rtf
 application/sbml+xml .sbml
 application/scvp-cv-request .scq
 application/scvp-cv-response .scs
@@ -340,7 +336,6 @@ application/vnd.mophun.certificate .mpc
 application/vnd.mozilla.xul+xml .xul
 application/vnd.ms-artgalry .cil
 application/vnd.ms-cab-compressed .cab
-application/vnd.ms-excel .xls
 application/vnd.ms-excel .xlm
 application/vnd.ms-excel .xla
 application/vnd.ms-excel .xlc
@@ -357,7 +352,6 @@ application/vnd.ms-lrm .lrm
 application/vnd.ms-officetheme .thmx
 application/vnd.ms-pki.seccat .cat
 application/vnd.ms-pki.stl .stl
-application/vnd.ms-powerpoint .ppt
 application/vnd.ms-powerpoint .pps
 application/vnd.ms-powerpoint .pot
 application/vnd.ms-powerpoint.addin.macroenabled.12 .ppam
@@ -401,24 +395,18 @@ application/vnd.oasis.opendocument.graphics .odg
 application/vnd.oasis.opendocument.graphics-template .otg
 application/vnd.oasis.opendocument.image .odi
 application/vnd.oasis.opendocument.image-template .oti
-application/vnd.oasis.opendocument.presentation .odp
 application/vnd.oasis.opendocument.presentation-template .otp
-application/vnd.oasis.opendocument.spreadsheet .ods
 application/vnd.oasis.opendocument.spreadsheet-template .ots
-application/vnd.oasis.opendocument.text .odt
 application/vnd.oasis.opendocument.text-master .odm
 application/vnd.oasis.opendocument.text-template .ott
 application/vnd.oasis.opendocument.text-web .oth
 application/vnd.olpc-sugar .xo
 application/vnd.oma.dd2+xml .dd2
 application/vnd.openofficeorg.extension .oxt
-application/vnd.openxmlformats-officedocument.presentationml.presentation .pptx
 application/vnd.openxmlformats-officedocument.presentationml.slide .sldx
 application/vnd.openxmlformats-officedocument.presentationml.slideshow .ppsx
 application/vnd.openxmlformats-officedocument.presentationml.template .potx
-application/vnd.openxmlformats-officedocument.spreadsheetml.sheet .xlsx
 application/vnd.openxmlformats-officedocument.spreadsheetml.template .xltx
-application/vnd.openxmlformats-officedocument.wordprocessingml.document .docx
 application/vnd.openxmlformats-officedocument.wordprocessingml.template .dotx
 application/vnd.osgeo.mapguide.package .mgp
 application/vnd.osgi.dp .dp
@@ -692,7 +680,6 @@ application/xcap-diff+xml .xdf
 application/xenc+xml .xenc
 application/xhtml+xml .xhtml
 application/xhtml+xml .xht
-application/xml .xml
 application/xml .xsl
 application/xml-dtd .dtd
 application/xop+xml .xop
@@ -705,7 +692,6 @@ application/xv+xml .xvml
 application/xv+xml .xvm
 application/yang .yang
 application/yin+xml .yin
-application/zip .zip
 audio/adpcm .adp
 audio/basic .au
 audio/basic .snd
@@ -718,7 +704,6 @@ audio/mp4 .mp4a
 audio/mpeg .mpga
 audio/mpeg .mp2
 audio/mpeg .mp2a
-audio/mpeg .mp3
 audio/mpeg .m2a
 audio/mpeg .m3a
 audio/ogg .oga
@@ -769,16 +754,11 @@ font/woff2 .woff2
 image/bmp .bmp
 image/cgm .cgm
 image/g3fax .g3
-image/gif .gif
 image/ief .ief
-image/jpeg .jpeg
-image/jpeg .jpg
 image/jpeg .jpe
 image/ktx .ktx
-image/png .png
 image/prs.btif .btif
 image/sgi .sgi
-image/svg+xml .svg
 image/svg+xml .svgz
 image/tiff .tiff
 image/tiff .tif
@@ -811,7 +791,6 @@ image/x-freehand .fhc
 image/x-freehand .fh4
 image/x-freehand .fh5
 image/x-freehand .fh7
-image/x-icon .ico
 image/x-mrsid-image .sid
 image/x-pcx .pcx
 image/x-pict .pic
@@ -825,7 +804,6 @@ image/x-tga .tga
 image/x-xbitmap .xbm
 image/x-xpixmap .xpm
 image/x-xwindowdump .xwd
-message/rfc822 .eml
 message/rfc822 .mime
 model/iges .igs
 model/iges .iges
@@ -850,16 +828,11 @@ text/cache-manifest .appcache
 text/calendar .ics
 text/calendar .ifb
 text/css .css
-text/csv .csv
-text/html .html
-text/html .htm
 text/n3 .n3
-text/plain .txt
 text/plain .text
 text/plain .conf
 text/plain .def
 text/plain .list
-text/plain .log
 text/plain .in
 text/prs.lines.tag .dsc
 text/richtext .rtx
@@ -912,7 +885,6 @@ text/x-setext .etx
 text/x-sfv .sfv
 text/x-uuencode .uu
 text/x-vcalendar .vcs
-text/x-vcard .vcf
 video/3gpp .3gp
 video/3gpp2 .3g2
 video/h261 .h261

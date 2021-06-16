@@ -11,7 +11,7 @@ namespace FolkerKinzel.URIs.Intls.Tests
         [DataRow(".json", "application/json")]
         public void GetMimeTypeTest1(string extension, string mimeType)
         {
-           Assert.AreEqual(mimeType,  MimeCache.GetMimeType(extension), true);
+           Assert.AreEqual(mimeType, MimeCache.GetMimeType(extension, 5), true);
         }
 
 
@@ -22,7 +22,14 @@ namespace FolkerKinzel.URIs.Intls.Tests
         [DataRow(".json", "application/json")]
         public void GetFileTypeExtensionTest1(string extension, string mimeType)
         {
-           Assert.AreEqual(extension,  MimeCache.GetFileTypeExtension(mimeType), true);
+           Assert.AreEqual(extension,  MimeCache.GetFileTypeExtension(mimeType, 5), true);
+        }
+
+
+        [TestMethod]
+        public void TestIndexTest()
+        {
+            MimeCache.TestIndex();
         }
     }
 }
