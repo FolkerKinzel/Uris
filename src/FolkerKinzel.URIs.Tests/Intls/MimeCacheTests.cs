@@ -17,6 +17,11 @@ namespace FolkerKinzel.URIs.Intls.Tests
 
 
         [DataTestMethod]
+        [DataRow(".ez", "application/andrew-inset")]
+        [DataRow(".ice", "x-conference/x-cooltalk")]
+        [DataRow(".ttc", "font/collection")]
+        [DataRow(".woff2", "font/woff2")]
+        [DataRow(".bin", "font/blabla")]
         [DataRow(".json", "application/json")]
         [DataRow(".psd", "image/vnd.adobe.photoshop")]
         [DataRow(".json", "application/json")]
@@ -26,10 +31,6 @@ namespace FolkerKinzel.URIs.Intls.Tests
         }
 
 
-        [TestMethod]
-        public void TestIndexTest()
-        {
-            MimeCache.TestIndex();
-        }
+        
     }
 }

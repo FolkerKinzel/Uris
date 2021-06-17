@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
@@ -33,10 +34,10 @@ namespace MapCreations
 
         private static string DownloadApacheList() => _httpClient.GetStringAsync(APACHE_URL).Result;
 
-        private static Dictionary<string, string> GetFileTypeCache() => FolkerKinzel.URIs.CacheFactory.CreateFyleTypeCache();
+        private static ConcurrentDictionary<string, string> GetFileTypeCache() => FolkerKinzel.URIs.CacheFactory.CreateFyleTypeCache();
 
 
-        private static void CompileResources(string directoryPath, string apacheList, Dictionary<string, string> fileTypeCache)
+        private static void CompileResources(string directoryPath, string apacheList, ConcurrentDictionary<string, string> fileTypeCache)
         {
             const string mimeFileName = "Mime.csv";
             const string indexFileName = "MimeIdx.csv";
@@ -66,7 +67,12 @@ namespace MapCreations
             indexWriter.Write(mimeFileStream.Length);
         }
 
-        private static void ProcessLine(Dictionary<string, string> fileTypeCache, StreamWriter mimeWriter, StreamWriter indexWriter, string line, Dictionary<string, object?> testDic, ref string? mediaType)
+        private static void ProcessLine(ConcurrentDictionary<string, string> fileTypeCache,
+                                        StreamWriter mimeWriter,
+                                        StreamWriter indexWriter,
+                                        string line,
+                                        Dictionary<string, object?> testDic,
+                                        ref string? mediaType)
         {
             const string defaultMime = "application/octet-stream";
 
@@ -84,7 +90,7 @@ namespace MapCreations
 
             string? mimeType = parts[0];
 
-            if (mediaType is null || !mimeType.StartsWith(mediaType))
+            if (mediaType is null || !mimeType.StartsWith(mediaType, StringComparison.OrdinalIgnoreCase))
             {
                 mediaType = mimeType.Substring(0, mimeType.IndexOf('/'));
 

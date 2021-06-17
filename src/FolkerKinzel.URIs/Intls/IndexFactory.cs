@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using FolkerKinzel.URIs.Properties;
 
 namespace FolkerKinzel.URIs.Intls
@@ -13,7 +10,7 @@ namespace FolkerKinzel.URIs.Intls
     {
         private const string RESOURCE_NAME = "FolkerKinzel.URIs.Resources.MimeIdx.csv";
 
-        internal static Dictionary<string, long> CreateIndex()
+        internal static ConcurrentDictionary<string, long> CreateIndex()
         {
             using Stream? stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(RESOURCE_NAME);
 
@@ -24,7 +21,7 @@ namespace FolkerKinzel.URIs.Intls
 
             using var reader = new StreamReader(stream);
 
-            var dic = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
+            var dic = new ConcurrentDictionary<string, long>(StringComparer.OrdinalIgnoreCase);
             string? line;
             while ((line = reader.ReadLine()) is not null)
             {
@@ -37,25 +34,30 @@ namespace FolkerKinzel.URIs.Intls
 
                 ++separatorIndex1;
 #if NETSTANDARD2_0
-                int index = int.Parse(line.Substring(separatorIndex1, separatorIndex2 - separatorIndex1));
+                int start = int.Parse(line.Substring(separatorIndex1, separatorIndex2 - separatorIndex1));
 #else
-                int index = int.Parse(line.AsSpan(separatorIndex1, separatorIndex2 - separatorIndex1));
+                int start = int.Parse(line.AsSpan(separatorIndex1, separatorIndex2 - separatorIndex1));
 #endif
                 ++separatorIndex2;
 
 #if NETSTANDARD2_0
-                int length = int.Parse(line.Substring(separatorIndex2)) - index;
+                int count = int.Parse(line.Substring(separatorIndex2)) - start;
 #else
-                int length = int.Parse(line.AsSpan(separatorIndex2)) - index;
+                int count = int.Parse(line.AsSpan(separatorIndex2)) - start;
 #endif
 
-                long l = (long)length << 32;
-                l |= (long)index;
-
-                dic[mediaType] = l;
+                dic.TryAdd(mediaType, PackIndex(start, count));
             }
 
             return dic;
+        }
+
+
+        private static long PackIndex(int start, int count)
+        {
+            long l = (long)count << 32;
+            l |= (long)start;
+            return l;
         }
     }
 }
