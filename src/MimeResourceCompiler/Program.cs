@@ -6,11 +6,12 @@ namespace MapCreations
     {
         static void Main(string[] args)
         {
-            string outDir;
+            Compiler compiler;
             try
             {
-                var compiler = new Compiler();
-                outDir = compiler.CreateResources(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory));
+                compiler = new Compiler(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory));
+
+                compiler.CreateResources();
             }
             catch(Exception e)
             {
@@ -23,7 +24,7 @@ namespace MapCreations
                 return;
             }
 
-            Console.WriteLine($"Mime resources successfully created at {outDir}.");
+            Console.WriteLine($"Mime resources successfully created at {compiler.OutputDirectory}.");
         }
 
     }
