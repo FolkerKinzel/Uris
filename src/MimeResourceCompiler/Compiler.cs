@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace MapCreations
 {
-    internal class Compiler
+    public class Compiler
     {
         private static readonly HttpClient _httpClient = new();
 
@@ -16,15 +16,17 @@ namespace MapCreations
         private const char SEPARATOR = ' ';
 
         private string? MediaType { get; set; }
-        internal string OutputDirectory { get; }
-
         private ConcurrentDictionary<string, string> MimeTypeCache { get; } = GetMimeTypeCache();
         private Dictionary<string, object?> TestDic { get; } = new();
 
 
         public Compiler(string targetDirectory) => OutputDirectory = CreateOutputDirectory(targetDirectory);
 
-        internal void CreateResources() => CompileResources(DownloadApacheList());
+        public string OutputDirectory { get; }
+
+        public void CreateResources() => CompileResources(DownloadApacheList());
+
+
 
         private static string CreateOutputDirectory(string targetDirectory)
         {
