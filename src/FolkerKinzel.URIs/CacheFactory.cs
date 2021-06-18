@@ -7,7 +7,7 @@ namespace FolkerKinzel.URIs
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class CacheFactory
     {
-        internal static ConcurrentDictionary<string, string> CreateFyleTypeCache()
+        internal static ConcurrentDictionary<string, string> CreateFileTypeCache()
         {
             var dic = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             _ = dic.TryAdd("application/json", ".json");

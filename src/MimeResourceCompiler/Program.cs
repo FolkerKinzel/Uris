@@ -9,7 +9,8 @@ namespace MapCreations
             string outDir;
             try
             {
-                outDir = Compiler.CreateResources(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory));
+                var compiler = new Compiler();
+                outDir = compiler.CreateResources(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory));
             }
             catch(Exception e)
             {
