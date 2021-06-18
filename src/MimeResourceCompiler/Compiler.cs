@@ -5,80 +5,49 @@ using System.IO;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 
-namespace MapCreations
+namespace MimeResourceCompiler
 {
-    public class Compiler
+    public sealed class Compiler : IDisposable
     {
-        private static readonly HttpClient _httpClient = new();
-
-        private const string DIRECTORY_NAME = "Mime Resources";
-        private const string APACHE_URL = @"http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types";
-        private const char SEPARATOR = ' ';
-
-        private string? MediaType { get; set; }
         private ConcurrentDictionary<string, string> MimeTypeCache { get; } = GetMimeTypeCache();
-        private Dictionary<string, object?> TestDic { get; } = new();
+        private readonly IApacheDataProvider _apacheProvider;
+        private readonly IMimeFile _mimeFile;
+        private readonly IIndexFile _indexFile;
 
-
-        public Compiler(string targetDirectory) => OutputDirectory = CreateOutputDirectory(targetDirectory);
-
-        public string OutputDirectory { get; }
-
-        public void CreateResources() => CompileResources(DownloadApacheList());
-
-
-
-        private static string CreateOutputDirectory(string targetDirectory)
+        public Compiler(IApacheDataProvider apacheProvider, IMimeFile mimeFile, IIndexFile indexFile)
         {
-            string directoryPath = Path.Combine(targetDirectory, DIRECTORY_NAME);
-            _ = Directory.CreateDirectory(directoryPath);
-            return directoryPath;
+            _apacheProvider = apacheProvider;
+            _mimeFile = mimeFile;
+            _indexFile = indexFile;
         }
 
-        private static string DownloadApacheList() => _httpClient.GetStringAsync(APACHE_URL).Result;
+
+        public string? MediaType { get; private set; }
+
 
         private static ConcurrentDictionary<string, string> GetMimeTypeCache() => FolkerKinzel.URIs.CacheFactory.CreateMimeTypeCache();
 
 
-        private void CompileResources(string apacheList)
+        public void CompileResources()
         {
-            const string mimeFileName = "Mime.csv";
-            const string indexFileName = "MimeIdx.csv";
-            const string newLine = "\n";
-
-            using var mimeFileStream = new FileStream(Path.Combine(OutputDirectory, mimeFileName), FileMode.Create, FileAccess.Write, FileShare.None);
-            using var indexFileStream = new FileStream(Path.Combine(OutputDirectory, indexFileName), FileMode.Create, FileAccess.Write, FileShare.None);
-            using var mimeWriter = new StreamWriter(mimeFileStream);
-            mimeWriter.NewLine = newLine;
-            using var indexWriter = new StreamWriter(indexFileStream);
-            indexWriter.NewLine = newLine;
-            using var reader = new StringReader(apacheList);
             string? line;
-
-            while ((line = reader.ReadLine()) != null)
+            while ((line = _apacheProvider.GetNextLine()) != null)
             {
-                ProcessLine(mimeWriter, indexWriter, line);
+                ProcessLine(line);
             }//while
 
 
             // Letzte Leerzeile entfernen:
-            mimeWriter.Flush();
-            mimeFileStream.SetLength(mimeFileStream.Length - newLine.Length);
-
-
+            _mimeFile.TruncateLastEmptyRow();
+            
             indexWriter.Write(mimeFileStream.Length);
         }
 
-        private void ProcessLine(StreamWriter mimeWriter,
-                                 StreamWriter indexWriter,
-                                 string line)
+        private void ProcessLine(string line)
         {
             const string defaultMime = "application/octet-stream";
 
-            if (line.Trim().StartsWith('#'))
-            {
-                return;
-            }
+            
 
             string[] parts = Regex.Split(line, @"\s+");
 
@@ -93,7 +62,7 @@ namespace MapCreations
             {
                 MediaType = mimeType.Substring(0, mimeType.IndexOf('/'));
 
-                TestApacheFile(MediaType);
+                _apacheProvider.TestApacheFile(MediaType);
 
                 SaveIndex(mimeWriter.BaseStream.Position, indexWriter, MediaType);
             }
@@ -111,10 +80,7 @@ namespace MapCreations
                     }
                 }
 
-                mimeWriter.Write(mimeType);
-                mimeWriter.Write(SEPARATOR);
-                mimeWriter.WriteLine(extension);
-                mimeWriter.Flush();
+                _mimeFile.WriteLine(mimeType, extension);
             }
 
             ///////////////////////////////
@@ -140,17 +106,11 @@ namespace MapCreations
             }
         }
 
-        private void TestApacheFile(string mediaType)
+        public void Dispose()
         {
-            try
-            {
-                TestDic.Add(mediaType, null);
-            }
-            catch (ArgumentException e)
-            {
-                throw new InvalidDataException($"{APACHE_URL} has the Media Type \"{mediaType}\" at different positions in the file.", e);
-            }
+            this._indexFile.Dispose();
+            this._mimeFile.Dispose();
+            GC.SuppressFinalize(this);
         }
-
     }
 }

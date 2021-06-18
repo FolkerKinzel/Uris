@@ -1,19 +1,19 @@
 ﻿using System;
 
-namespace MapCreations
+namespace MimeResourceCompiler
 {
     class Program
     {
         static void Main(string[] args)
         {
-            Compiler compiler;
+            using var factory = new Factory(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory));
+
             try
             {
-                compiler = new Compiler(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory));
-
-                compiler.CreateResources();
+                Compiler compiler = factory.ResolveCompiler();
+                compiler.CompileResources();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.Write("ERROR: ");
@@ -24,7 +24,7 @@ namespace MapCreations
                 return;
             }
 
-            Console.WriteLine($"Mime resources successfully created at {compiler.OutputDirectory}.");
+            Console.WriteLine($"Mime resources successfully created at {factory.ResolveOutputDirectory().FullName}.");
         }
 
     }
