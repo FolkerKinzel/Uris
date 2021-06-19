@@ -37,17 +37,5 @@ namespace MimeResourceCompiler.Classes
             GC.SuppressFinalize(this);
         }
 
-        //[MemberNotNull(nameof(_writer))]
-        //private void Initialize()
-        //{
-        //    if (_writer is null)
-        //    {
-        //        Stream stream = _streamFactory.CreateWriteStream(indexFileName);
-        //        _writer = new StreamWriter(stream)
-        //        {
-        //            NewLine = newLine
-        //        };
-        //    }
-        //}
     }
 }

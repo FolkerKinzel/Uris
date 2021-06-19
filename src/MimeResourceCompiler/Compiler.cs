@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 namespace MimeResourceCompiler
@@ -10,14 +11,20 @@ namespace MimeResourceCompiler
         private readonly IMimeFile _mimeFile;
         private readonly IIndexFile _indexFile;
         private readonly IDllCache _dllCache;
+        private readonly IAddendum _addendum;
         private bool _disposedValue;
 
-        public Compiler(IApacheData apacheData, IMimeFile mimeFile, IIndexFile indexFile, IDllCache dllCache)
+        public Compiler(IApacheData apacheData,
+                        IMimeFile mimeFile,
+                        IIndexFile indexFile,
+                        IDllCache dllCache,
+                        IAddendum addendum)
         {
             _apacheData = apacheData;
             _mimeFile = mimeFile;
             _indexFile = indexFile;
             _dllCache = dllCache;
+            _addendum = addendum;
         }
 
 
@@ -39,6 +46,22 @@ namespace MimeResourceCompiler
                 ProcessLine(line);
             }
 
+
+            string? mediaTp = null;
+            while (_addendum.GetLine(ref mediaTp, out AddendumRow? row))
+            {
+                if (MediaType is null) // Die könnte nur sein, wenn das Apache file leer ist
+                {
+                    WriteIndex(mediaTp, true);
+                }
+                else if (!StringComparer.OrdinalIgnoreCase.Equals(MediaType, mediaTp))
+                {
+                    WriteIndex(mediaTp, false);
+                }
+
+                WriteMimeFile(row.MimeType, row.Extension);
+            }
+
             _indexFile.WriteLinesCount(Line);
 
 
@@ -46,6 +69,7 @@ namespace MimeResourceCompiler
             _mimeFile.TruncateLastEmptyRow();
         }
 
+        
 
         private void ProcessLine(string line)
         {
@@ -60,14 +84,14 @@ namespace MimeResourceCompiler
 
             string? mimeType = parts[0];
 
-            if (MediaType is null || !mimeType.StartsWith(MediaType, StringComparison.OrdinalIgnoreCase))
+            if (MediaType is null)
             {
-                MediaType = mimeType.Substring(0, mimeType.IndexOf('/'));
-
-                _apacheData.TestApacheFile(MediaType);
-
-                SaveIndex();
-                Line = 0;
+                WriteIndex(GetMediaType(mimeType), true);
+            }
+            else if (!mimeType.StartsWith(MediaType, StringComparison.OrdinalIgnoreCase))
+            {
+                WriteAddendum(MediaType);
+                WriteIndex(GetMediaType(mimeType), false);
             }
 
 
@@ -83,21 +107,39 @@ namespace MimeResourceCompiler
                     }
                 }
 
-                _mimeFile.WriteLine(mimeType, extension);
-                ++Line;
+                WriteMimeFile(mimeType, extension);
+                _ = _addendum.RemoveFromAddendum(mimeType, extension);
             }
         }
 
-        private void SaveIndex()
+        private void WriteAddendum([DisallowNull] string? mediaType)
         {
-            long currentMimeFilePosition = _mimeFile.GetCurrentStreamPosition();
-            if (currentMimeFilePosition > 0)
+            while (_addendum.GetLine(ref mediaType, out AddendumRow? row))
+            {
+                _mimeFile.WriteLine(row.MimeType, row.Extension);
+                Line++;
+            }
+        }
+
+        private void WriteIndex(string mediaType, bool firstIndex)
+        {
+            MediaType = mediaType;
+            _apacheData.TestApacheFile(MediaType);
+
+            if (!firstIndex)
             {
                 _indexFile.WriteLinesCount(Line);
             }
 
-            Debug.Assert(MediaType != null);
-            _indexFile.WriteNewMediaType(MediaType, currentMimeFilePosition);
+            _indexFile.WriteNewMediaType(MediaType, _mimeFile.GetCurrentStreamPosition());
+            Line = 0;
+        }
+
+
+        private void WriteMimeFile(string mimeType, string extension)
+        {
+            _mimeFile.WriteLine(mimeType, extension);
+            ++Line;
         }
 
         private void Dispose(bool disposing)
@@ -113,6 +155,9 @@ namespace MimeResourceCompiler
                 _disposedValue = true;
             }
         }
+
+
+        private static string GetMediaType(string mimeType) => mimeType.Substring(0, mimeType.IndexOf('/'));
 
     }
 }

@@ -17,7 +17,7 @@ namespace FolkerKinzel.URIs.Intls.Tests
 
 
         [DataTestMethod]
-        [DataRow(".ez", "application/andrew-inset")]
+        //[DataRow(".ez", "application/andrew-inset")]
         [DataRow(".ice", "x-conference/x-cooltalk")]
         [DataRow(".ttc", "font/collection")]
         [DataRow(".woff2", "font/woff2")]

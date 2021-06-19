@@ -30,7 +30,7 @@ namespace FolkerKinzel.URIs.Intls
 
         internal static string GetFileTypeExtension(string mimeType, double cacheLifeTime)
         {
-            ConcurrentDictionary<string, string> dic = cache.GetOrAdd(EXTENSION_CACHE_NAME, CacheFactory.CreateFyleTypeCache, ComputeExpirationTime(cacheLifeTime));
+            ConcurrentDictionary<string, string> dic = cache.GetOrAdd(EXTENSION_CACHE_NAME, CacheFactory.CreateFileTypeCache, ComputeExpirationTime(cacheLifeTime));
 
             if (dic.TryGetValue(mimeType, out string? result))
             {

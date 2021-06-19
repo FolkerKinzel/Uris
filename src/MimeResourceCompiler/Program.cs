@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using CommandLine;
 
 namespace MimeResourceCompiler
 {
@@ -6,29 +8,72 @@ namespace MimeResourceCompiler
     {
         static void Main(string[] args)
         {
+            _ = Parser.Default.ParseArguments<Options>(args)
+                .WithParsed(options => RunCompiler(options))
+                .WithNotParsed(errs => OnCommandLineParseErrors(errs));
+        }
+
+
+        private static void RunCompiler(Options options)
+        {
             try
             {
-                using var factory = new Factory(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory));
+                using var factory = new Factory(options);
 
                 using (Compiler compiler = factory.ResolveCompiler())
                 {
                     compiler.CompileResources();
                 }
 
-                factory.ResolveReadmeFile().Create();
+                if (options.CreateReadme)
+                {
+                    factory.ResolveReadmeFile().Create();
+                }
 
                 Console.WriteLine($"Mime resources successfully created at {factory.ResolveOutputDirectory().FullName}.");
 
             }
             catch (Exception e)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("ERROR: ");
-                Console.Write(e.Message);
-                Console.ResetColor();
-
+                WriteError(e.Message);
                 Environment.Exit(-1);
             }
+        }
+
+
+        private static void OnCommandLineParseErrors(IEnumerable<Error> errs)
+        {
+            bool hasError = false;
+
+            foreach (Error err in errs)
+            {
+                switch (err.Tag)
+                {
+                    case ErrorType.HelpRequestedError:
+                    case ErrorType.VersionRequestedError:
+                        continue;
+                    
+                    default:
+                        break;
+                }
+
+                WriteError(err.ToString());
+                hasError = true;
+            }
+
+            if(hasError)
+            {
+                Environment.Exit(-1);
+            }
+        }
+
+
+        private static void WriteError(string? error)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write("ERROR: ");
+            Console.WriteLine(error);
+            Console.ResetColor();
         }
 
     }

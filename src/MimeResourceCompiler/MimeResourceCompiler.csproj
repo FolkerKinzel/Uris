@@ -4,14 +4,27 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <Copyright>Folker Kinzel</Copyright>
+    <Version>1.0.0</Version>
+    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+
+    <Authors>Folker Kinzel</Authors>
+    <Copyright>Copyright © 2021 Folker Kinzel</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageIcon>Logo.png</PackageIcon>
   </PropertyGroup>
 
+  
+
   <ItemGroup>
-    <None Remove="Resources\Readme.txt" />
+    <EmbeddedResource Include="Resources\Addendum.csv" />
+    <EmbeddedResource Include="Resources\Readme.txt" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Readme.txt" />
+    <PackageReference Include="CommandLineParser" Version="2.8.0" />
   </ItemGroup>
 
   <ItemGroup>

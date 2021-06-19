@@ -10,21 +10,21 @@ namespace MimeResourceCompiler.Classes
     public sealed class OutputDirectory : IOutputDirectory
     {
         private const string DIRECTORY_NAME = "Mime Resources";
-        private readonly string _rootDirectory;
         private readonly DirectoryInfo _info;
 
-        public OutputDirectory(string rootDirectory)
+        public OutputDirectory(string rootDirectory, bool createWrapper)
         {
-            this._rootDirectory = Path.GetFullPath(rootDirectory);
-            this._info = Create();
+            rootDirectory = rootDirectory is null ? Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) : Path.GetFullPath(rootDirectory);
+            
+            if(createWrapper)
+            {
+                rootDirectory = Path.Combine(rootDirectory, DIRECTORY_NAME);
+            }
+
+            this._info = Directory.CreateDirectory(rootDirectory);
         }
 
         public string FullName => _info.FullName;
 
-        private DirectoryInfo Create()
-        {
-            string directoryPath = Path.Combine(_rootDirectory, DIRECTORY_NAME);
-            return Directory.CreateDirectory(directoryPath);
-        }
     }
 }

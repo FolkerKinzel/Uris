@@ -13,16 +13,17 @@ namespace MimeResourceCompiler
         private readonly Compiler _compiler;
         private readonly ReadmeFile _readmeFile;
 
-        public Factory(string rootDirectory)
+        public Factory(Options options)
         {
-            _outputDirectory = new OutputDirectory(rootDirectory);
+            _outputDirectory = new OutputDirectory(options.OutputPath, options.CreateWrapper);
             var apacheProvider = new ApacheData();
             var streamFactory = new StreamFactory(_outputDirectory);
             var mimeFile = new MimeFile(streamFactory);
             var indexFile = new IndexFile(streamFactory);
             var dllCache = new DllCache();
             var resourceLoader = new ResourceLoader();
-            _compiler = new Compiler(apacheProvider, mimeFile, indexFile, dllCache);
+            var addendum = new Addendum(resourceLoader);
+            _compiler = new Compiler(apacheProvider, mimeFile, indexFile, dllCache, addendum);
             _readmeFile = new ReadmeFile(_outputDirectory, resourceLoader);
         }
 

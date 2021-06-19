@@ -29,9 +29,11 @@ namespace MimeResourceCompiler.Classes
         }
 
 
-        public long GetCurrentStreamPosition() => _writer.BaseStream.Position;
-
-
+        public long GetCurrentStreamPosition()
+        {
+            _writer.Flush();
+            return _writer.BaseStream.Position;
+        }
 
         public void TruncateLastEmptyRow()
         {

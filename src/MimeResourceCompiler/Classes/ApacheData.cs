@@ -25,15 +25,10 @@ namespace MimeResourceCompiler.Classes
 
         public string? GetNextLine()
         {
-            string? line = _reader.ReadLine();
+            string? line;
 
-            while (true)
+            while ((line = _reader.ReadLine()) is not null)
             {
-                if (line is null)
-                {
-                    return null;
-                }
-
                 if (line.TrimStart().StartsWith('#'))
                 {
                     continue;
@@ -41,6 +36,8 @@ namespace MimeResourceCompiler.Classes
 
                 return line;
             }
+
+            return null;
         }
 
         public void TestApacheFile(string mediaType)

@@ -10,28 +10,28 @@ namespace MimeResourceCompiler.Classes
 {
     public class ResourceLoader : IResourceLoader
     {
+        const string README_PATH = "MimeResourceCompiler.Resources.Readme.txt";
+        const string ADDENDUM_PATH = "MimeResourceCompiler.Resources.Addendum.csv";
+
         public byte[] LoadReadmeFile()
         {
-            using var stream = GetResourceStream("FolkerKinzel.URIs.Resources.Readme.txt");
+            using Stream? stream = GetResourceStream(README_PATH);
 
             var arr = new byte[stream.Length];
-            stream.Read(arr, 0, arr.Length);
+            _ = stream.Read(arr, 0, arr.Length);
 
             return arr;
         }
 
+
+        public Stream GetAddendumStream() => GetResourceStream(ADDENDUM_PATH);
 
 
         private static Stream GetResourceStream(string resourceName)
         {
             Stream? stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
 
-            if (stream is null)
-            {
-                throw new InvalidDataException($"The resource {resourceName} has not been found.");
-            }
-
-            return stream;
+            return stream is null ? throw new InvalidDataException($"The resource {resourceName} has not been found.") : stream;
         }
     }
 }

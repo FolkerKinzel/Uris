@@ -41,9 +41,9 @@ namespace FolkerKinzel.URIs.Intls
                 ++separatorIndex2;
 
 #if NETSTANDARD2_0
-                int count = int.Parse(line.Substring(separatorIndex2)) - start;
+                int count = int.Parse(line.Substring(separatorIndex2));
 #else
-                int count = int.Parse(line.AsSpan(separatorIndex2)) - start;
+                int count = int.Parse(line.AsSpan(separatorIndex2));
 #endif
 
                 dic.TryAdd(mediaType, PackIndex(start, count));
@@ -53,9 +53,9 @@ namespace FolkerKinzel.URIs.Intls
         }
 
 
-        private static long PackIndex(int start, int count)
+        private static long PackIndex(int start, int linesCount)
         {
-            long l = (long)count << 32;
+            long l = (long)linesCount << 32;
             l |= (long)start;
             return l;
         }

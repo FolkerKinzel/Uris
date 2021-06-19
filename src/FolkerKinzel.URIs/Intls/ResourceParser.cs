@@ -49,7 +49,7 @@ namespace FolkerKinzel.URIs.Intls
 
         internal static string GetFileType(string mimeType)
         {
-            (int Start, int Count) index;
+            (int Start, int LinesCount) index;
 
             if (Index.Value.TryGetValue(GetMediaTypeFromMimeType(mimeType), out long rawIdx))
             {
@@ -60,12 +60,17 @@ namespace FolkerKinzel.URIs.Intls
                 return DEFAULT_FILE_TYPE_EXTENSION;
             }
 
-            using StringReader reader = InitReader(index);
+            using StreamReader reader = InitReader(index.Start);
 
-
-            string? line;
-            while ((line = reader.ReadLine()) is not null)
+            for (int i = 0; i < index.LinesCount; i++)
             {
+                string? line = reader.ReadLine();
+
+                if(line is null)
+                {
+                    break;
+                }
+            
                 int separatorIndex = line.IndexOf(SEPARATOR);
 
                 ReadOnlySpan<char> span = line.AsSpan(0, separatorIndex);
@@ -80,22 +85,18 @@ namespace FolkerKinzel.URIs.Intls
 
             ////////////////////////////////////
             
-            static StringReader InitReader((int Start, int Count) index)
+            static StreamReader InitReader(int start)
             {
-                using Stream? stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(RESOURCE_NAME);
+                Stream? stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(RESOURCE_NAME);
 
                 if(stream is null)
                 {
                     throw new InvalidDataException(string.Format(Res.ResourceNotFound, RESOURCE_NAME));
                 }
 
-                stream.Position = index.Start;
+                stream.Position = start;
 
-                using var reader1 = new StreamReader(stream);
-                var buf = new char[index.Count];
-                _ = reader1.ReadBlock(buf, 0, buf.Length);
-
-                return new StringReader(new string(buf));
+                return new StreamReader(stream);
             }
 
             static string GetMediaTypeFromMimeType(string mimeType)
@@ -104,12 +105,12 @@ namespace FolkerKinzel.URIs.Intls
                 return sepIdx == -1 ? mimeType : mimeType.Substring(0, sepIdx);
             }
 
-            static (int Start, int Count) UnpackIndex(long rawIdx)
+            static (int Start, int LinesCount) UnpackIndex(long rawIdx)
             {
                 int start = (int)(rawIdx & 0xFFFFFFFF);
-                int count = (int)(rawIdx >> 32);
+                int linesCount = (int)(rawIdx >> 32);
 
-                return (start, count);
+                return (start, linesCount);
             }
 
         }
