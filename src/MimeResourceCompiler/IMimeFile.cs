@@ -6,6 +6,8 @@ namespace MimeResourceCompiler
     {
         void TruncateLastEmptyRow();
 
-        void WriteLine(string mimeType, string extension)
+        void WriteLine(string mimeType, string extension);
+
+        long GetCurrentStreamPosition();
     }
 }

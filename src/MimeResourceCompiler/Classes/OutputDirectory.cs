@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MimeResourceCompiler
+namespace MimeResourceCompiler.Classes
 {
-    public class OutputDirectory : IOutputDirectory
+    public sealed class OutputDirectory : IOutputDirectory
     {
         private const string DIRECTORY_NAME = "Mime Resources";
         private readonly string _rootDirectory;

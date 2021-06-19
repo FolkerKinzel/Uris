@@ -1,7 +1,11 @@
-﻿namespace MimeResourceCompiler
+﻿using System;
+
+namespace MimeResourceCompiler
 {
-    public interface IIndexFile
+    public interface IIndexFile : IDisposable
     {
-        void Dispose();
+        void WriteNewMediaType(string mediaType, long startPosition);
+
+        void WriteLinesCount(int linesCount);
     }
 }

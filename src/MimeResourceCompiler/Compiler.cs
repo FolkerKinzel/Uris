@@ -1,53 +1,55 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace MimeResourceCompiler
 {
     public sealed class Compiler : IDisposable
     {
-        private ConcurrentDictionary<string, string> MimeTypeCache { get; } = GetMimeTypeCache();
-        private readonly IApacheDataProvider _apacheProvider;
+        private readonly IApacheData _apacheData;
         private readonly IMimeFile _mimeFile;
         private readonly IIndexFile _indexFile;
+        private readonly IDllCache _dllCache;
+        private bool _disposedValue;
 
-        public Compiler(IApacheDataProvider apacheProvider, IMimeFile mimeFile, IIndexFile indexFile)
+        public Compiler(IApacheData apacheData, IMimeFile mimeFile, IIndexFile indexFile, IDllCache dllCache)
         {
-            _apacheProvider = apacheProvider;
+            _apacheData = apacheData;
             _mimeFile = mimeFile;
             _indexFile = indexFile;
+            _dllCache = dllCache;
         }
 
 
         public string? MediaType { get; private set; }
 
+        public int Line { get; private set; }
 
-        private static ConcurrentDictionary<string, string> GetMimeTypeCache() => FolkerKinzel.URIs.CacheFactory.CreateMimeTypeCache();
-
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
 
         public void CompileResources()
         {
             string? line;
-            while ((line = _apacheProvider.GetNextLine()) != null)
+            while ((line = _apacheData.GetNextLine()) != null)
             {
                 ProcessLine(line);
-            }//while
+            }
+
+            _indexFile.WriteLinesCount(Line);
 
 
             // Letzte Leerzeile entfernen:
             _mimeFile.TruncateLastEmptyRow();
-            
-            indexWriter.Write(mimeFileStream.Length);
         }
+
 
         private void ProcessLine(string line)
         {
             const string defaultMime = "application/octet-stream";
-
-            
 
             string[] parts = Regex.Split(line, @"\s+");
 
@@ -62,9 +64,10 @@ namespace MimeResourceCompiler
             {
                 MediaType = mimeType.Substring(0, mimeType.IndexOf('/'));
 
-                _apacheProvider.TestApacheFile(MediaType);
+                _apacheData.TestApacheFile(MediaType);
 
-                SaveIndex(mimeWriter.BaseStream.Position, indexWriter, MediaType);
+                SaveIndex();
+                Line = 0;
             }
 
 
@@ -72,45 +75,44 @@ namespace MimeResourceCompiler
             {
                 string extension = $".{parts[i]}";
 
-                if (MimeTypeCache.ContainsKey(extension))
+                if (_dllCache.TryGetMimeTypeFromFileTypeExtension(extension, out string? cacheResult))
                 {
-                    if (MimeTypeCache[extension] == mimeType)
+                    if (cacheResult == mimeType)
                     {
                         continue;
                     }
                 }
 
                 _mimeFile.WriteLine(mimeType, extension);
-            }
-
-            ///////////////////////////////
-
-            static void SaveIndex(long currentMimePosition, StreamWriter indexWriter, string? mediaType)
-            {
-                if (currentMimePosition == 0)
-                {
-                    indexWriter.Write(mediaType);
-                    indexWriter.Write(SEPARATOR);
-                    indexWriter.Write('0');
-                    indexWriter.Write(SEPARATOR);
-                }
-                else
-                {
-                    indexWriter.WriteLine(currentMimePosition);
-
-                    indexWriter.Write(mediaType);
-                    indexWriter.Write(SEPARATOR);
-                    indexWriter.Write(currentMimePosition);
-                    indexWriter.Write(SEPARATOR);
-                }
+                ++Line;
             }
         }
 
-        public void Dispose()
+        private void SaveIndex()
         {
-            this._indexFile.Dispose();
-            this._mimeFile.Dispose();
-            GC.SuppressFinalize(this);
+            long currentMimeFilePosition = _mimeFile.GetCurrentStreamPosition();
+            if (currentMimeFilePosition > 0)
+            {
+                _indexFile.WriteLinesCount(Line);
+            }
+
+            Debug.Assert(MediaType != null);
+            _indexFile.WriteNewMediaType(MediaType, currentMimeFilePosition);
         }
+
+        private void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    this._indexFile.Dispose();
+                    this._mimeFile.Dispose();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
     }
 }

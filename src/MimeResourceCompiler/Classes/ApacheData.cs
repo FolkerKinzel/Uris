@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MimeResourceCompiler
+namespace MimeResourceCompiler.Classes
 {
-    public class ApacheDataProvider : IApacheDataProvider, IDisposable
+    public sealed class ApacheData : IApacheData, IDisposable
     {
         private static readonly HttpClient _httpClient = new();
-        private bool _initialized;
         private StringReader? _reader;
         private const string APACHE_URL = @"http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types";
 
@@ -21,12 +21,9 @@ namespace MimeResourceCompiler
 
         public string? GetNextLine()
         {
-            if(!_initialized)
-            {
-                Initialize();
-            }
+            Initialize();
 
-            string? line = _reader!.ReadLine();
+            string? line = _reader.ReadLine();
 
             while (true)
             {
@@ -44,16 +41,16 @@ namespace MimeResourceCompiler
             }
         }
 
+
+        [MemberNotNull(nameof(_reader))]
         private void Initialize()
         {
-            string data = DownloadApacheList();
-            _reader = new StringReader(data);
-
-            _initialized = true;
+            if (_reader is null)
+            {
+                string data = _httpClient.GetStringAsync(APACHE_URL).Result;
+                _reader = new StringReader(data);
+            }
         }
-
-        private string DownloadApacheList() => _httpClient.GetStringAsync(APACHE_URL).Result;
-
 
         public void TestApacheFile(string mediaType)
         {
