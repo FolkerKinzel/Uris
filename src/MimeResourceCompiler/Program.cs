@@ -6,12 +6,19 @@ namespace MimeResourceCompiler
     {
         static void Main(string[] args)
         {
-            using var factory = new Factory(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory));
-
             try
             {
-                Compiler compiler = factory.ResolveCompiler();
-                compiler.CompileResources();
+                using var factory = new Factory(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory));
+
+                using (Compiler compiler = factory.ResolveCompiler())
+                {
+                    compiler.CompileResources();
+                }
+
+                factory.ResolveReadmeFile().Create();
+
+                Console.WriteLine($"Mime resources successfully created at {factory.ResolveOutputDirectory().FullName}.");
+
             }
             catch (Exception e)
             {
@@ -21,10 +28,7 @@ namespace MimeResourceCompiler
                 Console.ResetColor();
 
                 Environment.Exit(-1);
-                return;
             }
-
-            Console.WriteLine($"Mime resources successfully created at {factory.ResolveOutputDirectory().FullName}.");
         }
 
     }

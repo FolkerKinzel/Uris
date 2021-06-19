@@ -11,6 +11,7 @@ namespace MimeResourceCompiler
     {
         private readonly IOutputDirectory _outputDirectory;
         private readonly Compiler _compiler;
+        private readonly ReadmeFile _readmeFile;
 
         public Factory(string rootDirectory)
         {
@@ -20,12 +21,16 @@ namespace MimeResourceCompiler
             var mimeFile = new MimeFile(streamFactory);
             var indexFile = new IndexFile(streamFactory);
             var dllCache = new DllCache();
+            var resourceLoader = new ResourceLoader();
             _compiler = new Compiler(apacheProvider, mimeFile, indexFile, dllCache);
+            _readmeFile = new ReadmeFile(_outputDirectory, resourceLoader);
         }
 
         public IOutputDirectory ResolveOutputDirectory() => _outputDirectory;
 
         public Compiler ResolveCompiler() => _compiler;
+
+        public ReadmeFile ResolveReadmeFile() => _readmeFile;
 
         public void Dispose()
         {

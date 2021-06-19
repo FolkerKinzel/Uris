@@ -12,17 +12,19 @@ namespace MimeResourceCompiler.Classes
     public sealed class ApacheData : IApacheData, IDisposable
     {
         private static readonly HttpClient _httpClient = new();
-        private StringReader? _reader;
+        private readonly StringReader _reader;
         private const string APACHE_URL = @"http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types";
 
         private Dictionary<string, object?> TestDic { get; } = new();
 
-
+        public ApacheData()
+        {
+            string data = _httpClient.GetStringAsync(APACHE_URL).Result;
+            _reader = new StringReader(data);
+        }
 
         public string? GetNextLine()
         {
-            Initialize();
-
             string? line = _reader.ReadLine();
 
             while (true)
@@ -38,17 +40,6 @@ namespace MimeResourceCompiler.Classes
                 }
 
                 return line;
-            }
-        }
-
-
-        [MemberNotNull(nameof(_reader))]
-        private void Initialize()
-        {
-            if (_reader is null)
-            {
-                string data = _httpClient.GetStringAsync(APACHE_URL).Result;
-                _reader = new StringReader(data);
             }
         }
 
