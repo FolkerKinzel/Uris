@@ -120,6 +120,9 @@
   <data name="InvalidMediaType" xml:space="preserve">
     <value>"{0} ist kein gültiger Medientyp."</value>
   </data>
+  <data name="NoData" xml:space="preserve">
+    <value>Das Argument enthält keine Daten.</value>
+  </data>
   <data name="ResourceNotFound" xml:space="preserve">
     <value>Die Ressource {0} wurde nicht gefunden.</value>
   </data>

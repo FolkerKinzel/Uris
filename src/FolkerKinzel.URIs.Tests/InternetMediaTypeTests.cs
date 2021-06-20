@@ -13,12 +13,12 @@ namespace FolkerKinzel.URIs.Tests
     {
         [TestMethod()]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void InternetMediaTypeTest1() 
-            => _ = new InternetMediaType(null!);
+        public void ParseTest1() 
+            => _ = InternetMediaType.Parse(null!);
 
         [TestMethod()]
         [ExpectedException(typeof(ArgumentException))]
-        public void InternetMediaTypeTest2() => _ = new InternetMediaType(" \t \r\n");
+        public void ParseTest2() => _ = InternetMediaType.Parse(" \t \r\n");
 
 
         [TestMethod()]

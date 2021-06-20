@@ -19,7 +19,7 @@ namespace MimeResourceCompiler.Classes
 
         public ApacheData()
         {
-            string data = _httpClient.GetStringAsync(APACHE_URL).Result;
+            string data = _httpClient.GetStringAsync(APACHE_URL).GetAwaiter().GetResult();
             _reader = new StringReader(data);
         }
 

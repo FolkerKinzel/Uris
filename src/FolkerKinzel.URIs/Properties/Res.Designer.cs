@@ -70,6 +70,15 @@ namespace FolkerKinzel.URIs.Properties {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die The argument contains no data. ähnelt.
+        /// </summary>
+        internal static string NoData {
+            get {
+                return ResourceManager.GetString("NoData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The resource {0} was not found. ähnelt.
         /// </summary>
         internal static string ResourceNotFound {
