@@ -4,9 +4,21 @@ using System.ComponentModel;
 
 namespace FolkerKinzel.URIs
 {
+    /// <summary>
+    /// Klasse, die die mit häufig vorkommenden Datentypen gefüllten Dictionaries erstellt, die als Cache Verwendung finden.
+    /// </summary>
+    /// <remarks>
+    /// Die Klasse ist public, da sie von MimeResourceCompiler verwendet wird.
+    /// </remarks>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class CacheFactory
     {
+        /// <summary>
+        /// Erzeugt ein vorgefülltes Dictionary, das als Datenquelle für den Cache dient, der verwendet wird, um eine Dateiendung
+        /// für einen MIME-Typ zu finden.
+        /// </summary>
+        /// <returns>Ein vorgefülltes Dictionary, das als Datenquelle für den Cache dient, der verwendet wird, um eine Dateiendung
+        /// für einen MIME-Typ zu finden.</returns>
         internal static ConcurrentDictionary<string, string> CreateFileTypeCache()
         {
             var dic = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -40,7 +52,13 @@ namespace FolkerKinzel.URIs
             return dic;
         }
 
-
+        /// <summary>
+        /// Erzeugt ein vorgefülltes Dictionary, das als Datenquelle für den Cache dient, der verwendet wird, um einen MIME-Typ für eine Dateiendung
+        /// zu finden.
+        /// </summary>
+        /// <returns>Ein vorgefülltes Dictionary, das als Datenquelle für den Cache dient, der verwendet wird, um einen MIME-Typ für eine Dateiendung
+        /// zu finden.</returns>
+        /// <remarks>Die Methode ist public, weil sie von MimeResourceCompiler aufgerufen wird.</remarks>
         public static ConcurrentDictionary<string, string> CreateMimeTypeCache()
         {
             var dic = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);

@@ -4,6 +4,10 @@ using LazyCache;
 
 namespace FolkerKinzel.URIs.Intls
 {
+    /// <summary>
+    /// Cache, zum Finden von Dateiendungen für MIME-Typen und für das Finden passender MIME-Typen für Dateiendungen.
+    /// </summary>
+    /// <threadsafety static="true" instance="true"/>
     internal static class MimeCache
     {
         private static readonly IAppCache cache = new CachingService();

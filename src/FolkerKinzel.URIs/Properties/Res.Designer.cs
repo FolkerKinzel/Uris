@@ -61,6 +61,15 @@ namespace FolkerKinzel.URIs.Properties {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die &quot;{0} is not a valid Media Type.&quot; ähnelt.
+        /// </summary>
+        internal static string InvalidMediaType {
+            get {
+                return ResourceManager.GetString("InvalidMediaType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The resource {0} was not found. ähnelt.
         /// </summary>
         internal static string ResourceNotFound {
