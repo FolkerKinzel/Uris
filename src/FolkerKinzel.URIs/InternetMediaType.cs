@@ -11,6 +11,10 @@ using System.Threading.Tasks;
 using FolkerKinzel.URIs.Intls;
 using FolkerKinzel.URIs.Properties;
 
+#if NETSTANDARD2_0
+using FolkerKinzel.Strings;
+#endif
+
 namespace FolkerKinzel.URIs
 {
     /// <summary>
@@ -64,11 +68,7 @@ namespace FolkerKinzel.URIs
             int parameterSeparatorIndex = value.IndexOf(';');
             string mediaPart = parameterSeparatorIndex != -1 ? value.Substring(0, parameterSeparatorIndex).ToLowerInvariant() : value.ToLowerInvariant();
 
-#if NETSTANDARD2_0
-            string[] mediaArr = mediaPart.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-#else
             string[] mediaArr = mediaPart.Split('/', StringSplitOptions.RemoveEmptyEntries);
-#endif
 
             if (mediaArr.Length != 2)
             {
@@ -191,7 +191,7 @@ namespace FolkerKinzel.URIs
             }
         }
 
-        public override int GetHashCode() => MediaType.GetHashCode() ^ SubType.GetHashCode();
+        public override int GetHashCode() => HashCode.Combine(MediaType.GetHashCode(), SubType.GetHashCode());
 
 
         public static bool operator ==(InternetMediaType? mediaType1, InternetMediaType? mediaType2) => mediaType1 is null ? mediaType2 is null : mediaType1.Equals(mediaType2);
@@ -276,11 +276,7 @@ namespace FolkerKinzel.URIs
 
             fileTypeExtension = fileTypeExtension.Trim();
 
-#if NETSTANDARD2_0
-            if(!fileTypeExtension.StartsWith("."))
-#else
             if(!fileTypeExtension.StartsWith('.'))
-#endif
             {
                 fileTypeExtension = $".{fileTypeExtension}";
             }

@@ -7,6 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 using FolkerKinzel.URIs.Properties;
 
+#if NETSTANDARD2_0
+using FolkerKinzel.Strings;
+#endif
+
 namespace FolkerKinzel.URIs
 {
     /// <summary>
@@ -19,7 +23,7 @@ namespace FolkerKinzel.URIs
         /// <summary>
         /// Gibt an, dass der <see cref="Uri"/> ein <see cref="DataUrlHelper"/> nach RFC 2397 ist. Dieses Feld ist schreibgeschützt.
         /// </summary>
-        private const string UriSchemeData = "data:";
+        private const string URI_SCHEME_DATA = "data:";
 
         ///// <summary>
         ///// Gibt das Zeichen an, das das Schema des Kommunikationsprotokolls vom Adressteil des URIs trennt. Dieses Feld ist schreibgeschützt.
@@ -27,7 +31,7 @@ namespace FolkerKinzel.URIs
         //private const string SchemeDelimiter = ":";
 
 
-        public static bool IsDataUrl(this string? urlString) => urlString is not null && urlString.StartsWith(UriSchemeData, StringComparison.OrdinalIgnoreCase);
+        public static bool IsDataUrl(this string? urlString) => urlString is not null && urlString.StartsWith(URI_SCHEME_DATA, StringComparison.OrdinalIgnoreCase);
 
         public static bool IsDataUrl(this Uri? dataUrl) => dataUrl is not null && dataUrl.OriginalString.IsDataUrl();
 
@@ -88,11 +92,11 @@ namespace FolkerKinzel.URIs
             {
                 mediaType = _defaultMediaType;
             }
-#if NETSTANDARD2_0
-            else if (!InternetMediaType.TryParse(mimeString.StartsWith(";") ? "text/plain" + mimeString : mimeString, out mediaType))
-#else
+//#if NETSTANDARD2_0
+//            else if (!InternetMediaType.TryParse(mimeString.StartsWith(";") ? "text/plain" + mimeString : mimeString, out mediaType))
+//#else
             else if(!InternetMediaType.TryParse(mimeString.StartsWith(';') ? "text/plain" + mimeString : mimeString, out mediaType))
-#endif
+//#endif
             {
                 return false;
             }
@@ -145,19 +149,11 @@ namespace FolkerKinzel.URIs
         /// <exception cref="UriFormatException">Es kann kein <see cref="Uri"/> initialisiert werden, z.B.
         /// weil der URI-String länger als 65519 Zeichen ist.</exception>
         public static Uri FromText(string text)
-        {
-            if (text is null)
-            {
-                throw new ArgumentNullException(nameof(text));
-            }
-
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                throw new ArgumentException(Res.NoData, nameof(text));
-            }
-
-            return new Uri($"data:,{Uri.EscapeDataString(text)}");
-        }
+            => text is null
+                ? throw new ArgumentNullException(nameof(text))
+                : string.IsNullOrWhiteSpace(text)
+                    ? throw new ArgumentException(Res.NoData, nameof(text))
+                    : new Uri($"data:,{Uri.EscapeDataString(text)}");
 
 
         /// <summary>
@@ -190,14 +186,12 @@ namespace FolkerKinzel.URIs
                 throw new ArgumentException(Res.NoData, nameof(bytes));
             }
 
-            string mediaTypeString = mediaType == _defaultMediaType ? string.Empty :
-                mediaType.MediaType == InternetMediaType.TEXT_MEDIA_TYPE && mediaType.SubType == InternetMediaType.PLAIN_SUB_TYPE
-#if NETSTANDARD2_0
-                ? $";{mediaType.ToString().Split(new char[] { ';' }, 2, StringSplitOptions.None)[1]}"
-#else
-                ? $";{mediaType.ToString().Split(';', 2, StringSplitOptions.None)[1]}"
-#endif
-                : mediaType.ToString();
+            string mediaTypeString = 
+                mediaType == _defaultMediaType 
+                ? string.Empty 
+                : mediaType.MediaType == InternetMediaType.TEXT_MEDIA_TYPE && mediaType.SubType == InternetMediaType.PLAIN_SUB_TYPE
+                    ? $";{mediaType.ToString().Split(';', 2, StringSplitOptions.None)[1]}"
+                    : mediaType.ToString();
 
             return new Uri($"data:{mediaTypeString};base64,{Convert.ToBase64String(bytes)}");
         }

@@ -13,7 +13,7 @@ namespace FolkerKinzel.URIs.Intls
         private const char SEPARATOR = ' ';
         private const string DEFAULT_MIME_TYPE = "application/octet-stream";
         private const string DEFAULT_FILE_TYPE_EXTENSION = ".bin";
-        private static readonly Lazy<ConcurrentDictionary<string, long>> Index = new(IndexFactory.CreateIndex, true);
+        private static readonly Lazy<ConcurrentDictionary<string, long>> _index = new(IndexFactory.CreateIndex, true);
 
 
         internal static string GetMimeType(string fileTypeExtension)
@@ -51,7 +51,7 @@ namespace FolkerKinzel.URIs.Intls
         {
             (int Start, int LinesCount) index;
 
-            if (Index.Value.TryGetValue(GetMediaTypeFromMimeType(mimeType), out long rawIdx))
+            if (_index.Value.TryGetValue(GetMediaTypeFromMimeType(mimeType), out long rawIdx))
             {
                 index = UnpackIndex(rawIdx);
             }

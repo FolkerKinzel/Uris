@@ -4,9 +4,9 @@ using CommandLine;
 
 namespace MimeResourceCompiler
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             _ = Parser.Default.ParseArguments<Options>(args)
                 .WithParsed(options => RunCompiler(options))
@@ -52,7 +52,7 @@ namespace MimeResourceCompiler
                     case ErrorType.HelpRequestedError:
                     case ErrorType.VersionRequestedError:
                         continue;
-                    
+
                     default:
                         break;
                 }
@@ -61,7 +61,7 @@ namespace MimeResourceCompiler
                 hasError = true;
             }
 
-            if(hasError)
+            if (hasError)
             {
                 Environment.Exit(-1);
             }

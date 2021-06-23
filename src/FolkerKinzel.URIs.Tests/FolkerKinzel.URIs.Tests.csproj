@@ -5,6 +5,12 @@
     <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+
+    <Authors>Folker Kinzel</Authors>
+    <Copyright>Copyright © 2021 Folker Kinzel</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageIcon>Logo.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>

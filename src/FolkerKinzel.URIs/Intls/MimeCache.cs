@@ -10,7 +10,7 @@ namespace FolkerKinzel.URIs.Intls
     /// <threadsafety static="true" instance="true"/>
     internal static class MimeCache
     {
-        private static readonly IAppCache cache = new CachingService();
+        private static readonly IAppCache _cache = new CachingService();
 
         private const string MIME_CACHE_NAME = "mime";
         private const string EXTENSION_CACHE_NAME = "extensions";
@@ -18,7 +18,7 @@ namespace FolkerKinzel.URIs.Intls
 
         internal static string GetMimeType(string fileTypeExtension, double cacheLifeTime)
         {
-            ConcurrentDictionary<string, string> dic = cache.GetOrAdd(MIME_CACHE_NAME, CacheFactory.CreateMimeTypeCache, ComputeExpirationTime(cacheLifeTime));
+            ConcurrentDictionary<string, string> dic = _cache.GetOrAdd(MIME_CACHE_NAME, CacheFactory.CreateMimeTypeCache, ComputeExpirationTime(cacheLifeTime));
 
             if (dic.TryGetValue(fileTypeExtension, out string? result))
             {
@@ -34,7 +34,7 @@ namespace FolkerKinzel.URIs.Intls
 
         internal static string GetFileTypeExtension(string mimeType, double cacheLifeTime)
         {
-            ConcurrentDictionary<string, string> dic = cache.GetOrAdd(EXTENSION_CACHE_NAME, CacheFactory.CreateFileTypeCache, ComputeExpirationTime(cacheLifeTime));
+            ConcurrentDictionary<string, string> dic = _cache.GetOrAdd(EXTENSION_CACHE_NAME, CacheFactory.CreateFileTypeCache, ComputeExpirationTime(cacheLifeTime));
 
             if (dic.TryGetValue(mimeType, out string? result))
             {
