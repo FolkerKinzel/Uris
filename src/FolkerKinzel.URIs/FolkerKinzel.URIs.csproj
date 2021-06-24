@@ -33,7 +33,7 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
-    <PackageReference Include="FolkerKinzel.Strings" Version="2.0.0-alpha2" />
+    <PackageReference Include="FolkerKinzel.Strings" Version="2.0.0-alpha3" />
   </ItemGroup>
 
   <ItemGroup>
