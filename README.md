@@ -1,6 +1,6 @@
 # FolkerKinzel.Uris
 [![NuGet](https://img.shields.io/nuget/v/FolkerKinzel.VCards)](https://www.nuget.org/packages/FolkerKinzel.VCards/)
-
+![GitHub](https://img.shields.io/github/license/FolkerKinzel/Uris)
 
 .NET library that supports URIs and Internet Media Types ("MIME Types").
 
