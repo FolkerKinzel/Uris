@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 
-namespace FolkerKinzel.URIs
+namespace FolkerKinzel.Uris
 {
     /// <summary>
     /// Klasse, die die mit häufig vorkommenden Datentypen gefüllten Dictionaries erstellt, die als Cache Verwendung finden.
@@ -105,21 +105,21 @@ namespace FolkerKinzel.URIs
 
             if(error is not null)
             {
-                throw new InvalidDataException($"{nameof(FolkerKinzel.URIs)}.{nameof(CacheFactory)}: File type cache contains an uppercase letter at \"{error}\".");
+                throw new InvalidDataException($"{nameof(FolkerKinzel.Uris)}.{nameof(CacheFactory)}: File type cache contains an uppercase letter at \"{error}\".");
             }
 
             error = fileTypeCache.FirstOrDefault(kvp => string.IsNullOrEmpty(kvp.Value) || kvp.Value.IndexOf(' ') != -1 || kvp.Value.IndexOf('.') != 0).Value;
 
             if(error is not null)
             {
-                throw new InvalidDataException($"{nameof(FolkerKinzel.URIs)}.{nameof(CacheFactory)}: File type cache contains an invalid value at \"{error}\".");
+                throw new InvalidDataException($"{nameof(FolkerKinzel.Uris)}.{nameof(CacheFactory)}: File type cache contains an invalid value at \"{error}\".");
             }
 
             error = fileTypeCache.FirstOrDefault(kvp => kvp.Key.IndexOf(' ') != -1).Key;
 
             if(error is not null)
             {
-                throw new InvalidDataException($"{nameof(FolkerKinzel.URIs)}.{nameof(CacheFactory)}: File type cache contains an invalid key at \"{error}\".");
+                throw new InvalidDataException($"{nameof(FolkerKinzel.Uris)}.{nameof(CacheFactory)}: File type cache contains an invalid key at \"{error}\".");
             }
 
 
@@ -129,14 +129,14 @@ namespace FolkerKinzel.URIs
 
             if(error is not  null)
             {
-                throw new InvalidDataException($"{nameof(FolkerKinzel.URIs)}.{nameof(CacheFactory)}: Mime type cache contains an uppercase letter at \"{error}\"");
+                throw new InvalidDataException($"{nameof(FolkerKinzel.Uris)}.{nameof(CacheFactory)}: Mime type cache contains an uppercase letter at \"{error}\"");
             }
 
             error = mimeTypeCache.FirstOrDefault(kvp => string.IsNullOrEmpty(kvp.Value) || kvp.Value.IndexOf(' ') != -1).Value;
 
             if(error is not null)
             {
-                throw new InvalidDataException($"{nameof(FolkerKinzel.URIs)}.{nameof(CacheFactory)}: Mime type cache contains an invalid value at \"{error}\".");
+                throw new InvalidDataException($"{nameof(FolkerKinzel.Uris)}.{nameof(CacheFactory)}: Mime type cache contains an invalid value at \"{error}\".");
             }
 
 
@@ -144,14 +144,14 @@ namespace FolkerKinzel.URIs
 
             if(error is not null)
             {
-                throw new InvalidDataException($"{nameof(FolkerKinzel.URIs)}.{nameof(CacheFactory)}: File type cache contains an invalid key at \"{error}\".");
+                throw new InvalidDataException($"{nameof(FolkerKinzel.Uris)}.{nameof(CacheFactory)}: File type cache contains an invalid key at \"{error}\".");
             }
 
             error = mimeTypeCache.Values.Distinct(StringComparer.Ordinal).FirstOrDefault(s => !fileTypeCache.ContainsKey(s));
 
             if (error is not null)
             {
-                throw new InvalidDataException($"{nameof(FolkerKinzel)}.{nameof(URIs)}.{nameof(CacheFactory)}: Mime type cache contains the value \"{error}\", which is not a key in file type cache.");
+                throw new InvalidDataException($"{nameof(FolkerKinzel)}.{nameof(Uris)}.{nameof(CacheFactory)}: Mime type cache contains the value \"{error}\", which is not a key in file type cache.");
             }
 
         }

@@ -4,9 +4,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FolkerKinzel.URIs.Intls;
+using FolkerKinzel.Uris.Intls;
 
-namespace FolkerKinzel.URIs
+namespace FolkerKinzel.Uris
 {
     public class DataUrlInfo
     {

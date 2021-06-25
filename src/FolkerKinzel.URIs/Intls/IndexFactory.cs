@@ -2,13 +2,13 @@
 using System.Collections.Concurrent;
 using System.IO;
 using System.Reflection;
-using FolkerKinzel.URIs.Properties;
+using FolkerKinzel.Uris.Properties;
 
-namespace FolkerKinzel.URIs.Intls
+namespace FolkerKinzel.Uris.Intls
 {
     internal static class IndexFactory
     {
-        private const string RESOURCE_NAME = "FolkerKinzel.URIs.Resources.MimeIdx.csv";
+        private const string RESOURCE_NAME = "FolkerKinzel.Uris.Resources.MimeIdx.csv";
 
         internal static ConcurrentDictionary<string, long> CreateIndex()
         {

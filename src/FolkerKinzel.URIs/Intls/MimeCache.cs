@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using LazyCache;
 
-namespace FolkerKinzel.URIs.Intls
+namespace FolkerKinzel.Uris.Intls
 {
     /// <summary>
     /// Cache, zum Finden von Dateiendungen für MIME-Typen und für das Finden passender MIME-Typen für Dateiendungen.

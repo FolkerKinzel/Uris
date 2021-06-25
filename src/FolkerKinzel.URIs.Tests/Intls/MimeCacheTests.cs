@@ -1,6 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FolkerKinzel.URIs.Intls.Tests
+namespace FolkerKinzel.Uris.Intls.Tests
 {
     [TestClass]
     public class MimeCacheTests

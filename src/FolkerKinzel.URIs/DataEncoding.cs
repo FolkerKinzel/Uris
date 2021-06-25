@@ -1,4 +1,4 @@
-﻿namespace FolkerKinzel.URIs
+﻿namespace FolkerKinzel.Uris
 {
     /// <summary>
     /// Benannte Konstanten, um in der <see cref="DataUrl"/>-Klasse die Kodierung der eingebetteten Daten

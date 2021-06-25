@@ -1,28 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFrameworks>net5.0;netstandard2.1;netstandard2.0</TargetFrameworks>
     <NeutralLanguage>en</NeutralLanguage>
     <Nullable>enable</Nullable>
     <LangVersion>9.0</LangVersion>
-
     <Authors>Folker Kinzel</Authors>
     <Copyright>Copyright © 2021 Folker Kinzel</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageIcon>Logo.png</PackageIcon>
+    <FileVersion>1.0.0.2</FileVersion>
   </PropertyGroup>
-
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
   <ItemGroup>
     <None Remove="Resources\Mime.csv" />
     <None Remove="Resources\MimeIdx.csv" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Resources\Mime.csv" />
     <EmbeddedResource Include="Resources\MimeIdx.csv" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="LazyCache" Version="2.1.3" />
     <PackageReference Include="Nullable" Version="1.3.0">
@@ -30,12 +29,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
     <PackageReference Include="FolkerKinzel.Strings" Version="2.0.0-alpha3" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Update="Properties\Res.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -43,12 +40,13 @@
       <DependentUpon>Res.resx</DependentUpon>
     </Compile>
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Update="Properties\Res.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Res.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if $(ConfigurationName) == Release copy /v /b /y &quot;$(OutDir)$(ProjectName).xml&quot; &quot;$(OutDir)de/$(ProjectName).xml&quot;&#xD;&#xA;if $(ConfigurationName) == Release if '$(TargetFramework)' == 'netstandard2.1' dotnet $(SolutionDir)IncVersion\IncVersion.dll $(ProjectDir)$(ProjectFileName) --revision" />
+  </Target>
 </Project>

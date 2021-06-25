@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
-using FolkerKinzel.URIs;
+using FolkerKinzel.Uris;
 
 namespace MimeResourceCompiler.Classes
 {

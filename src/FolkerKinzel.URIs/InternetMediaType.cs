@@ -8,14 +8,14 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using FolkerKinzel.URIs.Intls;
-using FolkerKinzel.URIs.Properties;
+using FolkerKinzel.Uris.Intls;
+using FolkerKinzel.Uris.Properties;
 
 #if NETSTANDARD2_0
 using FolkerKinzel.Strings;
 #endif
 
-namespace FolkerKinzel.URIs
+namespace FolkerKinzel.Uris
 {
     /// <summary>
     /// Kapselt Informationen über einen Medientyp. (RFC 2045, 2046, RFC 7231 Section 3.1.1.1)

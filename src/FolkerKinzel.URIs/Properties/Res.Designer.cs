@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace FolkerKinzel.URIs.Properties {
+namespace FolkerKinzel.Uris.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace FolkerKinzel.URIs.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FolkerKinzel.URIs.Properties.Res", typeof(Res).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FolkerKinzel.Uris.Properties.Res", typeof(Res).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

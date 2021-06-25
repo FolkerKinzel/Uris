@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FolkerKinzel.URIs\FolkerKinzel.URIs.csproj" />
+    <ProjectReference Include="..\FolkerKinzel.Uris\FolkerKinzel.Uris.csproj" />
   </ItemGroup>
 
 </Project>

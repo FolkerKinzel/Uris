@@ -3,13 +3,13 @@ using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
-using FolkerKinzel.URIs.Properties;
+using FolkerKinzel.Uris.Properties;
 
-namespace FolkerKinzel.URIs.Intls
+namespace FolkerKinzel.Uris.Intls
 {
     internal static class ResourceParser
     {
-        private const string RESOURCE_NAME = "FolkerKinzel.URIs.Resources.Mime.csv";
+        private const string RESOURCE_NAME = "FolkerKinzel.Uris.Resources.Mime.csv";
         private const char SEPARATOR = ' ';
         private const string DEFAULT_MIME_TYPE = "application/octet-stream";
         private const string DEFAULT_FILE_TYPE_EXTENSION = ".bin";

@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace FolkerKinzel.URIs.Intls
+namespace FolkerKinzel.Uris.Intls
 {
     internal static class TextEncodingConverter
     {

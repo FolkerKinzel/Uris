@@ -5,13 +5,13 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
-using FolkerKinzel.URIs.Properties;
+using FolkerKinzel.Uris.Properties;
 
 #if NETSTANDARD2_0
 using FolkerKinzel.Strings;
 #endif
 
-namespace FolkerKinzel.URIs
+namespace FolkerKinzel.Uris
 {
     /// <summary>
     /// Repräsentiert einen Data-URL nach RFC 2397.
