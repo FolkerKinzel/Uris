@@ -2,7 +2,7 @@
 [![NuGet](https://img.shields.io/nuget/v/FolkerKinzel.VCards)](https://www.nuget.org/packages/FolkerKinzel.VCards/)
 
 
-.NET library to read, write and convert VCF files that match the vCard standards 2.1, 3.0 and 4.0.
+.NET library that supports URIs and Internet Media Types ("MIME Types").
 
 It enables you
 * to load VCF files from the file system and to save them there,
