@@ -10,6 +10,7 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageIcon>Logo.png</PackageIcon>
     <FileVersion>1.0.0.2</FileVersion>
+    <PackageIconUrl />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -17,6 +18,10 @@
   <ItemGroup>
     <None Remove="Resources\Mime.csv" />
     <None Remove="Resources\MimeIdx.csv" />
+    <None Include="..\..\..\..\Nuget-Logo\Logo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Mime.csv" />
