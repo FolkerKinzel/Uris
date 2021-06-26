@@ -11,7 +11,7 @@ namespace MimeResourceCompiler.Classes
 {
     public sealed class ApacheData : IApacheData, IDisposable
     {
-        private static readonly HttpClient _httpClient = new();
+        private readonly static HttpClient _httpClient = new();
         private readonly StringReader _reader;
         private const string APACHE_URL = @"http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types";
 

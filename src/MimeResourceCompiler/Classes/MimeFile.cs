@@ -6,17 +6,17 @@ namespace MimeResourceCompiler.Classes
 {
     public sealed class MimeFile : IDisposable, IMimeFile
     {
-        private const string mimeFileName = "Mime.csv";
-        private const string newLine = "\n";
+        private const string MIME_FILE_NAME = "Mime.csv";
+        private const string NEW_LINE = "\n";
         private const char SEPARATOR = ' ';
         private readonly StreamWriter _writer;
 
         public MimeFile(IStreamFactory streamFactory)
         {
-            Stream stream = streamFactory.CreateWriteStream(mimeFileName);
+            Stream stream = streamFactory.CreateWriteStream(MIME_FILE_NAME);
             _writer = new StreamWriter(stream)
             {
-                NewLine = newLine
+                NewLine = NEW_LINE
             };
         }
 
@@ -40,7 +40,7 @@ namespace MimeResourceCompiler.Classes
             _writer.Flush();
 
             Stream mimeFileStream = _writer.BaseStream;
-            mimeFileStream.SetLength(mimeFileStream.Length - newLine.Length);
+            mimeFileStream.SetLength(mimeFileStream.Length - NEW_LINE.Length);
         }
 
         public void Dispose()

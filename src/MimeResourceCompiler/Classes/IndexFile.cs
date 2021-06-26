@@ -6,18 +6,18 @@ namespace MimeResourceCompiler.Classes
 {
     public sealed class IndexFile : IDisposable, IIndexFile
     {
-        private const string indexFileName = "MimeIdx.csv";
-        private const string newLine = "\n";
+        private const string INDEX_FILE_NAME = "MimeIdx.csv";
+        private const string NEW_LINE = "\n";
         private const char SEPARATOR = ' ';
 
         private readonly StreamWriter _writer;
 
         public IndexFile(IStreamFactory streamFactory)
         {
-            Stream stream = streamFactory.CreateWriteStream(indexFileName);
+            Stream stream = streamFactory.CreateWriteStream(INDEX_FILE_NAME);
             _writer = new StreamWriter(stream)
             {
-                NewLine = newLine
+                NewLine = NEW_LINE
             };
         }
 

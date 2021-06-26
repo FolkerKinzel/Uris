@@ -1,22 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace MimeResourceCompiler.Classes
 {
     public class ReadmeFile
     {
-        const string FILENAME = "Readme.txt";
+        private const string FILENAME = "Readme.txt";
         private readonly IOutputDirectory _outputDirectory;
         private readonly IResourceLoader _resourceLoader;
 
         public ReadmeFile(IOutputDirectory outputDirectory, IResourceLoader resourceLoader)
         {
-            this._outputDirectory = outputDirectory;
-            this._resourceLoader = resourceLoader;
+            _outputDirectory = outputDirectory;
+            _resourceLoader = resourceLoader;
         }
 
 

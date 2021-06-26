@@ -21,7 +21,7 @@ namespace MimeResourceCompiler.Classes
                 rootDirectory = Path.Combine(rootDirectory, DIRECTORY_NAME);
             }
 
-            this._info = Directory.CreateDirectory(rootDirectory);
+            _info = Directory.CreateDirectory(rootDirectory);
         }
 
         public string FullName => _info.FullName;

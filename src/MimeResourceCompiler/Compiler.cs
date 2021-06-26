@@ -148,8 +148,8 @@ namespace MimeResourceCompiler
             {
                 if (disposing)
                 {
-                    this._indexFile.Dispose();
-                    this._mimeFile.Dispose();
+                    _indexFile.Dispose();
+                    _mimeFile.Dispose();
                 }
 
                 _disposedValue = true;

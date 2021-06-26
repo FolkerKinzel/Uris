@@ -6,12 +6,9 @@ namespace MimeResourceCompiler
 {
     internal class Program
     {
-        private static void Main(string[] args)
-        {
-            _ = Parser.Default.ParseArguments<Options>(args)
+        private static void Main(string[] args) => _ = Parser.Default.ParseArguments<Options>(args)
                 .WithParsed(options => RunCompiler(options))
                 .WithNotParsed(errs => OnCommandLineParseErrors(errs));
-        }
 
 
         private static void RunCompiler(Options options)
