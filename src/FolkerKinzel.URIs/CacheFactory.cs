@@ -96,7 +96,9 @@ namespace FolkerKinzel.Uris
             return dic;
         }
 
-
+        /// <summary>
+        /// Testet die vorgefüllten Caches auf Fehler.
+        /// </summary>
         public static void TestIt()
         {
             ConcurrentDictionary<string, string> fileTypeCache = CreateFileTypeCache();

@@ -1,8 +1,7 @@
 ﻿namespace FolkerKinzel.Uris
 {
     /// <summary>
-    /// Benannte Konstanten, um in der <see cref="DataUrl"/>-Klasse die Kodierung der eingebetteten Daten
-    /// anzugeben.
+    /// Benannte Konstanten, um die Kodierung eingebetteter Daten anzugeben.
     /// </summary>
     public enum DataEncoding
     {

@@ -26,7 +26,6 @@ namespace FolkerKinzel.Uris
         internal const string PLAIN_SUB_TYPE = "plain";
         internal const string CHARSET_PARAMETER_NAME = "charset";
         private const string DEFAULT_CHARSET = "us-ascii";
-        //private const string REGEX_PATTERN = @"(?P<main>\w+|\*)/(?P<sub>\w+|\*)(\s*;\s*(?P<param>\w+)=\s*=\s*(?P<val>\S+))?";
 
         private static readonly ReadOnlyDictionary<string, string> _emptyParameters
             = new(new Dictionary<string, string>(0));
@@ -42,6 +41,7 @@ namespace FolkerKinzel.Uris
             SubType = subType;
             Parameters = parameters;
         }
+
 
         public static InternetMediaType Parse(string value)
         {
