@@ -4,6 +4,9 @@ using System.IO;
 
 namespace MimeResourceCompiler.Classes
 {
+    /// <summary>
+    /// Represents the mime file "Mime.csv".
+    /// </summary>
     public sealed class MimeFile : IDisposable, IMimeFile
     {
         private const string MIME_FILE_NAME = "Mime.csv";
@@ -20,33 +23,42 @@ namespace MimeResourceCompiler.Classes
             };
         }
 
-        public void WriteLine(string mimeType, string extension)
+        /// <summary>
+        /// Writes a row of data to the MIME file.
+        /// </summary>
+        /// <param name="mimeType">Internet media type</param>
+        /// <param name="extension">File type extension.</param>
+        public void WriteRow(string mimeType, string extension)
         {
-            _writer.Write(mimeType);
+            _writer.Write(mimeType.ToLowerInvariant());
             _writer.Write(SEPARATOR);
-            _writer.WriteLine(extension);
+            _writer.WriteLine(extension.ToLowerInvariant());
             //_writer.Flush();
         }
 
-
+        /// <summary>
+        /// Returns the current file position in Mime.csv.
+        /// </summary>
+        /// <returns>The current file position in Mime.csv.</returns>
         public long GetCurrentStreamPosition()
         {
             _writer.Flush();
             return _writer.BaseStream.Position;
         }
 
-        public void TruncateLastEmptyRow()
+        public void Dispose()
+        {
+            TruncateLastEmptyRow();
+            _writer?.Close();
+            GC.SuppressFinalize(this);
+        }
+
+        private void TruncateLastEmptyRow()
         {
             _writer.Flush();
 
             Stream mimeFileStream = _writer.BaseStream;
             mimeFileStream.SetLength(mimeFileStream.Length - NEW_LINE.Length);
-        }
-
-        public void Dispose()
-        {
-            _writer?.Close();
-            GC.SuppressFinalize(this);
         }
 
         //[MemberNotNull(nameof(_writer))]

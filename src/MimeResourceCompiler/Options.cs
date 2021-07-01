@@ -3,6 +3,9 @@ using CommandLine;
 
 namespace MimeResourceCompiler
 {
+    /// <summary>
+    /// Encapsulates the command line options.
+    /// </summary>
     public class Options
     {
         private readonly string? _outputPath;

@@ -3,11 +3,18 @@ using System.Reflection;
 
 namespace MimeResourceCompiler.Classes
 {
+    /// <summary>
+    /// Encapsulates functionality to load the resources.
+    /// </summary>
     public class ResourceLoader : IResourceLoader
     {
         private const string README_PATH = "MimeResourceCompiler.Resources.Readme.txt";
         private const string ADDENDUM_PATH = "MimeResourceCompiler.Resources.Addendum.csv";
 
+        /// <summary>
+        /// Loads Readme.txt from the resources.
+        /// </summary>
+        /// <returns>Readme.txt as byte array.</returns>
         public byte[] LoadReadmeFile()
         {
             using Stream? stream = GetResourceStream(README_PATH);
@@ -18,7 +25,10 @@ namespace MimeResourceCompiler.Classes
             return arr;
         }
 
-
+        /// <summary>
+        /// Returns a stream to the addendum.
+        /// </summary>
+        /// <returns>A stream to the addendum.</returns>
         public Stream GetAddendumStream() => GetResourceStream(ADDENDUM_PATH);
 
 

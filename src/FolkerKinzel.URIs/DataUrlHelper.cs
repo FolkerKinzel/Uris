@@ -92,11 +92,11 @@ namespace FolkerKinzel.Uris
             {
                 mediaType = _defaultMediaType;
             }
-//#if NETSTANDARD2_0
-//            else if (!InternetMediaType.TryParse(mimeString.StartsWith(";") ? "text/plain" + mimeString : mimeString, out mediaType))
-//#else
-            else if(!InternetMediaType.TryParse(mimeString.StartsWith(';') ? "text/plain" + mimeString : mimeString, out mediaType))
-//#endif
+            //#if NETSTANDARD2_0
+            //            else if (!InternetMediaType.TryParse(mimeString.StartsWith(";") ? "text/plain" + mimeString : mimeString, out mediaType))
+            //#else
+            else if (!InternetMediaType.TryParse(mimeString.StartsWith(';') ? "text/plain" + mimeString : mimeString, out mediaType))
+            //#endif
             {
                 return false;
             }
@@ -186,9 +186,9 @@ namespace FolkerKinzel.Uris
                 throw new ArgumentException(Res.NoData, nameof(bytes));
             }
 
-            string mediaTypeString = 
-                mediaType == _defaultMediaType 
-                ? string.Empty 
+            string mediaTypeString =
+                mediaType == _defaultMediaType
+                ? string.Empty
                 : mediaType.MediaType == InternetMediaType.TEXT_MEDIA_TYPE && mediaType.SubType == InternetMediaType.PLAIN_SUB_TYPE
                     ? $";{mediaType.ToString().Split(';', 2, StringSplitOptions.None)[1]}"
                     : mediaType.ToString();
@@ -213,13 +213,38 @@ namespace FolkerKinzel.Uris
         /// <exception cref="IOException">E/A-Fehler.</exception>
         public static async Task<Uri> FromFileAsync(string path, InternetMediaType? mediaType = null)
         {
-            byte[] bytes;
+            byte[] bytes = await LoadFileAsync(path).ConfigureAwait(false);
+
+            if (mediaType is null)
+            {
+                mediaType = InternetMediaType.FromFileTypeExtension(Path.GetExtension(path));
+            }
+
+            return DataUrlHelper.FromBytes(bytes, mediaType);
+        }
+
+
+        public static Uri FromFile(string path, InternetMediaType? mediaType = null)
+        {
+            byte[] bytes = LoadFile(path);
+
+            if (mediaType is null)
+            {
+                mediaType = InternetMediaType.FromFileTypeExtension(Path.GetExtension(path));
+            }
+
+            return DataUrlHelper.FromBytes(bytes, mediaType);
+        }
+
+
+        private static async Task<byte[]> LoadFileAsync(string path)
+        {
             try
             {
 #if NETSTANDARD2_0
-                bytes = await Task.Run(() => File.ReadAllBytes(path));
+                return await Task.Run(() => File.ReadAllBytes(path)).ConfigureAwait(false);
 #else
-                bytes = await File.ReadAllBytesAsync(path);
+                return await File.ReadAllBytesAsync(path).ConfigureAwait(false);
 #endif
             }
             catch (ArgumentNullException)
@@ -250,17 +275,43 @@ namespace FolkerKinzel.Uris
             {
                 throw new IOException(e.Message, e);
             }
-
-            if (mediaType is null)
-            {
-                mediaType = await InternetMediaType.GetFromFileTypeExtensionAsync(Path.GetExtension(path));
-            }
-
-            return DataUrlHelper.FromBytes(bytes, mediaType);
         }
 
 
-
-
+        private static byte[] LoadFile(string path)
+        {
+            try
+            {
+                return File.ReadAllBytes(path);
+            }
+            catch (ArgumentNullException)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+            catch (ArgumentException e)
+            {
+                throw new ArgumentException(e.Message, nameof(path), e);
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                throw new IOException(e.Message, e);
+            }
+            catch (NotSupportedException e)
+            {
+                throw new ArgumentException(e.Message, nameof(path), e);
+            }
+            catch (System.Security.SecurityException e)
+            {
+                throw new IOException(e.Message, e);
+            }
+            catch (PathTooLongException e)
+            {
+                throw new ArgumentException(e.Message, nameof(path), e);
+            }
+            catch (Exception e)
+            {
+                throw new IOException(e.Message, e);
+            }
+        }
     }
 }

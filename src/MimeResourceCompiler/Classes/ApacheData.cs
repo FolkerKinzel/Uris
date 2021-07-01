@@ -9,20 +9,30 @@ using System.Threading.Tasks;
 
 namespace MimeResourceCompiler.Classes
 {
+    /// <summary>
+    /// Represents the Apache file http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types.
+    /// </summary>
     public sealed class ApacheData : IApacheData, IDisposable
     {
-        private readonly static HttpClient _httpClient = new();
-        private readonly StringReader _reader;
         private const string APACHE_URL = @"http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types";
 
-        private Dictionary<string, object?> TestDic { get; } = new();
+        private readonly static HttpClient _httpClient = new();
+        private readonly StringReader _reader;
+        private readonly Dictionary<string, object?> _testDic = new();
 
+        /// <summary>
+        /// ctor
+        /// </summary>
         public ApacheData()
         {
             string data = _httpClient.GetStringAsync(APACHE_URL).GetAwaiter().GetResult();
             _reader = new StringReader(data);
         }
 
+        /// <summary>
+        /// Gets the next line with data from the apache file, or null if the file is completely read.
+        /// </summary>
+        /// <returns>The next line with data from the apache file or null if the file is completely read.</returns>
         public string? GetNextLine()
         {
             string? line;
@@ -40,11 +50,17 @@ namespace MimeResourceCompiler.Classes
             return null;
         }
 
+        /// <summary>
+        /// Verifies the apache file.
+        /// </summary>
+        /// <param name="mediaType">The first part of an Internet media type (mediatype/subtype) that's used
+        /// to test the apache file.</param>
+        /// <remarks>The program is based on the assertion that the apache file is ordered bei media types.</remarks>
         public void TestApacheFile(string mediaType)
         {
             try
             {
-                TestDic.Add(mediaType, null);
+                _testDic.Add(mediaType, null);
             }
             catch (ArgumentException e)
             {
@@ -52,6 +68,9 @@ namespace MimeResourceCompiler.Classes
             }
         }
 
+        /// <summary>
+        /// Releases the resources.
+        /// </summary>
         public void Dispose()
         {
             _reader?.Close();

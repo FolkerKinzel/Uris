@@ -42,6 +42,7 @@ namespace FolkerKinzel.Uris
             Parameters = parameters;
         }
 
+        public const int DefaultCacheLifeTime = 5;
 
         public static InternetMediaType Parse(string value)
         {
@@ -199,7 +200,30 @@ namespace FolkerKinzel.Uris
         public static bool operator !=(InternetMediaType? mediaType1, InternetMediaType? mediaType2) => !(mediaType1 == mediaType2);
 
 
+        public string GetFileTypeExtension(double cacheLifeTime = DefaultCacheLifeTime) 
+            => MimeCache.GetFileTypeExtension(ToString(false), cacheLifeTime);
 
+
+        public static InternetMediaType FromFileTypeExtension(string fileTypeExtension, double cacheLifeTime = DefaultCacheLifeTime)
+        {
+            if (fileTypeExtension is null)
+            {
+                throw new ArgumentNullException(nameof(fileTypeExtension));
+            }
+
+            fileTypeExtension = fileTypeExtension.Trim();
+
+            if(!fileTypeExtension.StartsWith('.'))
+            {
+                fileTypeExtension = $".{fileTypeExtension}";
+            }
+
+            string mime = MimeCache.GetMimeType(fileTypeExtension, cacheLifeTime);
+
+            return InternetMediaType.Parse(mime);
+        }
+
+        
         private static bool ParseParameters(string value, int parameterSeparatorIndex, SortedDictionary<string, string> dic)
         {
             while (parameterSeparatorIndex != -1)
@@ -260,30 +284,6 @@ namespace FolkerKinzel.Uris
 
                 return -1;
             }
-        }
-
-
-        public Task<string> GetFileTypeExtensionAsync(double cacheLifeTime = 5) 
-            => Task.Run(() => MimeCache.GetFileTypeExtension(ToString(false), cacheLifeTime));
-
-
-        public static async Task<InternetMediaType> GetFromFileTypeExtensionAsync(string fileTypeExtension, double cacheLifeTime = 5)
-        {
-            if (fileTypeExtension is null)
-            {
-                throw new ArgumentNullException(nameof(fileTypeExtension));
-            }
-
-            fileTypeExtension = fileTypeExtension.Trim();
-
-            if(!fileTypeExtension.StartsWith('.'))
-            {
-                fileTypeExtension = $".{fileTypeExtension}";
-            }
-
-            string mime = await Task.Run(() => MimeCache.GetMimeType(fileTypeExtension, cacheLifeTime));
-
-            return InternetMediaType.Parse(mime);
         }
 
     }

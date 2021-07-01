@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace MimeResourceCompiler.Classes
 {
+    /// <summary>
+    /// Represents the output directory.
+    /// </summary>
     public sealed class OutputDirectory : IOutputDirectory
     {
         private const string DIRECTORY_NAME = "Mime Resources";
@@ -24,6 +27,9 @@ namespace MimeResourceCompiler.Classes
             _info = Directory.CreateDirectory(rootDirectory);
         }
 
+        /// <summary>
+        /// Absolute path of the output directory.
+        /// </summary>
         public string FullName => _info.FullName;
 
     }

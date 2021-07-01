@@ -7,6 +7,9 @@ using MimeResourceCompiler.Classes;
 
 namespace MimeResourceCompiler
 {
+    /// <summary>
+    /// Builds the objects used in the program and takes care to release their resources.
+    /// </summary>
     internal sealed class Factory : IDisposable
     {
         private readonly IOutputDirectory _outputDirectory;

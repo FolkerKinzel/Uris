@@ -5,6 +5,9 @@ using System.Text.RegularExpressions;
 
 namespace MimeResourceCompiler
 {
+    /// <summary>
+    /// Compiles the output.
+    /// </summary>
     public sealed class Compiler : IDisposable
     {
         private readonly IApacheData _apacheData;
@@ -13,6 +16,7 @@ namespace MimeResourceCompiler
         private readonly IDllCache _dllCache;
         private readonly IAddendum _addendum;
         private bool _disposedValue;
+        private string? _mediaType;
 
         public Compiler(IApacheData apacheData,
                         IMimeFile mimeFile,
@@ -28,7 +32,18 @@ namespace MimeResourceCompiler
         }
 
 
-        public string? MediaType { get; private set; }
+        public string? MediaType
+        {
+            get => _mediaType;
+            private set 
+            {
+                if (value is not null && !value.Equals(_mediaType, StringComparison.OrdinalIgnoreCase))
+                {
+                    _apacheData.TestApacheFile(value);
+                }
+                _mediaType = value;
+            }
+        }
 
         public int Line { get; private set; }
 
@@ -48,7 +63,7 @@ namespace MimeResourceCompiler
 
 
             string? mediaTp = null;
-            while (_addendum.GetLine(ref mediaTp, out AddendumRow? row))
+            while (_addendum.TryGetLine(ref mediaTp, out AddendumRow? row))
             {
                 if (MediaType is null) // Die könnte nur sein, wenn das Apache file leer ist
                 {
@@ -62,14 +77,10 @@ namespace MimeResourceCompiler
                 WriteMimeFile(row.MimeType, row.Extension);
             }
 
-            _indexFile.WriteLinesCount(Line);
-
-
-            // Letzte Leerzeile entfernen:
-            _mimeFile.TruncateLastEmptyRow();
+            _indexFile.WriteRowsCount(Line);
         }
 
-        
+
 
         private void ProcessLine(string line)
         {
@@ -114,9 +125,9 @@ namespace MimeResourceCompiler
 
         private void WriteAddendum([DisallowNull] string? mediaType)
         {
-            while (_addendum.GetLine(ref mediaType, out AddendumRow? row))
+            while (_addendum.TryGetLine(ref mediaType, out AddendumRow? row))
             {
-                _mimeFile.WriteLine(row.MimeType, row.Extension);
+                _mimeFile.WriteRow(row.MimeType, row.Extension);
                 Line++;
             }
         }
@@ -124,11 +135,11 @@ namespace MimeResourceCompiler
         private void WriteIndex(string mediaType, bool firstIndex)
         {
             MediaType = mediaType;
-            _apacheData.TestApacheFile(MediaType);
+
 
             if (!firstIndex)
             {
-                _indexFile.WriteLinesCount(Line);
+                _indexFile.WriteRowsCount(Line);
             }
 
             _indexFile.WriteNewMediaType(MediaType, _mimeFile.GetCurrentStreamPosition());
@@ -138,7 +149,7 @@ namespace MimeResourceCompiler
 
         private void WriteMimeFile(string mimeType, string extension)
         {
-            _mimeFile.WriteLine(mimeType, extension);
+            _mimeFile.WriteRow(mimeType, extension);
             ++Line;
         }
 

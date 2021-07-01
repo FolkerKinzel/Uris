@@ -1,7 +1,10 @@
 ﻿using System.IO;
 
-namespace MimeResourceCompiler.Classes
+namespace MimeResourceCompiler
 {
+    /// <summary>
+    /// Represents the readme file Readme.txt.
+    /// </summary>
     public class ReadmeFile
     {
         private const string FILENAME = "Readme.txt";
@@ -14,7 +17,9 @@ namespace MimeResourceCompiler.Classes
             _resourceLoader = resourceLoader;
         }
 
-
+        /// <summary>
+        /// Creates the file Readme.txt.
+        /// </summary>
         public void Create()
         {
             string path = Path.Combine(_outputDirectory.FullName, FILENAME);
