@@ -133,6 +133,6 @@ namespace FolkerKinzel.Uris
         /// eingebetteten Daten ermöglicht.</returns>
         /// <remarks>Da das Auffinden einer geeigneten Dateiendung ein aufwändiger Vorgang ist, werden Suchergebnisse für eine
         /// kurze Zeitspanne in einem Cache zwischengespeichert, um die Performance zu erhöhen.</remarks>
-        public Task<string> GetFileTypeExtensionAsync(double cacheLifeTime = 5) => MediaType.GetFileTypeExtension(cacheLifeTime);
+        public string GetFileTypeExtension(double cacheLifeTime = InternetMediaType.DefaultCacheLifeTime) => MediaType.GetFileTypeExtension(cacheLifeTime);
     }
 }
