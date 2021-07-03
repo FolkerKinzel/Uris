@@ -166,16 +166,22 @@ namespace FolkerKinzel.Uris
                 return false;
             }
 
+            Comparison<KeyValuePair<string, string>> comparison = (a, b) => StringComparer.Ordinal.Compare(a.Key, b.Key);
+            thisList.Sort(comparison);
+            otherList.Sort(comparison);
 
+
+            StringComparer comparer = StringComparer.Ordinal;
             for (int i = 0; i < thisList.Count; i++)
             {
                 KeyValuePair<string, string> kvp1 = thisList[i];
                 KeyValuePair<string, string> kvp2 = otherList[i];
 
-                if(!kvp1.Key.Equals(kvp2.Key) || !kvp1.Value.Equals(kvp2.Value))
+                if (comparer.Equals(kvp1.Key, kvp2.Key) && comparer.Equals(kvp1.Value, kvp2.Value))
                 {
-                    return false;
+                    continue;
                 }
+                return false;
             }
 
             return true;
@@ -212,11 +218,6 @@ namespace FolkerKinzel.Uris
             }
 
             fileTypeExtension = fileTypeExtension.Trim();
-
-            if(!fileTypeExtension.StartsWith('.'))
-            {
-                fileTypeExtension = $".{fileTypeExtension}";
-            }
 
             string mime = MimeCache.GetMimeType(fileTypeExtension, cacheLifeTime);
 
