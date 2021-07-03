@@ -22,7 +22,7 @@ namespace MimeResourceCompiler
         /// </param>
         /// <param name="row">The row from the addendum if the method successfully returns, otherwise null.</param>
         /// <returns>true, if a corresponding row could be found.</returns>
-        bool TryGetLine([NotNullWhen(true)] ref string? mediaType, [NotNullWhen(true)] out AddendumRow? row);
+        bool TryGetNextLine([NotNullWhen(true)] ref string? mediaType, [NotNullWhen(true)] out AddendumRecord? row);
         
         /// <summary>
         /// Removes an entry from the addendum.

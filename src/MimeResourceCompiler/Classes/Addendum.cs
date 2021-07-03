@@ -5,20 +5,25 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace MimeResourceCompiler.Classes
 {
 
     public class Addendum : IAddendum
     {
-        private readonly SortedDictionary<string, List<AddendumRow>> _data = new(StringComparer.OrdinalIgnoreCase);
+        private readonly SortedDictionary<string, List<AddendumRecord>> _data = new(StringComparer.OrdinalIgnoreCase);
+        private readonly ILogger _log;
 
         /// <summary>
         /// ctor
         /// </summary>
         /// <param name="resourceLoader">IResourceLoader</param>
-        public Addendum(IResourceLoader resourceLoader)
+        public Addendum(IResourceLoader resourceLoader, ILogger log)
         {
+            this._log = log;
+
+            _log.Debug("Start parsing the Addendum.");
             using var reader = new StreamReader(resourceLoader.GetAddendumStream());
 
             string? line;
@@ -37,11 +42,11 @@ namespace MimeResourceCompiler.Classes
                     throw new InvalidDataException("The resource Addendum.csv contains invalid data.");
                 }
 
-                AddendumRow row = BuildRow(parts[0], parts[1], out string mediaType);
+                AddendumRecord row = BuildRow(parts[0], parts[1], out string mediaType);
 
                 if (_data.ContainsKey(mediaType))
                 {
-                    List<AddendumRow> list = _data[mediaType];
+                    List<AddendumRecord> list = _data[mediaType];
 
                     if (list.Contains(row))
                     {
@@ -52,34 +57,38 @@ namespace MimeResourceCompiler.Classes
                 }
                 else
                 {
-                    _data.Add(mediaType, new List<AddendumRow>() { row });
+                    _data.Add(mediaType, new List<AddendumRecord>() { row });
                 }
             }
+            _log.Debug("Addendum completely parsed.");
         }
 
 
         /// <summary>
-        /// Removes an entry from the addendum.
+        /// Removes an entry from the addendum, if it's already present in the Apache file.
         /// </summary>
         /// <param name="mimeType">Internet media type.</param>
         /// <param name="extension">File type extension.</param>
         /// <returns>true if the the entry could be removed.</returns>
         public bool RemoveFromAddendum(string mimeType, string extension)
         {
-            AddendumRow row = BuildRow(mimeType, extension, out string mediaType);
+            AddendumRecord row = BuildRow(mimeType, extension, out string mediaType);
 
             if (_data.ContainsKey(mediaType))
             {
-                List<AddendumRow> list = _data[mediaType];
+                List<AddendumRecord> list = _data[mediaType];
 
-                bool result = list.Remove(row);
-
-                if (list.Count == 0)
+                if (list.Remove(row))
                 {
-                    _ = _data.Remove(mediaType);
-                }
+                    if (list.Count == 0)
+                    {
+                        _ = _data.Remove(mediaType);
+                    }
 
-                return result;
+                    _log.Warning("{mimeType} {extension} have been removed from the addendum because they are already present in the Apache file.");
+
+                    return true;
+                }
             }
 
             return false;
@@ -104,7 +113,7 @@ namespace MimeResourceCompiler.Classes
         /// </param>
         /// <param name="row">The row from the addendum if the method successfully returns, otherwise null.</param>
         /// <returns>true, if a corresponding row could be found.</returns>
-        public bool TryGetLine([NotNullWhen(true)] ref string? mediaType, [NotNullWhen(true)] out AddendumRow? row)
+        public bool TryGetNextLine([NotNullWhen(true)] ref string? mediaType, [NotNullWhen(true)] out AddendumRecord? row)
         {
             row = null;
 
@@ -115,10 +124,10 @@ namespace MimeResourceCompiler.Classes
                     return false;
                 }
 
-                KeyValuePair<string, List<AddendumRow>> kvp = _data.First();
+                KeyValuePair<string, List<AddendumRecord>> kvp = _data.First();
 
                 mediaType = kvp.Key;
-                List<AddendumRow> list = kvp.Value;
+                List<AddendumRecord> list = kvp.Value;
 
                 row = list[0];
                 list.RemoveAt(0);
@@ -134,7 +143,7 @@ namespace MimeResourceCompiler.Classes
             {
                 if (_data.ContainsKey(mediaType))
                 {
-                    List<AddendumRow> list = _data[mediaType];
+                    List<AddendumRecord> list = _data[mediaType];
                     row = list[0];
                     list.RemoveAt(0);
 
@@ -153,9 +162,9 @@ namespace MimeResourceCompiler.Classes
         }
 
 
-        private static AddendumRow BuildRow(string mimeType, string extension, out string mediaType)
+        private static AddendumRecord BuildRow(string mimeType, string extension, out string mediaType)
         {
-            var row = new AddendumRow(mimeType.ToLowerInvariant(), extension.ToLowerInvariant());
+            var row = new AddendumRecord(mimeType.ToLowerInvariant(), extension.ToLowerInvariant());
 
             int mediaTypeSeparatorIndex = row.MimeType.IndexOf('/');
 

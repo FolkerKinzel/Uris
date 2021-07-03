@@ -1,21 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using CommandLine;
+using Serilog;
+using Serilog.Core;
+using Serilog.Events;
 
 namespace MimeResourceCompiler
 {
     internal class Program
     {
-        private static void Main(string[] args) => _ = Parser.Default.ParseArguments<Options>(args)
-                .WithParsed(options => RunCompiler(options))
-                .WithNotParsed(errs => OnCommandLineParseErrors(errs));
+        private const string LOG_FILE_NAME = "LastBuild.log";
+
+        private static void Main(string[] args)
+        {
+            _ = Parser.Default.ParseArguments<Options>(args)
+                                .WithParsed(options => RunCompiler(options))
+                                .WithNotParsed(errs => OnCommandLineParseErrors(errs));
+        }
 
 
         private static void RunCompiler(Options options)
         {
+            string? logFilePath = Path.Combine(Environment.CurrentDirectory, LOG_FILE_NAME);
+            using Logger log = InitializeLogger(options.CreateLogFile ? logFilePath : null, options.LogToConsole);
+
             try
             {
-                using var factory = new Factory(options);
+
+                using var factory = new Factory(options, log);
 
                 using (Compiler compiler = factory.ResolveCompiler())
                 {
@@ -27,20 +40,21 @@ namespace MimeResourceCompiler
                     factory.ResolveReadmeFile().Create();
                 }
 
-                Console.WriteLine($"Mime resources successfully created at {factory.ResolveOutputDirectory().FullName}.");
-
+                log.Information("Mime resources successfully created at {outDir}.", factory.ResolveOutputDirectory().FullName);
+                log.Information("A log file has been created at {logFilePath}.", logFilePath);
             }
             catch (Exception e)
             {
-                WriteError(e.Message);
-                Environment.Exit(-1);
+                log.Fatal(e.Message);
+                log.Debug(e, "");
+                Environment.ExitCode = -1;
             }
         }
 
 
         private static void OnCommandLineParseErrors(IEnumerable<Error> errs)
         {
-            bool hasError = false;
+            using Logger log = InitializeLogger(null, false);
 
             foreach (Error err in errs)
             {
@@ -54,23 +68,35 @@ namespace MimeResourceCompiler
                         break;
                 }
 
-                WriteError(err.ToString());
-                hasError = true;
-            }
-
-            if (hasError)
-            {
-                Environment.Exit(-1);
+                log.Fatal(err.ToString());
+                Environment.ExitCode = -1;
             }
         }
 
 
-        private static void WriteError(string? error)
+        private static Logger InitializeLogger(string? logFilePath, bool logToConsole)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write("ERROR: ");
-            Console.WriteLine(error);
-            Console.ResetColor();
+            LogEventLevel consoleLogEventLevel = logToConsole ? LogEventLevel.Debug : LogEventLevel.Information;
+
+            LoggerConfiguration config = new LoggerConfiguration()
+                                        .MinimumLevel.Debug()
+                                        .WriteTo.Console(restrictedToMinimumLevel: consoleLogEventLevel);
+
+            if (logFilePath is not null)
+            {
+                if(File.Exists(logFilePath))
+                {
+                    try
+                    {
+                        File.Delete(logFilePath);
+                    }
+                    catch
+                    { }
+                }
+                _ = config.WriteTo.File(logFilePath);
+            }
+
+            return config.CreateLogger();
         }
 
     }

@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Serilog;
 
 namespace MimeResourceCompiler
 {
@@ -10,11 +11,13 @@ namespace MimeResourceCompiler
         private const string FILENAME = "Readme.txt";
         private readonly IOutputDirectory _outputDirectory;
         private readonly IResourceLoader _resourceLoader;
+        private readonly ILogger _log;
 
-        public ReadmeFile(IOutputDirectory outputDirectory, IResourceLoader resourceLoader)
+        public ReadmeFile(IOutputDirectory outputDirectory, IResourceLoader resourceLoader, ILogger log)
         {
             _outputDirectory = outputDirectory;
             _resourceLoader = resourceLoader;
+            this._log = log;
         }
 
         /// <summary>
@@ -24,6 +27,7 @@ namespace MimeResourceCompiler
         {
             string path = Path.Combine(_outputDirectory.FullName, FILENAME);
             File.WriteAllBytes(path, _resourceLoader.LoadReadmeFile());
+            _log.Debug("Readme file successfully created.");
         }
     }
 }

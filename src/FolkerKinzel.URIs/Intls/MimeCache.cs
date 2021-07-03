@@ -2,6 +2,10 @@
 using System.Collections.Concurrent;
 using LazyCache;
 
+#if NETSTANDARD2_0
+using FolkerKinzel.Strings;
+#endif
+
 namespace FolkerKinzel.Uris.Intls
 {
     /// <summary>
@@ -18,6 +22,8 @@ namespace FolkerKinzel.Uris.Intls
 
         internal static string GetMimeType(string fileTypeExtension, double cacheLifeTime)
         {
+            fileTypeExtension = fileTypeExtension.Replace(".", null).Replace(" ", null).ToLowerInvariant();
+
             ConcurrentDictionary<string, string> dic = _cache.GetOrAdd(MIME_CACHE_NAME, CacheFactory.CreateMimeTypeCache, ComputeExpirationTime(cacheLifeTime));
 
             if (dic.TryGetValue(fileTypeExtension, out string? result))
@@ -34,6 +40,7 @@ namespace FolkerKinzel.Uris.Intls
 
         internal static string GetFileTypeExtension(string mimeType, double cacheLifeTime)
         {
+            mimeType = mimeType.Replace(" ", "").ToLowerInvariant();
             ConcurrentDictionary<string, string> dic = _cache.GetOrAdd(EXTENSION_CACHE_NAME, CacheFactory.CreateFileTypeCache, ComputeExpirationTime(cacheLifeTime));
 
             if (dic.TryGetValue(mimeType, out string? result))

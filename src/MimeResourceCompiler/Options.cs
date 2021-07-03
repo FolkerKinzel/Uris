@@ -10,13 +10,17 @@ namespace MimeResourceCompiler
     {
         private readonly string? _outputPath;
         private readonly bool _createReadme;
+        private readonly bool _createLogFile;
+        private readonly bool _logToConsole;
         private readonly bool _createWrapper;
 
-        public Options(string outputPath, bool createWrapper, bool createReadme)
+        public Options(string outputPath, bool createWrapper, bool createReadme, bool createLogFile, bool logToConsole)
         {
             _outputPath = outputPath;
             _createWrapper = createWrapper;
             _createReadme = createReadme;
+            _createLogFile = createLogFile;
+            _logToConsole = logToConsole;
         }
 
         [Option('p', "path", Required = false, HelpText = "Path to the directory, which gets the compiled output.")]
@@ -27,5 +31,11 @@ namespace MimeResourceCompiler
 
         [Option('r', "readme", Required = false, Default = true, HelpText = "False, to create no Readme.txt file.")]
         public bool CreateReadme => _createReadme;
+
+        [Option('l', "logfile", Required = false, Default = false, HelpText = "True, to create a log file.")]
+        public bool CreateLogFile => _createLogFile;
+
+        [Option('c', "consolelog", Required = false, Default = false, HelpText = "True, to log to the console.")]
+        public bool LogToConsole => _logToConsole;
     }
 }

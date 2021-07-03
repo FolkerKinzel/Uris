@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace MimeResourceCompiler.Classes
 {
@@ -16,16 +17,21 @@ namespace MimeResourceCompiler.Classes
     {
         private const string APACHE_URL = @"http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types";
 
-        private readonly static HttpClient _httpClient = new();
+        private static readonly HttpClient _httpClient = new();
         private readonly StringReader _reader;
         private readonly Dictionary<string, object?> _testDic = new();
+        private readonly ILogger _log;
 
         /// <summary>
         /// ctor
         /// </summary>
-        public ApacheData()
+        public ApacheData(ILogger log)
         {
+            this._log = log;
+
+            _log.Debug("Start downloading Apache data.");
             string data = _httpClient.GetStringAsync(APACHE_URL).GetAwaiter().GetResult();
+            _log.Debug("Apache data successfully loaded.");
             _reader = new StringReader(data);
         }
 
@@ -39,7 +45,7 @@ namespace MimeResourceCompiler.Classes
 
             while ((line = _reader.ReadLine()) is not null)
             {
-                if (line.TrimStart().StartsWith('#'))
+                if (line.TrimStart().StartsWith('#') || string.IsNullOrWhiteSpace(line))
                 {
                     continue;
                 }
@@ -47,6 +53,7 @@ namespace MimeResourceCompiler.Classes
                 return line;
             }
 
+            _log.Debug("Apache data completely parsed.");
             return null;
         }
 

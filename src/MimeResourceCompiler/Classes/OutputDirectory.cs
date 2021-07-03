@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace MimeResourceCompiler.Classes
 {
@@ -14,10 +15,13 @@ namespace MimeResourceCompiler.Classes
     {
         private const string DIRECTORY_NAME = "Mime Resources";
         private readonly DirectoryInfo _info;
+        private readonly ILogger _log;
 
-        public OutputDirectory(string rootDirectory, bool createWrapper)
+        public OutputDirectory(string rootDirectory, bool createWrapper, ILogger log)
         {
-            rootDirectory = rootDirectory is null ? Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) : Path.GetFullPath(rootDirectory);
+            this._log = log;
+
+            rootDirectory = rootDirectory is null ? Environment.CurrentDirectory : Path.GetFullPath(rootDirectory);
             
             if(createWrapper)
             {
@@ -25,6 +29,8 @@ namespace MimeResourceCompiler.Classes
             }
 
             _info = Directory.CreateDirectory(rootDirectory);
+
+            _log.Debug("Output directory {rootDirectory} successfully created.", rootDirectory);
         }
 
         /// <summary>

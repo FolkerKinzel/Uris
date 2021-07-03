@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using Serilog;
 
 namespace MimeResourceCompiler.Classes
 {
@@ -13,9 +14,12 @@ namespace MimeResourceCompiler.Classes
         private const string NEW_LINE = "\n";
         private const char SEPARATOR = ' ';
         private readonly StreamWriter _writer;
+        private readonly ILogger _log;
 
-        public MimeFile(IStreamFactory streamFactory)
+        public MimeFile(IStreamFactory streamFactory, ILogger log)
         {
+            this._log = log;
+
             Stream stream = streamFactory.CreateWriteStream(MIME_FILE_NAME);
             _writer = new StreamWriter(stream)
             {
@@ -32,7 +36,7 @@ namespace MimeResourceCompiler.Classes
         {
             _writer.Write(mimeType.ToLowerInvariant());
             _writer.Write(SEPARATOR);
-            _writer.WriteLine(extension.ToLowerInvariant());
+            _writer.WriteLine(extension.Replace(".", null, StringComparison.Ordinal).ToLowerInvariant());
             //_writer.Flush();
         }
 
@@ -59,19 +63,8 @@ namespace MimeResourceCompiler.Classes
 
             Stream mimeFileStream = _writer.BaseStream;
             mimeFileStream.SetLength(mimeFileStream.Length - NEW_LINE.Length);
-        }
 
-        //[MemberNotNull(nameof(_writer))]
-        //private void Initialize()
-        //{
-        //    if (_writer is null)
-        //    {
-        //        Stream stream = _streamFactory.CreateWriteStream(mimeFileName);
-        //        _writer = new StreamWriter(stream)
-        //        {
-        //            NewLine = newLine
-        //        };
-        //    }
-        //}
+            _log.Debug("Last empty row in {mimeFile} successfully truncated.", MIME_FILE_NAME);
+        }
     }
 }

@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
+using Serilog;
 
 namespace MimeResourceCompiler
 {
@@ -15,6 +16,7 @@ namespace MimeResourceCompiler
         private readonly IIndexFile _indexFile;
         private readonly IDllCache _dllCache;
         private readonly IAddendum _addendum;
+        private readonly ILogger _log;
         private bool _disposedValue;
         private string? _mediaType;
 
@@ -22,13 +24,15 @@ namespace MimeResourceCompiler
                         IMimeFile mimeFile,
                         IIndexFile indexFile,
                         IDllCache dllCache,
-                        IAddendum addendum)
+                        IAddendum addendum,
+                        ILogger log)
         {
             _apacheData = apacheData;
             _mimeFile = mimeFile;
             _indexFile = indexFile;
             _dllCache = dllCache;
             _addendum = addendum;
+            _log = log;
         }
 
 
@@ -55,15 +59,18 @@ namespace MimeResourceCompiler
 
         public void CompileResources()
         {
+            _log.Debug("Start Compiling.");
+
+            _log.Debug("Start parsing the Apache data.");
             string? line;
             while ((line = _apacheData.GetNextLine()) != null)
             {
-                ProcessLine(line);
+                ProcessApacheLine(line);
             }
 
-
+            _log.Debug("Start adding the rest of the Addendum.");
             string? mediaTp = null;
-            while (_addendum.TryGetLine(ref mediaTp, out AddendumRow? row))
+            while (_addendum.TryGetNextLine(ref mediaTp, out AddendumRecord? row))
             {
                 if (MediaType is null) // Die könnte nur sein, wenn das Apache file leer ist
                 {
@@ -74,15 +81,18 @@ namespace MimeResourceCompiler
                     WriteIndex(mediaTp, false);
                 }
 
-                WriteMimeFile(row.MimeType, row.Extension);
+                _log.Debug("Write addendum {addendum}.", row);
+                AppendToMimeFile(row.MimeType, row.Extension);
             }
 
             _indexFile.WriteRowsCount(Line);
+
+            _log.Debug("Addendum completely added.");
         }
 
 
 
-        private void ProcessLine(string line)
+        private void ProcessApacheLine(string line)
         {
             const string defaultMime = "application/octet-stream";
 
@@ -108,26 +118,27 @@ namespace MimeResourceCompiler
 
             for (int i = 1; i < parts.Length; i++)
             {
-                string extension = $".{parts[i]}";
+                string extension = parts[i];
 
                 if (_dllCache.TryGetMimeTypeFromFileTypeExtension(extension, out string? cacheResult))
                 {
-                    if (cacheResult == mimeType)
+                    if (StringComparer.OrdinalIgnoreCase.Equals(cacheResult, mimeType))
                     {
                         continue;
                     }
                 }
 
-                WriteMimeFile(mimeType, extension);
+                AppendToMimeFile(mimeType, extension);
                 _ = _addendum.RemoveFromAddendum(mimeType, extension);
             }
         }
 
         private void WriteAddendum([DisallowNull] string? mediaType)
         {
-            while (_addendum.TryGetLine(ref mediaType, out AddendumRow? row))
+            while (_addendum.TryGetNextLine(ref mediaType, out AddendumRecord? row))
             {
                 _mimeFile.WriteRow(row.MimeType, row.Extension);
+                _log.Debug("Write addendum {addendum}.", row);
                 Line++;
             }
         }
@@ -147,7 +158,7 @@ namespace MimeResourceCompiler
         }
 
 
-        private void WriteMimeFile(string mimeType, string extension)
+        private void AppendToMimeFile(string mimeType, string extension)
         {
             _mimeFile.WriteRow(mimeType, extension);
             ++Line;
