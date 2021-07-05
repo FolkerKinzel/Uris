@@ -12,7 +12,7 @@ namespace FolkerKinzel.Uris.Intls
         private const string RESOURCE_NAME = "FolkerKinzel.Uris.Resources.Mime.csv";
         private const char SEPARATOR = ' ';
         private const string DEFAULT_MIME_TYPE = "application/octet-stream";
-        private const string DEFAULT_FILE_TYPE_EXTENSION = ".bin";
+        private const string DEFAULT_FILE_TYPE_EXTENSION = "bin";
         private static readonly Lazy<ConcurrentDictionary<string, long>> _index = new(IndexFactory.CreateIndex, true);
 
 

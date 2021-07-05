@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -34,15 +35,12 @@ namespace FolkerKinzel.Uris
 
         internal InternetMediaType() : this(TEXT_MEDIA_TYPE, PLAIN_SUB_TYPE, _emptyParameters) { }
 
-
         private InternetMediaType(string mediaType, string subType, ReadOnlyDictionary<string, string> parameters)
         {
             MediaType = mediaType;
             SubType = subType;
             Parameters = parameters;
         }
-
-        public const int DefaultCacheLifeTime = 5;
 
         public static InternetMediaType Parse(string value)
         {
@@ -62,7 +60,6 @@ namespace FolkerKinzel.Uris
             {
                 return false;
             }
-
 
             value = Regex.Replace(value, @"\s+", string.Empty, RegexOptions.None);
 
@@ -166,9 +163,9 @@ namespace FolkerKinzel.Uris
                 return false;
             }
 
-            Comparison<KeyValuePair<string, string>> comparison = (a, b) => StringComparer.Ordinal.Compare(a.Key, b.Key);
-            thisList.Sort(comparison);
-            otherList.Sort(comparison);
+            //Comparison<KeyValuePair<string, string>> comparison = (a, b) => StringComparer.Ordinal.Compare(a.Key, b.Key);
+            //thisList.Sort(comparison);
+            //otherList.Sort(comparison);
 
 
             StringComparer comparer = StringComparer.Ordinal;
@@ -206,25 +203,21 @@ namespace FolkerKinzel.Uris
         public static bool operator !=(InternetMediaType? mediaType1, InternetMediaType? mediaType2) => !(mediaType1 == mediaType2);
 
 
-        public string GetFileTypeExtension(double cacheLifeTime = DefaultCacheLifeTime) 
-            => MimeCache.GetFileTypeExtension(ToString(false), cacheLifeTime);
+        public string GetFileTypeExtension()
+            => MimeCache.GetFileTypeExtension(ToString(false));
 
 
-        public static InternetMediaType FromFileTypeExtension(string fileTypeExtension, double cacheLifeTime = DefaultCacheLifeTime)
+        public static InternetMediaType FromFileTypeExtension(string fileTypeExtension)
         {
-            if (fileTypeExtension is null)
-            {
-                throw new ArgumentNullException(nameof(fileTypeExtension));
-            }
-
-            fileTypeExtension = fileTypeExtension.Trim();
-
-            string mime = MimeCache.GetMimeType(fileTypeExtension, cacheLifeTime);
-
-            return InternetMediaType.Parse(mime);
+            return fileTypeExtension is null
+                ? throw new ArgumentNullException(nameof(fileTypeExtension))
+                : InternetMediaType.Parse(MimeCache.GetMimeType(fileTypeExtension));
         }
 
+
         
+
+
         private static bool ParseParameters(string value, int parameterSeparatorIndex, SortedDictionary<string, string> dic)
         {
             while (parameterSeparatorIndex != -1)

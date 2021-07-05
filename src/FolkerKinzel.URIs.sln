@@ -18,6 +18,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FolkerKinzel.Uris", "Folker
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FolkerKinzel.Uris.Tests", "FolkerKinzel.Uris.Tests\FolkerKinzel.Uris.Tests.csproj", "{DBEC6873-384F-4357-9BC1-98AF1C757843}"
 EndProject
+Project("{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}") = "FolkerKinzel.Uris.Doku.de", "FolkerKinzel.Uris.Doku.de\FolkerKinzel.Uris.Doku.de.shfbproj", "{924B78A7-00D3-4C2C-9A6B-C57A20CEE13C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +38,8 @@ Global
 		{DBEC6873-384F-4357-9BC1-98AF1C757843}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DBEC6873-384F-4357-9BC1-98AF1C757843}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DBEC6873-384F-4357-9BC1-98AF1C757843}.Release|Any CPU.Build.0 = Release|Any CPU
+		{924B78A7-00D3-4C2C-9A6B-C57A20CEE13C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{924B78A7-00D3-4C2C-9A6B-C57A20CEE13C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

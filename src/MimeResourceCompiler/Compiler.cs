@@ -14,7 +14,7 @@ namespace MimeResourceCompiler
         private readonly IApacheData _apacheData;
         private readonly IMimeFile _mimeFile;
         private readonly IIndexFile _indexFile;
-        private readonly IDllCache _dllCache;
+        //private readonly IDllCache _dllCache;
         private readonly IAddendum _addendum;
         private readonly ILogger _log;
         private bool _disposedValue;
@@ -23,14 +23,13 @@ namespace MimeResourceCompiler
         public Compiler(IApacheData apacheData,
                         IMimeFile mimeFile,
                         IIndexFile indexFile,
-                        IDllCache dllCache,
                         IAddendum addendum,
                         ILogger log)
         {
             _apacheData = apacheData;
             _mimeFile = mimeFile;
             _indexFile = indexFile;
-            _dllCache = dllCache;
+            //_dllCache = dllCache;
             _addendum = addendum;
             _log = log;
         }
@@ -120,13 +119,13 @@ namespace MimeResourceCompiler
             {
                 string extension = parts[i];
 
-                if (_dllCache.TryGetMimeTypeFromFileTypeExtension(extension, out string? cacheResult))
-                {
-                    if (StringComparer.OrdinalIgnoreCase.Equals(cacheResult, mimeType))
-                    {
-                        continue;
-                    }
-                }
+                //if (_dllCache.TryGetMimeTypeFromFileTypeExtension(extension, out string? cacheResult))
+                //{
+                //    if (StringComparer.Ordinal.Equals(cacheResult, mimeType))
+                //    {
+                //        continue;
+                //    }
+                //}
 
                 AppendToMimeFile(mimeType, extension);
                 _ = _addendum.RemoveFromAddendum(mimeType, extension);

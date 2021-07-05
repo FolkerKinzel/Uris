@@ -5,14 +5,14 @@ namespace FolkerKinzel.Uris.Intls.Tests
     [TestClass]
     public class MimeCacheTests
     {
+        [TestMethod()]
+        public void TestItTest() => MimeCache.TestIt();
+
         [DataTestMethod]
         [DataRow(".json", "application/json")]
         [DataRow(".psd", "image/vnd.adobe.photoshop")]
         [DataRow(".json", "application/json")]
-        public void GetMimeTypeTest1(string extension, string mimeType)
-        {
-           Assert.AreEqual(mimeType, MimeCache.GetMimeType(extension, 5), true);
-        }
+        public void GetMimeTypeTest1(string extension, string mimeType) => Assert.AreEqual(mimeType, MimeCache.GetMimeType(extension), true);
 
 
 
@@ -25,12 +25,9 @@ namespace FolkerKinzel.Uris.Intls.Tests
         [DataRow(".json", "application/json")]
         [DataRow(".psd", "image/vnd.adobe.photoshop")]
         [DataRow(".json", "application/json")]
-        public void GetFileTypeExtensionTest1(string extension, string mimeType)
-        {
-           Assert.AreEqual(extension,  MimeCache.GetFileTypeExtension(mimeType, 5), true);
-        }
+        public void GetFileTypeExtensionTest1(string extension, string mimeType) => Assert.AreEqual(extension, MimeCache.GetFileTypeExtension(mimeType), true);
 
 
-        
+
     }
 }

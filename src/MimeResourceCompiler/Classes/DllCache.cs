@@ -11,7 +11,7 @@ namespace MimeResourceCompiler.Classes
     /// </summary>
     public sealed class DllCache : IDllCache
     {
-        private readonly ConcurrentDictionary<string, string> _mimeTypeCache = CacheFactory.CreateMimeTypeCache();
+        private readonly ConcurrentDictionary<string, string> _mimeTypeCache = MimeCacheFactory.CreateMimeTypeCache();
         private readonly ILogger _log;
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace MimeResourceCompiler.Classes
             this._log = log;
 
             _log.Debug("Start testing the data integrity of the cache from FolkerKinzel.Uris.");
-            CacheFactory.TestIt();
+            MimeCacheFactory.TestIt();
             _log.Debug("Data integrity of the cache from FolkerKinzel.Uris verified.");
 
         }

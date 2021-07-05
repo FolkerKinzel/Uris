@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FolkerKinzel.Uris.Intls;
@@ -11,8 +9,11 @@ namespace FolkerKinzel.Uris
     /// <summary>
     /// Kapselt die in einem Data-URL (RFC 2397) enthaltenen Informationen.
     /// </summary>
-    public class DataUrlInfo
+    public sealed class DataUrlInfo
     {
+        internal static InternetMediaType DefaultMediaType { get; } = new();
+
+
         internal DataUrlInfo(InternetMediaType mediaType, DataEncoding dataEncoding, string embeddedData)
         {
             MediaType = mediaType;
@@ -128,11 +129,10 @@ namespace FolkerKinzel.Uris
         /// Gibt eine geeignete Dateiendung für die in den den Data-Url eingebetteten Daten 
         /// zurück. Die Dateiendung enthält den Punkt "." als Trennzeichen.
         /// </summary>
-        /// <param name="cacheLifeTime">Die Lebensdauer des angelegten Caches in Minuten.</param>
         /// <returns>Ein <see cref="Task{TResult}"/>-Objekt, das den Zugriff auf eine geeignete Dateiendung für die in den Data-URL
         /// eingebetteten Daten ermöglicht.</returns>
         /// <remarks>Da das Auffinden einer geeigneten Dateiendung ein aufwändiger Vorgang ist, werden Suchergebnisse für eine
         /// kurze Zeitspanne in einem Cache zwischengespeichert, um die Performance zu erhöhen.</remarks>
-        public string GetFileTypeExtension(double cacheLifeTime = InternetMediaType.DefaultCacheLifeTime) => MediaType.GetFileTypeExtension(cacheLifeTime);
+        public string GetFileTypeExtension() => MediaType.GetFileTypeExtension();
     }
 }
