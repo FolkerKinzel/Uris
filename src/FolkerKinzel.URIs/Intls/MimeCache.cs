@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 
 #if NETSTANDARD2_0
-using FolkerKinzel.Strings;
+using FolkerKinzel.Strings.Polyfills;
 #endif
 
 namespace FolkerKinzel.Uris.Intls

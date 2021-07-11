@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 #if NETSTANDARD2_0
-using FolkerKinzel.Strings;
+using FolkerKinzel.Strings.Polyfills;
 #endif
 
 namespace FolkerKinzel.Uris

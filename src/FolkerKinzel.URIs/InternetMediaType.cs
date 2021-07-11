@@ -1,19 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using FolkerKinzel.Uris.Intls;
 using FolkerKinzel.Uris.Properties;
 
 #if NETSTANDARD2_0
-using FolkerKinzel.Strings;
+using FolkerKinzel.Strings.Polyfills;
 #endif
 
 namespace FolkerKinzel.Uris
@@ -70,7 +66,7 @@ namespace FolkerKinzel.Uris
 
             if (mediaArr.Length != 2)
             {
-                throw new ArgumentException(string.Format(Res.InvalidMediaType, nameof(value)));
+                return false;
             }
 
             string mediaType = mediaArr[0];
@@ -213,9 +209,6 @@ namespace FolkerKinzel.Uris
                 ? throw new ArgumentNullException(nameof(fileTypeExtension))
                 : InternetMediaType.Parse(MimeCache.GetMimeType(fileTypeExtension));
         }
-
-
-        
 
 
         private static bool ParseParameters(string value, int parameterSeparatorIndex, SortedDictionary<string, string> dic)
