@@ -5,6 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#if NETSTANDARD2_0 || NETSTANDARD2_1
+using FolkerKinzel.Strings.Polyfills;
+#endif
+
 namespace FolkerKinzel.Uris.Intls
 {
     internal static class HelperExtension
@@ -19,7 +23,10 @@ namespace FolkerKinzel.Uris.Intls
 
         internal static StringBuilder ToLowerInvariant(this StringBuilder builder, int startIndex, int count)
         {
-            Debug.Assert(builder != null);
+            if (builder is null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
 
             for (int i = startIndex; i < count; i++)
             {

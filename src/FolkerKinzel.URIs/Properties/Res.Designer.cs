@@ -61,6 +61,15 @@ namespace FolkerKinzel.Uris.Properties {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {0} is empty or consists only of white space. ähnelt.
+        /// </summary>
+        internal static string EmptyOrWhiteSpace {
+            get {
+                return ResourceManager.GetString("EmptyOrWhiteSpace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die &quot;{0} is not a valid Media Type.&quot; ähnelt.
         /// </summary>
         internal static string InvalidMediaType {
