@@ -42,6 +42,16 @@ namespace FolkerKinzel.Uris
         /// </summary>
         public IEnumerable<MediaTypeParameter> Parameters => ParseParameters();
 
+        public static bool TryParse(string mediaTypeString, out InternetMediaType2 mediaType)
+        {
+            if (mediaTypeString is null)
+            {
+                mediaType = default;
+                return false;
+            }
+
+            return TryParse(mediaTypeString.AsMemory(), out mediaType);
+        }
 
         public static bool TryParse(ReadOnlyMemory<char> mediaTypeString, out InternetMediaType2 mediaType)
         {
@@ -85,24 +95,24 @@ namespace FolkerKinzel.Uris
 
         private bool TryParseParameter(ref int parameterStartIndex, out MediaTypeParameter parameter)
         {
-            int parameterLength = GetParameterLength(_parameters.Span.Slice(parameterStartIndex));
+            int nextParameterSeparatorIndex = GetNextParameterSeparatorIndex(_parameters.Span.Slice(parameterStartIndex));
             ReadOnlyMemory<char> currentParameterString;
 
-            if (parameterLength < 0)
+            if (nextParameterSeparatorIndex < 0) // last parameter
             {
                 currentParameterString = _parameters.Slice(parameterStartIndex);
                 parameterStartIndex = -1;
             }
             else
             {
-                currentParameterString = _parameters.Slice(parameterStartIndex, parameterLength);
-                parameterStartIndex = parameterLength + 1;
+                currentParameterString = _parameters.Slice(parameterStartIndex, nextParameterSeparatorIndex);
+                parameterStartIndex += nextParameterSeparatorIndex + 1;
             }
 
             return MediaTypeParameter.TryParse(currentParameterString, out parameter);
         }
 
-        private static int GetParameterLength(ReadOnlySpan<char> value)
+        private static int GetNextParameterSeparatorIndex(ReadOnlySpan<char> value)
         {
             bool isInQuotes = false;
 
@@ -146,7 +156,7 @@ namespace FolkerKinzel.Uris
 
         internal void AppendTo(StringBuilder sb, bool includeParameters)
         {
-             _ = sb.Append(MediaType).Append('/').Append(SubType).ToLowerInvariant();
+            _ = sb.Append(MediaType).Append('/').Append(SubType).ToLowerInvariant();
 
             if (includeParameters)
             {
@@ -170,7 +180,7 @@ namespace FolkerKinzel.Uris
                 : InternetMediaType.Parse(MimeCache.GetMimeType(fileTypeExtension));
         }
 
-
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
         public override int GetHashCode()
         {
             var hash = new HashCode();
@@ -187,8 +197,29 @@ namespace FolkerKinzel.Uris
                 hash.Add(char.ToLowerInvariant(subTypeSpan[j]));
             }
 
+            StringComparer comparer = StringComparer.OrdinalIgnoreCase;
+            IOrderedEnumerable<MediaTypeParameter> thisParameters;
+
+            if (MediaType.Equals("text".AsSpan(), StringComparison.OrdinalIgnoreCase))
+            {
+                var asciiCharsetParameter = new MediaTypeParameter("charset".AsMemory(), "us-ascii".AsMemory());
+                bool predicate(MediaTypeParameter x) => x.Equals(asciiCharsetParameter);
+
+                thisParameters = Parameters.SkipWhile(predicate).OrderBy(KeySelector, comparer);
+            }
+            else
+            {
+                thisParameters = Parameters.OrderBy(KeySelector, comparer);
+            }
+
+            foreach (MediaTypeParameter parameter in thisParameters)
+            {
+                hash.Add(parameter);
+            }
+
             return hash.ToHashCode();
         }
+
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
         public bool Equals(InternetMediaType2 other)
@@ -199,28 +230,28 @@ namespace FolkerKinzel.Uris
                 return false;
             }
 
-            static string keySelector(MediaTypeParameter x) => x.Key.ToString();
             StringComparer comparer = StringComparer.OrdinalIgnoreCase;
             IOrderedEnumerable<MediaTypeParameter> thisParameters;
             IOrderedEnumerable<MediaTypeParameter> otherParameters;
 
-            if(MediaType.Equals("text".AsSpan(), StringComparison.OrdinalIgnoreCase))
+            if (MediaType.Equals("text".AsSpan(), StringComparison.OrdinalIgnoreCase))
             {
                 var asciiCharsetParameter = new MediaTypeParameter("charset".AsMemory(), "us-ascii".AsMemory());
-
                 bool predicate(MediaTypeParameter x) => x.Equals(asciiCharsetParameter);
 
-                thisParameters = Parameters.SkipWhile(predicate).OrderBy(keySelector, comparer);
-                otherParameters = Parameters.SkipWhile(predicate).OrderBy(keySelector, comparer);
+                thisParameters = Parameters.SkipWhile(predicate).OrderBy(KeySelector, comparer);
+                otherParameters = other.Parameters.SkipWhile(predicate).OrderBy(KeySelector, comparer);
             }
             else
             {
-                thisParameters = Parameters.OrderBy(keySelector, comparer);
-                otherParameters = Parameters.OrderBy(keySelector, comparer);
+                thisParameters = Parameters.OrderBy(KeySelector, comparer);
+                otherParameters = other.Parameters.OrderBy(KeySelector, comparer);
             }
 
             return thisParameters.SequenceEqual(otherParameters);
         }
+
+        private static string KeySelector(MediaTypeParameter parameter) => parameter.Key.ToString();
 
         public override bool Equals(object? obj) => obj is InternetMediaType2 type && Equals(type);
 

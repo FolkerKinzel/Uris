@@ -82,6 +82,7 @@ namespace FolkerKinzel.Uris
 
         public override bool Equals(object? obj) => obj is MediaTypeParameter parameter && Equals(parameter);
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
         public override int GetHashCode()
         {
             var hash = new HashCode();
@@ -93,9 +94,20 @@ namespace FolkerKinzel.Uris
             }
 
             ReadOnlySpan<char> valueSpan = Value;
-            for (int j = 0; j < valueSpan.Length; j++)
+
+            if (Key.Equals(CHARSET_KEY.AsSpan(), StringComparison.OrdinalIgnoreCase))
             {
-                hash.Add(char.ToLowerInvariant(valueSpan[j]));
+                for (int j = 0; j < valueSpan.Length; j++)
+                {
+                    hash.Add(char.ToLowerInvariant(valueSpan[j]));
+                }
+            }
+            else
+            {
+                for (int j = 0; j < valueSpan.Length; j++)
+                {
+                    hash.Add(valueSpan[j]);
+                }
             }
 
             return hash.ToHashCode();
