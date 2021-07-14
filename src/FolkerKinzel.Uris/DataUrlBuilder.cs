@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using FolkerKinzel.Uris.Intls;
 using FolkerKinzel.Uris.Properties;
 
 #if NETSTANDARD2_0
@@ -55,10 +56,10 @@ namespace FolkerKinzel.Uris
                 throw new ArgumentNullException(nameof(bytes));
             }
 
-            if (mediaType is null)
-            {
-                throw new ArgumentNullException(nameof(mediaType));
-            }
+            //if (mediaType is null)
+            //{
+            //    throw new ArgumentNullException(nameof(mediaType));
+            //}
 
             if (bytes.Length == 0)
             {
@@ -66,9 +67,9 @@ namespace FolkerKinzel.Uris
             }
 
             string mediaTypeString =
-                mediaType.Equals(DataUrlInfo.DefaultMediaType)
+                mediaType.Equals(DataUrl.DefaultMediaType())
                 ? string.Empty
-                : mediaType.MediaType == InternetMediaType.TEXT_MEDIA_TYPE && mediaType.SubType == InternetMediaType.PLAIN_SUB_TYPE
+                : mediaType.IsTextPlainType()
                     ? $";{mediaType.ToString().Split(';', 2, StringSplitOptions.None)[1]}"
                     : mediaType.ToString();
 
@@ -98,7 +99,7 @@ namespace FolkerKinzel.Uris
                 mediaType = InternetMediaType.FromFileTypeExtension(Path.GetExtension(path));
             }
 
-            return DataUrlBuilder.EmbedBytes(bytes, mediaType);
+            return DataUrlBuilder.EmbedBytes(bytes, mediaType.Value);
         }
 
 
@@ -111,7 +112,7 @@ namespace FolkerKinzel.Uris
                 mediaType = InternetMediaType.FromFileTypeExtension(Path.GetExtension(path));
             }
 
-            return DataUrlBuilder.EmbedBytes(bytes, mediaType);
+            return DataUrlBuilder.EmbedBytes(bytes, mediaType.Value);
         }
 
 

@@ -11,9 +11,6 @@ namespace FolkerKinzel.Uris
     /// </summary>
     public sealed class DataUrlInfo
     {
-        internal static InternetMediaType DefaultMediaType { get; } = new();
-
-
         internal DataUrlInfo(InternetMediaType mediaType, DataEncoding dataEncoding, string embeddedData)
         {
             MediaType = mediaType;

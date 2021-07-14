@@ -1,110 +1,168 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using FolkerKinzel.Uris.Intls;
 using FolkerKinzel.Uris.Properties;
 
-#if NETSTANDARD2_0
+#if NETSTANDARD2_0 || NETSTANDARD2_1
 using FolkerKinzel.Strings.Polyfills;
 #endif
 
 namespace FolkerKinzel.Uris
 {
-    /// <summary>
-    /// Kapselt Informationen über einen Medientyp. (RFC 2045, 2046, RFC 7231 Section 3.1.1.1)
-    /// </summary>
-    public sealed class InternetMediaType : IEquatable<InternetMediaType?>
+    public readonly struct InternetMediaType : IEquatable<InternetMediaType>
     {
-        internal const string TEXT_MEDIA_TYPE = "text";
-        internal const string PLAIN_SUB_TYPE = "plain";
-        internal const string CHARSET_PARAMETER_NAME = "charset";
-        private const string DEFAULT_CHARSET = "us-ascii";
+        private readonly ReadOnlyMemory<char> _mediaType;
+        private readonly ReadOnlyMemory<char> _subType;
+        private readonly ReadOnlyMemory<char> _parameters;
 
-        private static readonly ReadOnlyDictionary<string, string> _emptyParameters
-            = new(new Dictionary<string, string>(0));
+        internal const int StringLength = 64;
 
-        private const string MASK_CHARS = "[ ()<>@,;:\\\"/[>]?=]";
-
-        internal InternetMediaType() : this(TEXT_MEDIA_TYPE, PLAIN_SUB_TYPE, _emptyParameters) { }
-
-        private InternetMediaType(string mediaType, string subType, ReadOnlyDictionary<string, string> parameters)
+        private InternetMediaType(ReadOnlyMemory<char> mediaType, ReadOnlyMemory<char> subType, ReadOnlyMemory<char> parameters)
         {
-            MediaType = mediaType;
-            SubType = subType;
-            Parameters = parameters;
-        }
-
-        public static InternetMediaType Parse(string value)
-        {
-            return value is null
-                ? throw new ArgumentNullException(nameof(value))
-                : TryParse(value, out InternetMediaType? imt)
-                    ? imt
-                    : throw new ArgumentException(string.Format(Res.InvalidMediaType, nameof(value)));
-        }
-
-
-        public static bool TryParse(string value, [NotNullWhen(true)] out InternetMediaType? internetMediaType)
-        {
-            internetMediaType = default;
-
-            if (value is null)
-            {
-                return false;
-            }
-
-            value = Regex.Replace(value, @"\s+", string.Empty, RegexOptions.None);
-
-            int parameterSeparatorIndex = value.IndexOf(';');
-            string mediaPart = parameterSeparatorIndex != -1 ? value.Substring(0, parameterSeparatorIndex).ToLowerInvariant() : value.ToLowerInvariant();
-
-            string[] mediaArr = mediaPart.Split('/', StringSplitOptions.RemoveEmptyEntries);
-
-            if (mediaArr.Length != 2)
-            {
-                return false;
-            }
-
-            string mediaType = mediaArr[0];
-            string subType = mediaArr[1];
-            ReadOnlyDictionary<string, string> parameters = _emptyParameters;
-
-            if (parameterSeparatorIndex != -1)
-            {
-                var dic = new SortedDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-                if (ParseParameters(value, parameterSeparatorIndex, dic))
-                {
-                    parameters = new ReadOnlyDictionary<string, string>(dic);
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            internetMediaType = new InternetMediaType(mediaType, subType, parameters);
-            return true;
+            this._mediaType = mediaType.Trim();
+            this._subType = subType.Trim();
+            this._parameters = parameters;
         }
 
         /// <summary>
         /// Medientyp (Nie <c>null</c>.)
         /// </summary>
-        public string MediaType { get; } = TEXT_MEDIA_TYPE;
+        public ReadOnlySpan<char> MediaType => _mediaType.Span;
 
         /// <summary>
         /// Subtyp (Nie <c>null</c>.)
         /// </summary>
-        public string SubType { get; } = PLAIN_SUB_TYPE;
+        public ReadOnlySpan<char> SubType => _subType.Span;
 
         /// <summary>
         /// Parameter (Nie <c>null</c>.)
         /// </summary>
-        public ReadOnlyDictionary<string, string> Parameters { get; } = _emptyParameters;
+        public IEnumerable<MediaTypeParameter> Parameters => ParseParameters();
+
+        public static InternetMediaType Empty => default;
+
+        public bool IsEmpty => _mediaType.IsEmpty;
+
+
+        public static bool TryParse(string mediaTypeString, out InternetMediaType mediaType)
+        {
+            if (mediaTypeString is null)
+            {
+                mediaType = default;
+                return false;
+            }
+
+            return TryParse(mediaTypeString.AsMemory(), out mediaType);
+        }
+
+
+        public static bool TryParse(ReadOnlyMemory<char> mediaTypeString, out InternetMediaType mediaType)
+        {
+            int parameterStartIndex = mediaTypeString.Span.IndexOf(';');
+
+            ReadOnlyMemory<char> mediaPart = parameterStartIndex < 0 ? mediaTypeString : mediaTypeString.Slice(0, parameterStartIndex);
+
+            const char mediaTypeSeparator = '/';
+
+            int mediaTypeSeparatorIndex = mediaTypeString.Span.IndexOf(mediaTypeSeparator);
+
+            if (mediaTypeSeparatorIndex == -1 || mediaTypeSeparatorIndex == mediaTypeString.Length)
+            {
+                mediaType = default;
+                return false;
+            }
+
+            mediaType = new InternetMediaType(
+                mediaPart.Slice(0, mediaTypeSeparatorIndex),
+                mediaPart.Slice(mediaTypeSeparatorIndex + 1),
+                parameterStartIndex < 0 ? ReadOnlyMemory<char>.Empty : mediaTypeString.Slice(parameterStartIndex + 1));
+
+            return true;
+        }
+
+
+        public bool IsTextMediaType()
+        {
+            ReadOnlySpan<char> text = stackalloc char[] { 't', 'e', 'x', 't' };
+            return text.Equals(MediaType, StringComparison.OrdinalIgnoreCase);
+        }
+
+
+        public bool IsTextPlainType()
+        {
+            if (IsTextMediaType())
+            {
+                ReadOnlySpan<char> plain = stackalloc char[] { 'p', 'l', 'a', 'i', 'n' };
+                return plain.Equals(SubType, StringComparison.OrdinalIgnoreCase);
+            }
+
+            return false;
+        }
+
+
+        private IEnumerable<MediaTypeParameter> ParseParameters()
+        {
+            int parameterStartIndex = 0;
+            do
+            {
+                if (TryParseParameter(ref parameterStartIndex, out MediaTypeParameter parameter))
+                {
+                    yield return parameter;
+                }
+            }
+            while (parameterStartIndex != -1);
+        }
+
+
+        private bool TryParseParameter(ref int parameterStartIndex, out MediaTypeParameter parameter)
+        {
+            int nextParameterSeparatorIndex = GetNextParameterSeparatorIndex(_parameters.Span.Slice(parameterStartIndex));
+            ReadOnlyMemory<char> currentParameterString;
+
+            if (nextParameterSeparatorIndex < 0) // last parameter
+            {
+                currentParameterString = _parameters.Slice(parameterStartIndex);
+                parameterStartIndex = -1;
+            }
+            else
+            {
+                currentParameterString = _parameters.Slice(parameterStartIndex, nextParameterSeparatorIndex);
+                parameterStartIndex += nextParameterSeparatorIndex + 1;
+            }
+
+            return MediaTypeParameter.TryParse(currentParameterString, out parameter);
+        }
+
+
+        private static int GetNextParameterSeparatorIndex(ReadOnlySpan<char> value)
+        {
+            bool isInQuotes = false;
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                char current = value[i];
+
+                if (current == '"')
+                {
+                    isInQuotes = !isInQuotes;
+                }
+
+                if (isInQuotes)
+                {
+                    continue;
+                }
+
+                if (current == ';')
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
 
         /// <summary>
         /// Erstellt eine <see cref="string"/>-Repräsentation des <see cref="InternetMediaType"/>-Objekts.
@@ -112,91 +170,32 @@ namespace FolkerKinzel.Uris
         /// <returns>Eine <see cref="string"/>-Repräsentation des <see cref="InternetMediaType"/>-Objekts.</returns>
         public override string ToString() => ToString(true);
 
-
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
         public string ToString(bool includeParameters)
         {
-            var sb = new StringBuilder();
-
-            _ = sb.Append(MediaType).Append('/').Append(SubType);
-
-            if (includeParameters)
-            {
-                foreach (KeyValuePair<string, string> parameter in Parameters)
-                {
-                    _ = sb.Append(';').Append(parameter.Key).Append('=');
-
-                    // RFC 2045 Section 5.1 "tspecials"
-                    _ = Regex.IsMatch(parameter.Value, MASK_CHARS) ? sb.Append('"').Append(parameter.Value).Append('"') : sb.Append(parameter.Value);
-
-                }
-            }
-
+            var sb = new StringBuilder(StringLength);
+            AppendTo(sb, includeParameters);
             return sb.ToString();
         }
 
-        public override bool Equals(object? obj) => obj is InternetMediaType other && Equals(other);
-
-
-        public bool Equals(InternetMediaType? other)
+        internal void AppendTo(StringBuilder sb, bool includeParameters)
         {
-            if (other is null || !MediaType.Equals(other.MediaType, StringComparison.Ordinal) || !SubType.Equals(other.SubType, StringComparison.Ordinal))
+            if(IsEmpty)
             {
-                return false;
+                return;
             }
+            _ = sb.EnsureCapacity(sb.Length + StringLength);
+            _ = sb.Append(MediaType).Append('/').Append(SubType).ToLowerInvariant();
 
-            var thisList = Parameters.ToList();
-            var otherList = Parameters.ToList();
-
-
-            if (MediaType == TEXT_MEDIA_TYPE)
+            if (includeParameters)
             {
-                RemoveCharsetUsAscii(thisList);
-                RemoveCharsetUsAscii(otherList);
-            }
-
-            if (thisList.Count != otherList.Count)
-            {
-                return false;
-            }
-
-            //Comparison<KeyValuePair<string, string>> comparison = (a, b) => StringComparer.Ordinal.Compare(a.Key, b.Key);
-            //thisList.Sort(comparison);
-            //otherList.Sort(comparison);
-
-
-            StringComparer comparer = StringComparer.Ordinal;
-            for (int i = 0; i < thisList.Count; i++)
-            {
-                KeyValuePair<string, string> kvp1 = thisList[i];
-                KeyValuePair<string, string> kvp2 = otherList[i];
-
-                if (comparer.Equals(kvp1.Key, kvp2.Key) && comparer.Equals(kvp1.Value, kvp2.Value))
+                foreach (MediaTypeParameter parameter in Parameters)
                 {
-                    continue;
-                }
-                return false;
-            }
-
-            return true;
-
-            ////////////////////////////////////////////////
-
-            static void RemoveCharsetUsAscii(List<KeyValuePair<string, string>> list)
-            {
-                int index = list.FindIndex(kvp => kvp.Key.Equals(CHARSET_PARAMETER_NAME, StringComparison.Ordinal) && kvp.Value.Equals(DEFAULT_CHARSET, StringComparison.Ordinal));
-                if (index != -1)
-                {
-                    list.RemoveAt(index);
+                    _ = sb.Append(';');
+                    parameter.AppendTo(sb);
                 }
             }
         }
-
-        public override int GetHashCode() => HashCode.Combine(MediaType.GetHashCode(), SubType.GetHashCode());
-
-
-        public static bool operator ==(InternetMediaType? mediaType1, InternetMediaType? mediaType2) => mediaType1 is null ? mediaType2 is null : mediaType1.Equals(mediaType2);
-
-        public static bool operator !=(InternetMediaType? mediaType1, InternetMediaType? mediaType2) => !(mediaType1 == mediaType2);
 
 
         public string GetFileTypeExtension()
@@ -205,73 +204,94 @@ namespace FolkerKinzel.Uris
 
         public static InternetMediaType FromFileTypeExtension(string fileTypeExtension)
         {
-            return fileTypeExtension is null
-                ? throw new ArgumentNullException(nameof(fileTypeExtension))
-                : InternetMediaType.Parse(MimeCache.GetMimeType(fileTypeExtension));
+            if (fileTypeExtension is null)
+            {
+                throw new ArgumentNullException(nameof(fileTypeExtension));
+            }
+            else
+            {
+                _ = TryParse(MimeCache.GetMimeType(fileTypeExtension), out InternetMediaType inetMediaType);
+                return inetMediaType;
+            }
         }
 
-
-        private static bool ParseParameters(string value, int parameterSeparatorIndex, SortedDictionary<string, string> dic)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
+        public override int GetHashCode()
         {
-            while (parameterSeparatorIndex != -1)
+            var hash = new HashCode();
+
+            ReadOnlySpan<char> mediaTypeSpan = MediaType;
+            for (int i = 0; i < mediaTypeSpan.Length; i++)
             {
-                int parameterStart = parameterSeparatorIndex + 1;
-                int keyValueSeparatorIndex = value.IndexOf('=', parameterStart);
-
-                if (keyValueSeparatorIndex <= parameterStart)
-                {
-                    return false;
-                }
-
-                string key = value.Substring(parameterStart, keyValueSeparatorIndex).ToLowerInvariant();
-
-                int valueStart = keyValueSeparatorIndex + 1;
-                parameterSeparatorIndex = GetNextParameterSeparatorIndex(value, valueStart);
-
-                string val = parameterSeparatorIndex == -1
-                    ? value.Substring(valueStart).Trim('"')
-                    : value.Substring(valueStart, parameterSeparatorIndex).Trim('"');
-
-                // RFC 2046 Sect. 412: Charset-Parameter not case sensitive.
-                if (key == CHARSET_PARAMETER_NAME)
-                {
-                    val = val.ToLowerInvariant();
-                }
-
-                dic[key] = val;
+                hash.Add(char.ToLowerInvariant(mediaTypeSpan[i]));
             }
 
-            return true;
-
-            /////////////////////////////////////////////////////////////////
-
-            static int GetNextParameterSeparatorIndex(string value, int start)
+            ReadOnlySpan<char> subTypeSpan = SubType;
+            for (int j = 0; j < subTypeSpan.Length; j++)
             {
-                bool isInQuotes = false;
-
-                for (int j = start; j < value.Length; j++)
-                {
-                    char current = value[j];
-
-                    if (current == '"')
-                    {
-                        isInQuotes = !isInQuotes;
-                    }
-
-                    if (isInQuotes)
-                    {
-                        continue;
-                    }
-
-                    if (current == ';')
-                    {
-                        return j;
-                    }
-                }
-
-                return -1;
+                hash.Add(char.ToLowerInvariant(subTypeSpan[j]));
             }
+
+            StringComparer comparer = StringComparer.OrdinalIgnoreCase;
+            IOrderedEnumerable<MediaTypeParameter> thisParameters;
+
+            if (MediaType.Equals("text".AsSpan(), StringComparison.OrdinalIgnoreCase))
+            {
+                var asciiCharsetParameter = new MediaTypeParameter("charset".AsMemory(), "us-ascii".AsMemory());
+                bool predicate(MediaTypeParameter x) => x.Equals(asciiCharsetParameter);
+
+                thisParameters = Parameters.SkipWhile(predicate).OrderBy(KeySelector, comparer);
+            }
+            else
+            {
+                thisParameters = Parameters.OrderBy(KeySelector, comparer);
+            }
+
+            foreach (MediaTypeParameter parameter in thisParameters)
+            {
+                hash.Add(parameter);
+            }
+
+            return hash.ToHashCode();
         }
+
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
+        public bool Equals(InternetMediaType other)
+        {
+            if (!MediaType.Equals(other.MediaType, StringComparison.OrdinalIgnoreCase) ||
+               !SubType.Equals(other.SubType, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            StringComparer comparer = StringComparer.OrdinalIgnoreCase;
+            IOrderedEnumerable<MediaTypeParameter> thisParameters;
+            IOrderedEnumerable<MediaTypeParameter> otherParameters;
+
+            if (MediaType.Equals("text".AsSpan(), StringComparison.OrdinalIgnoreCase))
+            {
+                var asciiCharsetParameter = new MediaTypeParameter("charset".AsMemory(), "us-ascii".AsMemory());
+                bool predicate(MediaTypeParameter x) => x.Equals(asciiCharsetParameter);
+
+                thisParameters = Parameters.SkipWhile(predicate).OrderBy(KeySelector, comparer);
+                otherParameters = other.Parameters.SkipWhile(predicate).OrderBy(KeySelector, comparer);
+            }
+            else
+            {
+                thisParameters = Parameters.OrderBy(KeySelector, comparer);
+                otherParameters = other.Parameters.OrderBy(KeySelector, comparer);
+            }
+
+            return thisParameters.SequenceEqual(otherParameters);
+        }
+
+        private static string KeySelector(MediaTypeParameter parameter) => parameter.Key.ToString();
+
+        public override bool Equals(object? obj) => obj is InternetMediaType type && Equals(type);
+
+        public static bool operator ==(InternetMediaType mediaType1, InternetMediaType mediaType2) => mediaType1.Equals(mediaType2);
+        public static bool operator !=(InternetMediaType mediaType1, InternetMediaType mediaType2) => !(mediaType1 == mediaType2);
 
     }
 }

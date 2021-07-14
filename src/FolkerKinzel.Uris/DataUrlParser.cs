@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FolkerKinzel.Uris.Intls;
 
 #if NETSTANDARD2_0
 using FolkerKinzel.Strings.Polyfills;
@@ -13,18 +14,16 @@ namespace FolkerKinzel.Uris
 {
     public static class DataUrlParser
     {
-
-
-         /// <summary>
+        /// <summary>
         /// Gibt an, dass der <see cref="Uri"/> ein <see cref="DataUrlBuilder"/> nach RFC 2397 ist. Dieses Feld ist schreibgeschützt.
         /// </summary>
         private const string URI_SCHEME_DATA = "data:";
-        
+
         public static bool IsDataUrl(this string? urlString) => urlString is not null && urlString.StartsWith(URI_SCHEME_DATA, StringComparison.OrdinalIgnoreCase);
 
         public static bool IsDataUrl(this Uri? dataUrl) => dataUrl is not null && dataUrl.OriginalString.IsDataUrl();
 
-        
+
         /// <summary>
         /// Erstellt einen neuen <see cref="DataUrlBuilder"/>. Löst keine Ausnahme aus, wenn der <see cref="DataUrlBuilder"/> nicht erstellt werden kann.
         /// </summary>
@@ -34,7 +33,6 @@ namespace FolkerKinzel.Uris
         {
             dataUrlInfo = null;
             DataEncoding dataEncoding = DataEncoding.UrlEncoded;
-            InternetMediaType? mediaType;
             string? embeddedData;
 
             if (value is null || !value.IsDataUrl())
@@ -68,20 +66,21 @@ namespace FolkerKinzel.Uris
                 return false;
             }
 
-
             // dies ändert ggf. auch endIndex
             if (HasBase64Encoding(value))
             {
                 dataEncoding = DataEncoding.Base64;
             }
 
-            string mimeString = value.Substring(DATA_PROTOCOL_LENGTH, endIndex - DATA_PROTOCOL_LENGTH);
+            InternetMediaType mediaType;
 
-            if (string.IsNullOrWhiteSpace(mimeString))
+            if (value.AsSpan(DATA_PROTOCOL_LENGTH, endIndex - DATA_PROTOCOL_LENGTH).Trim().IsEmpty)
             {
-                mediaType = DataUrlInfo.DefaultMediaType;
+                mediaType = DataUrl.DefaultMediaType();
             }
-            else if (!InternetMediaType.TryParse(mimeString.StartsWith(';') ? "text/plain" + mimeString : mimeString, out mediaType))
+            else if (!InternetMediaType.TryParse(value[DATA_PROTOCOL_LENGTH] == ';'
+                ? ("text/plain" + value.Substring(DATA_PROTOCOL_LENGTH, endIndex - DATA_PROTOCOL_LENGTH)).AsMemory()
+                : value.AsMemory(DATA_PROTOCOL_LENGTH, endIndex - DATA_PROTOCOL_LENGTH), out mediaType))
             {
                 return false;
             }
@@ -121,7 +120,5 @@ namespace FolkerKinzel.Uris
                 return false;
             }
         }
-
-
     }
 }

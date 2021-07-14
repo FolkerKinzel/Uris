@@ -16,6 +16,11 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="alt\**" />
+    <EmbeddedResource Remove="alt\**" />
+    <None Remove="alt\**" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Remove="Intls\Cache.cs" />
     <Compile Remove="MimeCacheFactory.cs" />
   </ItemGroup>

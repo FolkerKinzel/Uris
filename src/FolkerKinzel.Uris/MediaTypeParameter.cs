@@ -43,7 +43,19 @@ namespace FolkerKinzel.Uris
         }
 
         public ReadOnlySpan<char> Key => _key.Span;
+
         public ReadOnlySpan<char> Value => _value.Span;
+
+        public bool IsEmpty => _key.IsEmpty;
+
+        public static MediaTypeParameter Empty => default;
+
+        public bool IsCharsetParameter()
+        {
+            ReadOnlySpan<char> charset = stackalloc char[] { 'c', 'h', 'a', 'r', 's', 'e', 't' };
+            return charset.Equals(Key, StringComparison.OrdinalIgnoreCase);
+        }
+
 
         internal static bool TryParse(ReadOnlyMemory<char> parameterString, out MediaTypeParameter parameter)
         {
@@ -96,7 +108,7 @@ namespace FolkerKinzel.Uris
 
             ReadOnlySpan<char> valueSpan = Value;
 
-            if (Key.Equals(CHARSET_KEY.AsSpan(), StringComparison.OrdinalIgnoreCase))
+            if (IsCharsetParameter())
             {
                 for (int j = 0; j < valueSpan.Length; j++)
                 {
@@ -130,7 +142,7 @@ namespace FolkerKinzel.Uris
         internal void AppendTo(StringBuilder builder)
         {
             // Standard ctor
-            if(Key.Length == 0)
+            if(IsEmpty)
             {
                 return;
             }
