@@ -19,6 +19,7 @@ namespace FolkerKinzel.Uris
 
         internal const string CHARSET_PARAMETER_NAME = "charset";
 
+        internal const int StringLength = 64;
 
         private InternetMediaType2(ReadOnlyMemory<char> mediaType, ReadOnlyMemory<char> subType, ReadOnlyMemory<char> parameters)
         {
@@ -149,13 +150,14 @@ namespace FolkerKinzel.Uris
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
         public string ToString(bool includeParameters)
         {
-            var sb = new StringBuilder();
+            var sb = new StringBuilder(StringLength);
             AppendTo(sb, includeParameters);
             return sb.ToString();
         }
 
         internal void AppendTo(StringBuilder sb, bool includeParameters)
         {
+            _ = sb.EnsureCapacity(sb.Length + StringLength);
             _ = sb.Append(MediaType).Append('/').Append(SubType).ToLowerInvariant();
 
             if (includeParameters)

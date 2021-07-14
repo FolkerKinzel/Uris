@@ -15,6 +15,7 @@ namespace FolkerKinzel.Uris
         private readonly ReadOnlyMemory<char> _value;
         private const string CHARSET_KEY = "charset";
 
+        internal const int StringLength = 32;
 
         public MediaTypeParameter(ReadOnlyMemory<char> key, ReadOnlyMemory<char> value)
         {
@@ -120,7 +121,7 @@ namespace FolkerKinzel.Uris
 
         public override string ToString()
         {
-            var sb = new StringBuilder();
+            var sb = new StringBuilder(StringLength);
             AppendTo(sb);
             return sb.ToString();
         }
@@ -133,6 +134,8 @@ namespace FolkerKinzel.Uris
             {
                 return;
             }
+
+            _ = builder.EnsureCapacity(builder.Length + StringLength);
 
             // RFC 2045 Section 5.1 "tspecials"
             ReadOnlySpan<char> maskChars = stackalloc char[] { ' ', '(', ')', '<', '>', '@', ',', ';', ':', '\\', '\"', '/', '[', '>', ']', '?', '=' };

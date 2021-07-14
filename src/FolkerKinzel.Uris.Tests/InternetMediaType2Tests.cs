@@ -89,12 +89,21 @@ namespace FolkerKinzel.Uris.Tests
         public void EqualsTest6()
         {
             Assert.IsTrue(InternetMediaType2.TryParse("text/plain; charset=iso-8859-1;other=value", out var media1));
-            Assert.IsTrue(InternetMediaType2.TryParse("text/plain; charset=iso-8859-1;OTHER=VALUE", out var media2));
+            Assert.IsTrue(InternetMediaType2.TryParse("text/plain;charset=iso-8859-1;OTHER=VALUE", out var media2));
 
             Assert.IsTrue(media1 != media2);
             Assert.IsFalse(media1 == media2);
 
             Assert.AreNotEqual(media1.GetHashCode(), media2.GetHashCode());
+        }
+
+
+        [TestMethod]
+        public void ToStringTest1()
+        {
+            Assert.IsTrue(InternetMediaType2.TryParse("TEXT/PLAIN ; CHARSET=ISO-8859-1", out InternetMediaType2 inetMedia));
+
+            Assert.AreEqual("text/plain;charset=iso-8859-1", inetMedia.ToString());
         }
         
     }
