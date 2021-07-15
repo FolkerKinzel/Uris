@@ -47,7 +47,7 @@ namespace FolkerKinzel.Uris
 
             return sb.AppendProtocol().Append(',').Append(data).ToString();
 
-            //: new Uri($"data:,{Uri.EscapeDataString(text)}");
+            // $"data:,{Uri.EscapeDataString(text)}"
         }
 
 
@@ -86,7 +86,7 @@ namespace FolkerKinzel.Uris
 
             return builder.AppendProtocol().AppendMediaType(mediaType).AppendBase64().Append(data).ToString();
 
-            //return new Uri($"data:{mediaTypeString};base64,{Convert.ToBase64String(bytes)}");
+            // $"data:{mediaTypeString};base64,{Convert.ToBase64String(bytes)}"
         }
 
         

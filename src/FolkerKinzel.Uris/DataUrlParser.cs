@@ -14,12 +14,7 @@ namespace FolkerKinzel.Uris
 {
     public static class DataUrlParser
     {
-        /// <summary>
-        /// Gibt an, dass der <see cref="Uri"/> ein <see cref="DataUrlBuilder"/> nach RFC 2397 ist. Dieses Feld ist schreibgeschützt.
-        /// </summary>
-        private const string URI_SCHEME_DATA = "data:";
-
-        public static bool IsDataUrl(this string? urlString) => urlString is not null && urlString.StartsWith(URI_SCHEME_DATA, StringComparison.OrdinalIgnoreCase);
+        public static bool IsDataUrl(this string? urlString) => urlString.StartsWithDataUrlProtocol();
 
         public static bool IsDataUrl(this Uri? dataUrl) => dataUrl is not null && dataUrl.OriginalString.IsDataUrl();
 

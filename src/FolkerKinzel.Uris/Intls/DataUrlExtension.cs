@@ -12,6 +12,18 @@ namespace FolkerKinzel.Uris.Intls
 {
     internal static class DataUrlExtension
     {
+        internal static bool StartsWithDataUrlProtocol(this string? input)
+        {
+            if(input is null)
+            {
+                return false;
+            }
+
+            ReadOnlySpan<char> protocol = stackalloc char[] { 'd', 'a', 't', 'a', ':' };
+
+            return input.AsSpan().StartsWith(protocol, StringComparison.OrdinalIgnoreCase);
+        }
+
         internal static StringBuilder AppendProtocol(this StringBuilder sb)
         {
             ReadOnlySpan<char> protocol = stackalloc char[] { 'd', 'a', 't', 'a', ':' };
