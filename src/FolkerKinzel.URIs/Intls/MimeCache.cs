@@ -94,7 +94,7 @@ namespace FolkerKinzel.Uris.Intls
 
         internal static string GetFileTypeExtension(string mimeType)
         {
-            mimeType = mimeType.Replace(" ", "").ToLowerInvariant();
+            //mimeType = mimeType.Replace(" ", "").ToLowerInvariant();
 
             return TryGetFileTypeExtensionFromCache(mimeType, out string? fileTypeExtension)
                 ? PrepareFileTypeExtension(fileTypeExtension)

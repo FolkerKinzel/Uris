@@ -49,20 +49,20 @@ namespace FolkerKinzel.Uris.Intls
 
         internal static string GetFileType(string mimeType)
         {
-            (int Start, int LinesCount) index;
+            (int Start, int LinesCount) mediaTypeIndex;
 
             if (_index.Value.TryGetValue(GetMediaTypeFromMimeType(mimeType), out long rawIdx))
             {
-                index = UnpackIndex(rawIdx);
+                mediaTypeIndex = UnpackIndex(rawIdx);
             }
             else
             {
                 return DEFAULT_FILE_TYPE_EXTENSION;
             }
 
-            using StreamReader reader = InitReader(index.Start);
+            using StreamReader reader = InitReader(mediaTypeIndex.Start);
 
-            for (int i = 0; i < index.LinesCount; i++)
+            for (int i = 0; i < mediaTypeIndex.LinesCount; i++)
             {
                 string? line = reader.ReadLine();
 

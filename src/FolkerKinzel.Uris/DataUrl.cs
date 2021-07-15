@@ -14,10 +14,14 @@ namespace FolkerKinzel.Uris
     /// </summary>
     public readonly struct DataUrl
     {
+        #region private const
+
         private const string DEFAULT_MEDIA_TYPE = "text/plain";
         private const int PROTOCOL_LENGTH = 5;
         private const int BASE64_LENGTH = 8;
-        
+
+        #endregion
+
         private readonly ReadOnlyMemory<char> _embeddedData;
 
         internal DataUrl(InternetMediaType mediaType, DataEncoding dataEncoding, ReadOnlyMemory<char> embeddedData)
@@ -26,6 +30,8 @@ namespace FolkerKinzel.Uris
             DataEncoding = dataEncoding;
             _embeddedData = embeddedData;
         }
+
+        #region Properties
 
         /// <summary>
         /// Der Datentyp der im Data-URL eingebetteten Daten.
@@ -45,25 +51,33 @@ namespace FolkerKinzel.Uris
 
 
         /// <summary>
-        /// <c>true</c>, wenn der Data-Url eingebetteten Text enthält.
+        /// <c>true</c>, wenn der <see cref="DataUrl"/> eingebetteten Text enthält.
         /// </summary>
         public bool ContainsText => this.InternetMediaType.IsTextMediaType();
 
 
         /// <summary>
-        /// <c>true</c>, wenn der Data-URL eingebettete binäre Daten enthält.
+        /// <c>true</c>, wenn der <see cref="DataUrl"/> eingebettete binäre Daten enthält.
         /// </summary>
         public bool ContainsBytes => DataEncoding == DataEncoding.Base64 || !ContainsText;
 
+        public bool IsEmpty => this.InternetMediaType.IsEmpty;
+
+        public static DataUrl Empty => default;
+
+        #endregion
+
+        #region Parser
 
         /// <summary>
-        /// Erstellt einen neuen <see cref="DataUrlBuilder"/>. Löst keine Ausnahme aus, wenn der <see cref="DataUrlBuilder"/> nicht erstellt werden kann.
+        /// Erstellt einen neuen <see cref="DataUrl"/>. Löst keine Ausnahme aus, wenn der <see cref="DataUrl"/> nicht erstellt werden kann.
         /// </summary>
         /// <param name="value">Ein <see cref="string"/>, der dem Data-URL-Schema nach RFC 2397 entspricht.</param>
-        /// <returns>Ein <see cref="bool"/>-Wert, der <c>true</c> ist, wenn value erfolgreich als Data-Url geparst wurde, andernfalls <c>false</c>.</returns>
-        public static bool TryParse(string? value, [NotNullWhen(true)] out DataUrl? dataUrlInfo)
+        /// <returns>Ein <see cref="bool"/>-Wert, der <c>true</c> ist, wenn <paramref name="value"/> erfolgreich als <see cref="DataUrl"/> 
+        /// geparst wurde, andernfalls <c>false</c>.</returns>
+        public static bool TryParse(string? value, out DataUrl dataUrl)
         {
-            dataUrlInfo = null;
+            dataUrl = default;
             DataEncoding dataEncoding = DataEncoding.UrlEncoded;
 
             if (value is null || !value.IsDataUrl())
@@ -116,7 +130,7 @@ namespace FolkerKinzel.Uris
                 return false;
             }
 
-            dataUrlInfo = new DataUrl(mediaType, dataEncoding, value.AsMemory(startOfData + 1));
+            dataUrl = new DataUrl(mediaType, dataEncoding, value.AsMemory(startOfData + 1));
 
             return true;
 
@@ -150,11 +164,15 @@ namespace FolkerKinzel.Uris
             }
         }
 
+        #endregion
+
+        #region Builder
+
         /// <summary>
-        /// Erzeugt einen <see cref="Uri"/>, in den Text eingebettet ist.
+        /// Erzeugt einen Data-URL-<see cref="string"/>, in den Text eingebettet ist.
         /// </summary>
-        /// <param name="text">Der in den <see cref="Uri"/> einzubettende Text.</param>
-        /// <returns>Ein <see cref="Uri"/>, in den <paramref name="text"/> eingebettet ist.</returns>
+        /// <param name="text">Der in den Data-URL einzubettende Text.</param>
+        /// <returns>Ein Data-URL, in den <paramref name="text"/> eingebettet ist.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="text"/> ist <c>null</c>.</exception>
         /// <exception cref="ArgumentException"><paramref name="text"/> ist ein Leerstring oder
         /// enthält nur Whitespace.</exception>
@@ -257,7 +275,10 @@ namespace FolkerKinzel.Uris
             return FromBytes(bytes, mediaType.Value);
         }
 
-        
+        #endregion
+
+        #region Data
+
         /// <summary>
         /// Ruft im Data-URL eingebetten Text ab.
         /// </summary>
@@ -346,7 +367,8 @@ namespace FolkerKinzel.Uris
         /// kurze Zeitspanne in einem Cache zwischengespeichert, um die Performance zu erhöhen.</remarks>
         public string GetFileTypeExtension() => InternetMediaType.GetFileTypeExtension();
 
-        
+        #endregion
+
         [SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
         internal static InternetMediaType DefaultMediaType()
         {

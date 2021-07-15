@@ -8,7 +8,7 @@ namespace FolkerKinzel.Uris.Tests
     public class DataUrlExtensionTests
     {
         private const string DATA_URL_PROTOCOL = "data:";
-        const string BASE64 = ";base64,";
+        private const string BASE64 = ";base64,";
 
         [DataTestMethod]
         [DataRow(DATA_URL_PROTOCOL, true)]
