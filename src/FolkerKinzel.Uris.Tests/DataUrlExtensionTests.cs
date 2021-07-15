@@ -2,7 +2,7 @@
 using System;
 using System.Text;
 
-namespace FolkerKinzel.Uris.Intls.Tests
+namespace FolkerKinzel.Uris.Tests
 {
     [TestClass]
     public class DataUrlExtensionTests

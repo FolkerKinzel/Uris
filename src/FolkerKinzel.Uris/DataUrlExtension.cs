@@ -8,10 +8,14 @@ using System.Threading.Tasks;
 using FolkerKinzel.Strings.Polyfills;
 #endif
 
-namespace FolkerKinzel.Uris.Intls
+namespace FolkerKinzel.Uris
 {
-    internal static class DataUrlExtension
+    public static class DataUrlExtension
     {
+        public static bool IsDataUrl(this string? urlString) => urlString.StartsWithDataUrlProtocol();
+
+        public static bool IsDataUrl(this Uri? dataUrl) => dataUrl is not null && dataUrl.OriginalString.IsDataUrl();
+
         internal static bool StartsWithDataUrlProtocol(this string? input)
         {
             if(input is null)
