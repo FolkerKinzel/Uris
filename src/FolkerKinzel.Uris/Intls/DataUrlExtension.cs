@@ -50,6 +50,7 @@ namespace FolkerKinzel.Uris.Intls
             return mediaType.AppendTo(builder);
         }
 
+
         internal static StringBuilder AppendBase64(this StringBuilder builder)
         {
             ReadOnlySpan<char> base64 = stackalloc char[] { ';', 'b', 'a', 's', 'e', '6', '4', ',' };

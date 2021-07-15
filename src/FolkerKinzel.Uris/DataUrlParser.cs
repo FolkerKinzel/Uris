@@ -24,7 +24,7 @@ namespace FolkerKinzel.Uris
         /// </summary>
         /// <param name="value">Ein <see cref="string"/>, der dem Data-URL-Schema nach RFC 2397 entspricht.</param>
         /// <returns>Ein <see cref="bool"/>-Wert, der <c>true</c> ist, wenn value erfolgreich als Data-Url geparst wurde, andernfalls <c>false</c>.</returns>
-        public static bool TryParse(string? value, [NotNullWhen(true)] out DataUrlInfo? dataUrlInfo)
+        public static bool TryParse(string? value, [NotNullWhen(true)] out DataUrl? dataUrlInfo)
         {
             dataUrlInfo = null;
             DataEncoding dataEncoding = DataEncoding.UrlEncoded;
@@ -79,7 +79,7 @@ namespace FolkerKinzel.Uris
                 return false;
             }
 
-            dataUrlInfo = new DataUrlInfo(mediaType, dataEncoding, value.AsMemory(startOfData + 1));
+            dataUrlInfo = new DataUrl(mediaType, dataEncoding, value.AsMemory(startOfData + 1));
 
             return true;
 

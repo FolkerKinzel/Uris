@@ -10,11 +10,14 @@ namespace FolkerKinzel.Uris
     /// <summary>
     /// Kapselt die in einem Data-URL (RFC 2397) enthaltenen Informationen.
     /// </summary>
-    public readonly struct DataUrlInfo
+    public readonly struct DataUrl
     {
+        private const string DEFAULT_MEDIA_TYPE = "text/plain";
+
+        
         private readonly ReadOnlyMemory<char> _embeddedData;
 
-        internal DataUrlInfo(InternetMediaType mediaType, DataEncoding dataEncoding, ReadOnlyMemory<char> embeddedData)
+        internal DataUrl(InternetMediaType mediaType, DataEncoding dataEncoding, ReadOnlyMemory<char> embeddedData)
         {
             InternetMediaType = mediaType;
             DataEncoding = dataEncoding;
@@ -49,6 +52,7 @@ namespace FolkerKinzel.Uris
         /// </summary>
         public bool ContainsBytes => DataEncoding == DataEncoding.Base64 || !ContainsText;
 
+        
 
         /// <summary>
         /// Ruft im Data-URL eingebetten Text ab.
@@ -137,5 +141,12 @@ namespace FolkerKinzel.Uris
         /// <remarks>Da das Auffinden einer geeigneten Dateiendung ein aufwändiger Vorgang ist, werden Suchergebnisse für eine
         /// kurze Zeitspanne in einem Cache zwischengespeichert, um die Performance zu erhöhen.</remarks>
         public string GetFileTypeExtension() => InternetMediaType.GetFileTypeExtension();
+
+        [SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
+        internal static InternetMediaType DefaultMediaType()
+        {
+            _ = InternetMediaType.TryParse(DEFAULT_MEDIA_TYPE.AsMemory(), out InternetMediaType mediaType);
+            return mediaType;
+        }
     }
 }

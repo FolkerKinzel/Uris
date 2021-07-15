@@ -46,29 +46,25 @@ namespace FolkerKinzel.Uris
         public bool IsEmpty => _mediaType.IsEmpty;
 
 
-        public static bool TryParse(string mediaTypeString, out InternetMediaType mediaType)
+        public static InternetMediaType Parse(string? value)
+            => value is null
+                ? throw new ArgumentNullException(value)
+                : TryParse(value.AsMemory(), out InternetMediaType mediaType)
+                    ? mediaType
+                    : throw new ArgumentException(string.Format(Res.InvalidMediaType, nameof(value)), nameof(value));
+
+
+        public static bool TryParse(ReadOnlyMemory<char> value, out InternetMediaType mediaType)
         {
-            if (mediaTypeString is null)
-            {
-                mediaType = default;
-                return false;
-            }
+            int parameterStartIndex = value.Span.IndexOf(';');
 
-            return TryParse(mediaTypeString.AsMemory(), out mediaType);
-        }
-
-
-        public static bool TryParse(ReadOnlyMemory<char> mediaTypeString, out InternetMediaType mediaType)
-        {
-            int parameterStartIndex = mediaTypeString.Span.IndexOf(';');
-
-            ReadOnlyMemory<char> mediaPart = parameterStartIndex < 0 ? mediaTypeString : mediaTypeString.Slice(0, parameterStartIndex);
+            ReadOnlyMemory<char> mediaPart = parameterStartIndex < 0 ? value : value.Slice(0, parameterStartIndex);
 
             const char mediaTypeSeparator = '/';
 
-            int mediaTypeSeparatorIndex = mediaTypeString.Span.IndexOf(mediaTypeSeparator);
+            int mediaTypeSeparatorIndex = value.Span.IndexOf(mediaTypeSeparator);
 
-            if (mediaTypeSeparatorIndex == -1 || mediaTypeSeparatorIndex == mediaTypeString.Length)
+            if (mediaTypeSeparatorIndex == -1 || mediaTypeSeparatorIndex == value.Length)
             {
                 mediaType = default;
                 return false;
@@ -77,7 +73,7 @@ namespace FolkerKinzel.Uris
             mediaType = new InternetMediaType(
                 mediaPart.Slice(0, mediaTypeSeparatorIndex),
                 mediaPart.Slice(mediaTypeSeparatorIndex + 1),
-                parameterStartIndex < 0 ? ReadOnlyMemory<char>.Empty : mediaTypeString.Slice(parameterStartIndex + 1));
+                parameterStartIndex < 0 ? ReadOnlyMemory<char>.Empty : value.Slice(parameterStartIndex + 1));
 
             return true;
         }
@@ -174,7 +170,7 @@ namespace FolkerKinzel.Uris
         public string ToString(bool includeParameters)
         {
             var sb = new StringBuilder(StringLength);
-            AppendTo(sb, includeParameters);
+            _ = AppendTo(sb, includeParameters);
             return sb.ToString();
         }
 
@@ -217,7 +213,7 @@ namespace FolkerKinzel.Uris
             }
             else
             {
-                _ = TryParse(MimeCache.GetMimeType(fileTypeExtension), out InternetMediaType inetMediaType);
+                _ = TryParse(MimeCache.GetMimeType(fileTypeExtension).AsMemory(), out InternetMediaType inetMediaType);
                 return inetMediaType;
             }
         }
