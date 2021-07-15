@@ -178,12 +178,18 @@ namespace FolkerKinzel.Uris
             return sb.ToString();
         }
 
-        internal void AppendTo(StringBuilder sb, bool includeParameters)
+        public StringBuilder AppendTo(StringBuilder sb, bool includeParameters = true)
         {
-            if(IsEmpty)
+            if (sb is null)
             {
-                return;
+                throw new ArgumentNullException(nameof(sb));
             }
+
+            if (IsEmpty)
+            {
+                return sb;
+            }
+
             _ = sb.EnsureCapacity(sb.Length + StringLength);
             _ = sb.Append(MediaType).Append('/').Append(SubType).ToLowerInvariant();
 
@@ -191,10 +197,11 @@ namespace FolkerKinzel.Uris
             {
                 foreach (MediaTypeParameter parameter in Parameters)
                 {
-                    _ = sb.Append(';');
                     parameter.AppendTo(sb);
                 }
             }
+
+            return sb;
         }
 
 

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using FolkerKinzel.Uris.Intls;
@@ -19,6 +17,10 @@ namespace FolkerKinzel.Uris
     /// </summary>
     public static class DataUrlBuilder
     {
+        private const int PROTOCOL_LENGTH = 5;
+        private const int BASE64_LENGTH = 8;
+
+
         /// <summary>
         /// Erzeugt einen <see cref="Uri"/>, in den Text eingebettet ist.
         /// </summary>
@@ -27,14 +29,28 @@ namespace FolkerKinzel.Uris
         /// <exception cref="ArgumentNullException"><paramref name="text"/> ist <c>null</c>.</exception>
         /// <exception cref="ArgumentException"><paramref name="text"/> ist ein Leerstring oder
         /// enthält nur Whitespace.</exception>
-        /// <exception cref="UriFormatException">Es kann kein <see cref="Uri"/> initialisiert werden, z.B.
-        /// weil der URI-String länger als 65519 Zeichen ist.</exception>
-        public static Uri EmbedText(string text)
-            => text is null
-                ? throw new ArgumentNullException(nameof(text))
-                : string.IsNullOrWhiteSpace(text)
-                    ? throw new ArgumentException(Res.NoData, nameof(text))
-                    : new Uri($"data:,{Uri.EscapeDataString(text)}");
+        public static string FromText(string text)
+        {
+            if (text is null)
+            {
+                throw new ArgumentNullException(nameof(text));
+            }
+
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                throw new ArgumentException(Res.NoData, nameof(text));
+            }
+
+            string data = Uri.EscapeDataString(text);
+
+            var sb = new StringBuilder(PROTOCOL_LENGTH + 1 + data.Length);
+
+            return sb.AppendProtocol().Append(',').Append(data).ToString();
+
+            //: new Uri($"data:,{Uri.EscapeDataString(text)}");
+        }
+
+
 
 
         /// <summary>
@@ -47,9 +63,7 @@ namespace FolkerKinzel.Uris
         /// binären Daten eingebettet sind.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="bytes"/> oder <paramref name="mediaType"/> ist <c>null</c>.</exception>
         /// <exception cref="ArgumentException"><paramref name="bytes"/> ist ein leeres Array.</exception>
-        /// <exception cref="UriFormatException">Es kann kein <see cref="Uri"/> initialisiert werden, z.B.
-        /// weil der URI-String länger als 65519 Zeichen ist.</exception>
-        public static Uri EmbedBytes(byte[] bytes, InternetMediaType mediaType)
+        public static string FromBytes(byte[] bytes, InternetMediaType mediaType)
         {
             if (bytes == null)
             {
@@ -66,15 +80,16 @@ namespace FolkerKinzel.Uris
                 throw new ArgumentException(Res.NoData, nameof(bytes));
             }
 
-            string mediaTypeString =
-                mediaType.Equals(DataUrl.DefaultMediaType())
-                ? string.Empty
-                : mediaType.IsTextPlainType()
-                    ? $";{mediaType.ToString().Split(';', 2, StringSplitOptions.None)[1]}"
-                    : mediaType.ToString();
+            string data = Convert.ToBase64String(bytes);
 
-            return new Uri($"data:{mediaTypeString};base64,{Convert.ToBase64String(bytes)}");
+            var builder = new StringBuilder(PROTOCOL_LENGTH + BASE64_LENGTH + InternetMediaType.StringLength + data.Length);
+
+            return builder.AppendProtocol().AppendMediaType(mediaType).AppendBase64().Append(data).ToString();
+
+            //return new Uri($"data:{mediaTypeString};base64,{Convert.ToBase64String(bytes)}");
         }
+
+        
 
 
         /// <summary>
@@ -90,7 +105,7 @@ namespace FolkerKinzel.Uris
         /// <exception cref="UriFormatException">Es kann kein <see cref="Uri"/> initialisiert werden, z.B.
         /// weil der URI-String länger als 65519 Zeichen ist.</exception>
         /// <exception cref="IOException">E/A-Fehler.</exception>
-        public static async Task<Uri> EmbedFileContentAsync(string path, InternetMediaType? mediaType = null)
+        public static async Task<string> FromFileAsync(string path, InternetMediaType? mediaType = null)
         {
             byte[] bytes = await LoadFileAsync(path).ConfigureAwait(false);
 
@@ -99,11 +114,11 @@ namespace FolkerKinzel.Uris
                 mediaType = InternetMediaType.FromFileTypeExtension(Path.GetExtension(path));
             }
 
-            return DataUrlBuilder.EmbedBytes(bytes, mediaType.Value);
+            return DataUrlBuilder.FromBytes(bytes, mediaType.Value);
         }
 
 
-        public static Uri EmbedFileContent(string path, InternetMediaType? mediaType = null)
+        public static string FromFile(string path, InternetMediaType? mediaType = null)
         {
             byte[] bytes = LoadFile(path);
 
@@ -112,10 +127,10 @@ namespace FolkerKinzel.Uris
                 mediaType = InternetMediaType.FromFileTypeExtension(Path.GetExtension(path));
             }
 
-            return DataUrlBuilder.EmbedBytes(bytes, mediaType.Value);
+            return DataUrlBuilder.FromBytes(bytes, mediaType.Value);
         }
 
-
+        #region private
         private static async Task<byte[]> LoadFileAsync(string path)
         {
             try
@@ -192,5 +207,7 @@ namespace FolkerKinzel.Uris
                 throw new IOException(e.Message, e);
             }
         }
+
+        #endregion
     }
 }

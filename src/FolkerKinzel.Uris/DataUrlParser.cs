@@ -33,7 +33,6 @@ namespace FolkerKinzel.Uris
         {
             dataUrlInfo = null;
             DataEncoding dataEncoding = DataEncoding.UrlEncoded;
-            string? embeddedData;
 
             if (value is null || !value.IsDataUrl())
             {
@@ -85,9 +84,7 @@ namespace FolkerKinzel.Uris
                 return false;
             }
 
-            embeddedData = value.Substring(startOfData + 1);
-
-            dataUrlInfo = new DataUrlInfo(mediaType, dataEncoding, embeddedData);
+            dataUrlInfo = new DataUrlInfo(mediaType, dataEncoding, value.AsMemory(startOfData + 1));
 
             return true;
 

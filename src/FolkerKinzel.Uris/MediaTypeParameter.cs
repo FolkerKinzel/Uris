@@ -141,8 +141,14 @@ namespace FolkerKinzel.Uris
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
         internal void AppendTo(StringBuilder builder)
         {
+            //if (builder is null)
+            //{
+            //    throw new ArgumentNullException(nameof(builder));
+            //}
+
+
             // Standard ctor
-            if(IsEmpty)
+            if (IsEmpty)
             {
                 return;
             }
@@ -153,25 +159,24 @@ namespace FolkerKinzel.Uris
             ReadOnlySpan<char> maskChars = stackalloc char[] { ' ', '(', ')', '<', '>', '@', ',', ';', ':', '\\', '\"', '/', '[', '>', ']', '?', '=' };
 
             int keyStart = builder.Length;
-            _ = builder.Append(Key).ToLowerInvariant(keyStart).Append('=');
+            _ = builder.Append(';').Append(Key).ToLowerInvariant(keyStart).Append('=');
 
 
             bool mask = Value.ContainsAny(maskChars);
+
+            if (mask)
             {
-                if (mask)
-                {
-                    _ = builder.Append('\"');
-                }
+                _ = builder.Append('\"');
+            }
 
-                int valueStart = builder.Length;
-                _ = Key.CompareTo(CHARSET_KEY.AsSpan(), StringComparison.OrdinalIgnoreCase) == 0
-                    ? builder.Append(Value).ToLowerInvariant()
-                    : builder.Append(Value);
+            int valueStart = builder.Length;
+            _ = Key.CompareTo(CHARSET_KEY.AsSpan(), StringComparison.OrdinalIgnoreCase) == 0
+                ? builder.Append(Value).ToLowerInvariant()
+                : builder.Append(Value);
 
-                if (mask)
-                {
-                    _ = builder.Append('\"');
-                }
+            if (mask)
+            {
+                _ = builder.Append('\"');
             }
         }
     }

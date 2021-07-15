@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FolkerKinzel.Uris.Intls;
@@ -9,35 +10,38 @@ namespace FolkerKinzel.Uris
     /// <summary>
     /// Kapselt die in einem Data-URL (RFC 2397) enthaltenen Informationen.
     /// </summary>
-    public sealed class DataUrlInfo
+    public readonly struct DataUrlInfo
     {
-        internal DataUrlInfo(InternetMediaType mediaType, DataEncoding dataEncoding, string embeddedData)
+        private readonly ReadOnlyMemory<char> _embeddedData;
+
+        internal DataUrlInfo(InternetMediaType mediaType, DataEncoding dataEncoding, ReadOnlyMemory<char> embeddedData)
         {
-            MediaType = mediaType;
+            InternetMediaType = mediaType;
             DataEncoding = dataEncoding;
-            EmbeddedData = embeddedData;
+            _embeddedData = embeddedData;
         }
 
         /// <summary>
         /// Der Datentyp der im Data-URL eingebetteten Daten.
         /// </summary>
-        public InternetMediaType MediaType { get; }
+        public InternetMediaType InternetMediaType { get; }
 
         /// <summary>
         /// Die Art der Enkodierung der in <see cref="EmbeddedData"/> enthaltenen Daten.
         /// </summary>
         public DataEncoding DataEncoding { get; }
 
+
         /// <summary>
         /// Der Teil des Data-URLs, der die eingebetteten Daten enthält.
         /// </summary>
-        public string EmbeddedData { get; }
+        public ReadOnlySpan<char> EmbeddedData => _embeddedData.Span;
 
 
         /// <summary>
         /// <c>true</c>, wenn der Data-Url eingebetteten Text enthält.
         /// </summary>
-        public bool ContainsText => this.MediaType.MediaType.Equals("text", StringComparison.Ordinal);
+        public bool ContainsText => this.InternetMediaType.IsTextMediaType();
 
 
         /// <summary>
@@ -61,16 +65,18 @@ namespace FolkerKinzel.Uris
                 return false;
             }
 
+            // als Base64 codierter Text:
             if (DataEncoding == DataEncoding.Base64)
             {
-                // als Base64 codierter Text:
-                Encoding enc = MediaType.Parameters.ContainsKey(InternetMediaType.CHARSET_PARAMETER_NAME)
-                    ? TextEncodingConverter.GetEncoding(MediaType.Parameters[InternetMediaType.CHARSET_PARAMETER_NAME])
-                    : Encoding.ASCII;
+                static bool Predicate(MediaTypeParameter p) => p.IsCharsetParameter();
 
+                MediaTypeParameter charsetParameter = InternetMediaType.Parameters.FirstOrDefault(Predicate);
+                
+                Encoding enc = charsetParameter.IsEmpty ? Encoding.ASCII : TextEncodingConverter.GetEncoding(charsetParameter.Value.ToString());
+                
                 try
                 {
-                    embeddedText = enc.GetString(Convert.FromBase64String(EmbeddedData));
+                    embeddedText = enc.GetString(Convert.FromBase64String(EmbeddedData.ToString()));
                 }
                 catch
                 {
@@ -80,7 +86,7 @@ namespace FolkerKinzel.Uris
             else
             {
                 // Url-Codierter UTF-8-String:
-                embeddedText = Uri.UnescapeDataString(EmbeddedData);
+                embeddedText = Uri.UnescapeDataString(EmbeddedData.ToString());
             }
 
             return true;
@@ -110,8 +116,8 @@ namespace FolkerKinzel.Uris
             try
             {
                 embeddedBytes = this.DataEncoding == DataEncoding.Base64
-                    ? Convert.FromBase64String(EmbeddedData)
-                    : System.Text.Encoding.UTF8.GetBytes(Uri.UnescapeDataString(EmbeddedData));
+                    ? Convert.FromBase64String(EmbeddedData.ToString())
+                    : Encoding.UTF8.GetBytes(Uri.UnescapeDataString(EmbeddedData.ToString()));
             }
             catch
             {
@@ -130,6 +136,6 @@ namespace FolkerKinzel.Uris
         /// eingebetteten Daten ermöglicht.</returns>
         /// <remarks>Da das Auffinden einer geeigneten Dateiendung ein aufwändiger Vorgang ist, werden Suchergebnisse für eine
         /// kurze Zeitspanne in einem Cache zwischengespeichert, um die Performance zu erhöhen.</remarks>
-        public string GetFileTypeExtension() => MediaType.GetFileTypeExtension();
+        public string GetFileTypeExtension() => InternetMediaType.GetFileTypeExtension();
     }
 }
