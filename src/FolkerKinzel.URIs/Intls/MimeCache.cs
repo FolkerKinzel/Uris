@@ -113,7 +113,7 @@ namespace FolkerKinzel.Uris.Intls
                 {
                     _cache ??= InitCache();
 
-                    if (_cache.Find(x => x.Extension.Equals(mimeType, StringComparison.Ordinal)) is Entry entry)
+                    if (_cache.Find(x => x.MimeType.Equals(mimeType, StringComparison.Ordinal)) is Entry entry)
                     {
                         fileTypeExtension = entry.Extension;
                         AddEntryToCache(entry);
