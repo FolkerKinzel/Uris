@@ -5,7 +5,7 @@ using System.Text;
 using FolkerKinzel.Uris.Intls;
 using FolkerKinzel.Uris.Properties;
 
-#if NETSTANDARD2_0 || NETSTANDARD2_1
+#if NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
 using FolkerKinzel.Strings.Polyfills;
 #endif
 
@@ -79,7 +79,7 @@ namespace FolkerKinzel.Uris
         /// <returns>Eine <see cref="string"/>-Repräsentation des <see cref="InternetMediaType"/>-Objekts.</returns>
         public override string ToString() => ToString(true);
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
+        //[System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
         public string ToString(bool includeParameters)
         {
             var sb = new StringBuilder(StringLength);

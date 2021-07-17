@@ -3,7 +3,7 @@ using FolkerKinzel.Uris.Properties;
 using System.Text;
 using FolkerKinzel.Uris.Intls;
 
-#if NETSTANDARD2_0 || NETSTANDARD2_1
+#if NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
 using FolkerKinzel.Strings.Polyfills;
 #endif
 
@@ -85,13 +85,11 @@ namespace FolkerKinzel.Uris
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0075:Bedingten Ausdruck vereinfachen", Justification = "<Ausstehend>")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
         public bool Equals(MediaTypeParameter other)
-        {
-            return !Key.Equals(other.Key, StringComparison.OrdinalIgnoreCase)
+            => !Key.Equals(other.Key, StringComparison.OrdinalIgnoreCase)
                 ? false
                 : Key.Equals(CHARSET_KEY.AsSpan(), StringComparison.OrdinalIgnoreCase)
                     ? Value.Equals(other.Value, StringComparison.OrdinalIgnoreCase)
                     : Value.Equals(other.Value, StringComparison.Ordinal);
-        }
 
         public override bool Equals(object? obj) => obj is MediaTypeParameter parameter && Equals(parameter);
 

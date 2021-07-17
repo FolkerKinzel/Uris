@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 
-#if NETSTANDARD2_0
+#if NETSTANDARD2_0 || NET461
 using FolkerKinzel.Strings.Polyfills;
 #endif
 

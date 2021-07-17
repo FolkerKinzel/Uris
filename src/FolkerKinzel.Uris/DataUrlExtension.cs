@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-#if NETSTANDARD2_0
+#if NETSTANDARD2_0 || NET461
 using FolkerKinzel.Strings.Polyfills;
 #endif
 

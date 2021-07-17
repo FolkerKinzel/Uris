@@ -382,7 +382,7 @@ namespace FolkerKinzel.Uris
         {
             try
             {
-#if NETSTANDARD2_0
+#if NETSTANDARD2_0 || NET461
                 return await Task.Run(() => File.ReadAllBytes(path)).ConfigureAwait(false);
 #else
                 return await File.ReadAllBytesAsync(path).ConfigureAwait(false);
