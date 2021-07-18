@@ -10,7 +10,7 @@ using FolkerKinzel.Uris.Properties;
 namespace FolkerKinzel.Uris
 {
     /// <summary>
-    /// Kapselt die in einem Data-URL (RFC 2397) enthaltenen Informationen.
+    /// Represents a "data" URL (RFC 2397) that embeds data in-line in a URL.
     /// </summary>
     public readonly struct DataUrl
     {
@@ -24,9 +24,9 @@ namespace FolkerKinzel.Uris
 
         private readonly ReadOnlyMemory<char> _embeddedData;
 
-        internal DataUrl(InternetMediaType mediaType, DataEncoding dataEncoding, ReadOnlyMemory<char> embeddedData)
+        internal DataUrl(MimeType mediaType, DataEncoding dataEncoding, ReadOnlyMemory<char> embeddedData)
         {
-            InternetMediaType = mediaType;
+            MimeType = mediaType;
             DataEncoding = dataEncoding;
             _embeddedData = embeddedData;
         }
@@ -34,35 +34,41 @@ namespace FolkerKinzel.Uris
         #region Properties
 
         /// <summary>
-        /// Der Datentyp der im Data-URL eingebetteten Daten.
+        /// The data type of the embedded data.
         /// </summary>
-        public InternetMediaType InternetMediaType { get; }
+        public MimeType MimeType { get; }
 
         /// <summary>
-        /// Die Art der Enkodierung der in <see cref="EmbeddedData"/> enthaltenen Daten.
+        /// The encoding of the data in <see cref="EmbeddedData"/>.
         /// </summary>
         public DataEncoding DataEncoding { get; }
 
 
         /// <summary>
-        /// Der Teil des Data-URLs, der die eingebetteten Daten enthält.
+        /// The part of the "data" URL, which contains the embedded data.
         /// </summary>
         public ReadOnlySpan<char> EmbeddedData => _embeddedData.Span;
 
 
         /// <summary>
-        /// <c>true</c>, wenn der <see cref="DataUrl"/> eingebetteten Text enthält.
+        /// <c>true</c> if <see cref="EmbeddedData"/> contains text.
         /// </summary>
-        public bool ContainsText => this.InternetMediaType.IsTextMediaType();
+        public bool ContainsText => this.MimeType.IsTextMediaType();
 
 
         /// <summary>
-        /// <c>true</c>, wenn der <see cref="DataUrl"/> eingebettete binäre Daten enthält.
+        /// <c>true</c> if <see cref="EmbeddedData"/> contains binary data.
         /// </summary>
         public bool ContainsBytes => DataEncoding == DataEncoding.Base64 || !ContainsText;
 
-        public bool IsEmpty => this.InternetMediaType.IsEmpty;
+        /// <summary>
+        /// <c>true</c> if the <see cref="DataUrl"/> contains nothing.
+        /// </summary>
+        public bool IsEmpty => this.MimeType.IsEmpty;
 
+        /// <summary>
+        /// Returns an empty <see cref="DataUrl"/> struct.
+        /// </summary>
         public static DataUrl Empty => default;
 
         #endregion
@@ -70,11 +76,12 @@ namespace FolkerKinzel.Uris
         #region Parser
 
         /// <summary>
-        /// Erstellt einen neuen <see cref="DataUrl"/>. Löst keine Ausnahme aus, wenn der <see cref="DataUrl"/> nicht erstellt werden kann.
+        /// Tries to parse a <see cref="string"/> as <see cref="DataUrl"/>.
         /// </summary>
-        /// <param name="value">Ein <see cref="string"/>, der dem Data-URL-Schema nach RFC 2397 entspricht.</param>
-        /// <returns>Ein <see cref="bool"/>-Wert, der <c>true</c> ist, wenn <paramref name="value"/> erfolgreich als <see cref="DataUrl"/> 
-        /// geparst wurde, andernfalls <c>false</c>.</returns>
+        /// <param name="value">The <see cref="string"/> to parse., der dem Data-URL-Schema nach RFC 2397 entspricht.</param>
+        /// <param name="dataUrl">If the method returns <c>true</c> the parameter contains a <see cref="DataUrl"/> struct that provides the contents
+        /// of value. The parameter is passed uninitialized.</param>
+        /// <returns><c>true</c> if  <paramref name="value"/> could be parsed as <see cref="DataUrl"/>, <c>false</c> otherwise.</returns>
         public static bool TryParse(string? value, out DataUrl dataUrl)
         {
             dataUrl = default;
@@ -117,13 +124,13 @@ namespace FolkerKinzel.Uris
                 dataEncoding = DataEncoding.Base64;
             }
 
-            InternetMediaType mediaType;
+            MimeType mediaType;
 
             if (value.AsSpan(DATA_PROTOCOL_LENGTH, endIndex - DATA_PROTOCOL_LENGTH).Trim().IsEmpty)
             {
                 mediaType = DataUrl.DefaultMediaType();
             }
-            else if (!InternetMediaType.TryParse(value[DATA_PROTOCOL_LENGTH] == ';'
+            else if (!MimeType.TryParse(value[DATA_PROTOCOL_LENGTH] == ';'
                 ? ("text/plain" + value.Substring(DATA_PROTOCOL_LENGTH, endIndex - DATA_PROTOCOL_LENGTH)).AsMemory()
                 : value.AsMemory(DATA_PROTOCOL_LENGTH, endIndex - DATA_PROTOCOL_LENGTH), out mediaType))
             {
@@ -169,26 +176,29 @@ namespace FolkerKinzel.Uris
         #region Builder
 
         /// <summary>
-        /// Erzeugt einen Data-URL-<see cref="string"/>, in den Text eingebettet ist.
+        /// Creates a "data" URL (RFC 2397), which contains embedded text.
         /// </summary>
-        /// <param name="text">Der in den Data-URL einzubettende Text.</param>
-        /// <returns>Ein Data-URL, in den <paramref name="text"/> eingebettet ist.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="text"/> ist <c>null</c>.</exception>
-        /// <exception cref="ArgumentException"><paramref name="text"/> ist ein Leerstring oder
-        /// enthält nur Whitespace.</exception>
-        public static string FromText(string text)
+        /// <param name="text">The text to embed into the "data" URL.</param>
+        /// <returns>A "data" URL, into which the text provided by the parameter text is embedded.</returns>
+        /// <exception cref="FormatException">The <see cref="Uri"/> class was not able to encode <paramref name="text"/> correctly.</exception>
+        ///// <exception cref="ArgumentNullException"><paramref name="text"/> ist <c>null</c>.</exception>
+        ///// <exception cref="ArgumentException"><paramref name="text"/> ist ein Leerstring oder
+        ///// enthält nur Whitespace.</exception>
+        public static string FromText(string? text)
         {
-            if (text is null)
-            {
-                throw new ArgumentNullException(nameof(text));
-            }
+            //if (text is null)
+            //{
+            //    throw new ArgumentNullException(nameof(text));
+            //}
 
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                throw new ArgumentException(Res.NoData, nameof(text));
-            }
+            //if (string.IsNullOrWhiteSpace(text))
+            //{
+            //    throw new ArgumentException(Res.NoData, nameof(text));
+            //}
 
-            string data = Uri.EscapeDataString(text);
+            //string data = text is null ? string.Empty : Uri.EscapeDataString(text);
+
+            string data = text is null ? string.Empty : Uri.EscapeDataString(Uri.UnescapeDataString(text));
 
             var sb = new StringBuilder(PROTOCOL_LENGTH + 1 + data.Length);
 
@@ -202,13 +212,13 @@ namespace FolkerKinzel.Uris
         /// Erzeugt einen <see cref="Uri"/>, in den binäre Daten eingebettet sind.
         /// </summary>
         /// <param name="bytes">Die in den <see cref="Uri"/> einzubettenden Daten.</param>
-        /// <param name="mediaType">Der <see cref="InternetMediaType"/> der in <paramref name="bytes"/> enthaltenen
+        /// <param name="mediaType">Der <see cref="MimeType"/> der in <paramref name="bytes"/> enthaltenen
         /// Daten.</param>
         /// <returns>Ein <see cref="Uri"/>, in den die in <paramref name="bytes"/> enthaltenen 
         /// binären Daten eingebettet sind.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="bytes"/> oder <paramref name="mediaType"/> ist <c>null</c>.</exception>
         /// <exception cref="ArgumentException"><paramref name="bytes"/> ist ein leeres Array.</exception>
-        public static string FromBytes(byte[] bytes, InternetMediaType mediaType)
+        public static string FromBytes(byte[] bytes, MimeType mediaType)
         {
             if (bytes == null)
             {
@@ -227,7 +237,7 @@ namespace FolkerKinzel.Uris
 
             string data = Convert.ToBase64String(bytes);
 
-            var builder = new StringBuilder(PROTOCOL_LENGTH + BASE64_LENGTH + InternetMediaType.StringLength + data.Length);
+            var builder = new StringBuilder(PROTOCOL_LENGTH + BASE64_LENGTH + MimeType.StringLength + data.Length);
 
             return builder.AppendProtocol().AppendMediaType(mediaType).AppendBase64().Append(data).ToString();
 
@@ -241,8 +251,8 @@ namespace FolkerKinzel.Uris
         /// Erzeugt einen <see cref="Uri"/>, in den der Inhalt einer Datei eingebettet ist.
         /// </summary>
         /// <param name="path">Absoluter Pfad zu der einzubettenden Datei.</param>
-        /// <param name="mediaType">Der <see cref="InternetMediaType"/> der einzubettenden Datei oder <c>null</c>. Wenn <c>null</c> angegeben wird,
-        /// wird versucht, den <see cref="InternetMediaType"/> aus der Dateiendung automatisch zu ermitteln.</param>
+        /// <param name="mediaType">Der <see cref="MimeType"/> der einzubettenden Datei oder <c>null</c>. Wenn <c>null</c> angegeben wird,
+        /// wird versucht, den <see cref="MimeType"/> aus der Dateiendung automatisch zu ermitteln.</param>
         /// <returns>Ein <see cref="DataUrlBuilder"/>, in den die Daten der mit <paramref name="path"/> referenzierten Datei
         /// eingebettet sind.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="path"/> ist <c>null</c>.</exception>
@@ -250,26 +260,26 @@ namespace FolkerKinzel.Uris
         /// <exception cref="UriFormatException">Es kann kein <see cref="Uri"/> initialisiert werden, z.B.
         /// weil der URI-String länger als 65519 Zeichen ist.</exception>
         /// <exception cref="IOException">E/A-Fehler.</exception>
-        public static async Task<string> FromFileAsync(string path, InternetMediaType? mediaType = null)
+        public static async Task<string> FromFileAsync(string path, MimeType? mediaType = null)
         {
             byte[] bytes = await LoadFileAsync(path).ConfigureAwait(false);
 
             if (mediaType is null)
             {
-                mediaType = InternetMediaType.FromFileTypeExtension(Path.GetExtension(path));
+                mediaType = MimeType.FromFileTypeExtension(Path.GetExtension(path));
             }
 
             return FromBytes(bytes, mediaType.Value);
         }
 
 
-        public static string FromFile(string path, InternetMediaType? mediaType = null)
+        public static string FromFile(string path, MimeType? mediaType = null)
         {
             byte[] bytes = LoadFile(path);
 
             if (mediaType is null)
             {
-                mediaType = InternetMediaType.FromFileTypeExtension(Path.GetExtension(path));
+                mediaType = MimeType.FromFileTypeExtension(Path.GetExtension(path));
             }
 
             return FromBytes(bytes, mediaType.Value);
@@ -297,9 +307,9 @@ namespace FolkerKinzel.Uris
             // als Base64 codierter Text:
             if (DataEncoding == DataEncoding.Base64)
             {
-                static bool Predicate(MediaTypeParameter p) => p.IsCharsetParameter();
+                static bool Predicate(MimeTypeParameter p) => p.IsCharsetParameter();
 
-                MediaTypeParameter charsetParameter = InternetMediaType.Parameters.FirstOrDefault(Predicate);
+                MimeTypeParameter charsetParameter = MimeType.Parameters.FirstOrDefault(Predicate);
                 
                 Encoding enc = charsetParameter.IsEmpty ? Encoding.ASCII : TextEncodingConverter.GetEncoding(charsetParameter.Value.ToString());
                 
@@ -365,14 +375,14 @@ namespace FolkerKinzel.Uris
         /// eingebetteten Daten ermöglicht.</returns>
         /// <remarks>Da das Auffinden einer geeigneten Dateiendung ein aufwändiger Vorgang ist, werden Suchergebnisse für eine
         /// kurze Zeitspanne in einem Cache zwischengespeichert, um die Performance zu erhöhen.</remarks>
-        public string GetFileTypeExtension() => InternetMediaType.GetFileTypeExtension();
+        public string GetFileTypeExtension() => MimeType.GetFileTypeExtension();
 
         #endregion
 
         [SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
-        internal static InternetMediaType DefaultMediaType()
+        internal static MimeType DefaultMediaType()
         {
-            _ = InternetMediaType.TryParse(DEFAULT_MEDIA_TYPE.AsMemory(), out InternetMediaType mediaType);
+            _ = MimeType.TryParse(DEFAULT_MEDIA_TYPE.AsMemory(), out MimeType mediaType);
             return mediaType;
         }
 

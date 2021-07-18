@@ -11,7 +11,7 @@ using FolkerKinzel.Strings.Polyfills;
 
 namespace FolkerKinzel.Uris
 {
-    public readonly struct InternetMediaType : IEquatable<InternetMediaType>
+    public readonly struct MimeType : IEquatable<MimeType>
     {
         private readonly ReadOnlyMemory<char> _mediaType;
         private readonly ReadOnlyMemory<char> _subType;
@@ -19,7 +19,7 @@ namespace FolkerKinzel.Uris
 
         internal const int StringLength = 64;
 
-        private InternetMediaType(ReadOnlyMemory<char> mediaType, ReadOnlyMemory<char> subType, ReadOnlyMemory<char> parameters)
+        private MimeType(ReadOnlyMemory<char> mediaType, ReadOnlyMemory<char> subType, ReadOnlyMemory<char> parameters)
         {
             this._mediaType = mediaType.Trim();
             this._subType = subType.Trim();
@@ -43,7 +43,7 @@ namespace FolkerKinzel.Uris
         /// <summary>
         /// Parameter (Nie <c>null</c>.)
         /// </summary>
-        public IEnumerable<MediaTypeParameter> Parameters => ParseParameters();
+        public IEnumerable<MimeTypeParameter> Parameters => ParseParameters();
 
 
         public bool IsEmpty => _mediaType.IsEmpty;
@@ -74,9 +74,9 @@ namespace FolkerKinzel.Uris
 
         
         /// <summary>
-        /// Erstellt eine <see cref="string"/>-Repräsentation des <see cref="InternetMediaType"/>-Objekts.
+        /// Erstellt eine <see cref="string"/>-Repräsentation des <see cref="MimeType"/>-Objekts.
         /// </summary>
-        /// <returns>Eine <see cref="string"/>-Repräsentation des <see cref="InternetMediaType"/>-Objekts.</returns>
+        /// <returns>Eine <see cref="string"/>-Repräsentation des <see cref="MimeType"/>-Objekts.</returns>
         public override string ToString() => ToString(true);
 
         //[System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
@@ -104,7 +104,7 @@ namespace FolkerKinzel.Uris
 
             if (includeParameters)
             {
-                foreach (MediaTypeParameter parameter in Parameters)
+                foreach (MimeTypeParameter parameter in Parameters)
                 {
                     parameter.AppendTo(sb);
                 }
@@ -131,12 +131,12 @@ namespace FolkerKinzel.Uris
             }
 
             StringComparer comparer = StringComparer.OrdinalIgnoreCase;
-            IOrderedEnumerable<MediaTypeParameter> thisParameters;
+            IOrderedEnumerable<MimeTypeParameter> thisParameters;
 
             if (MediaType.Equals("text".AsSpan(), StringComparison.OrdinalIgnoreCase))
             {
-                var asciiCharsetParameter = new MediaTypeParameter("charset".AsMemory(), "us-ascii".AsMemory());
-                bool predicate(MediaTypeParameter x) => x.Equals(asciiCharsetParameter);
+                var asciiCharsetParameter = new MimeTypeParameter("charset".AsMemory(), "us-ascii".AsMemory());
+                bool predicate(MimeTypeParameter x) => x.Equals(asciiCharsetParameter);
 
                 thisParameters = Parameters.SkipWhile(predicate).OrderBy(KeySelector, comparer);
             }
@@ -145,7 +145,7 @@ namespace FolkerKinzel.Uris
                 thisParameters = Parameters.OrderBy(KeySelector, comparer);
             }
 
-            foreach (MediaTypeParameter parameter in thisParameters)
+            foreach (MimeTypeParameter parameter in thisParameters)
             {
                 hash.Add(parameter);
             }
@@ -155,7 +155,7 @@ namespace FolkerKinzel.Uris
 
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
-        public bool Equals(InternetMediaType other)
+        public bool Equals(MimeType other)
         {
             if (!MediaType.Equals(other.MediaType, StringComparison.OrdinalIgnoreCase) ||
                !SubType.Equals(other.SubType, StringComparison.OrdinalIgnoreCase))
@@ -164,13 +164,13 @@ namespace FolkerKinzel.Uris
             }
 
             StringComparer comparer = StringComparer.OrdinalIgnoreCase;
-            IOrderedEnumerable<MediaTypeParameter> thisParameters;
-            IOrderedEnumerable<MediaTypeParameter> otherParameters;
+            IOrderedEnumerable<MimeTypeParameter> thisParameters;
+            IOrderedEnumerable<MimeTypeParameter> otherParameters;
 
             if (MediaType.Equals("text".AsSpan(), StringComparison.OrdinalIgnoreCase))
             {
-                var asciiCharsetParameter = new MediaTypeParameter("charset".AsMemory(), "us-ascii".AsMemory());
-                bool predicate(MediaTypeParameter x) => x.Equals(asciiCharsetParameter);
+                var asciiCharsetParameter = new MimeTypeParameter("charset".AsMemory(), "us-ascii".AsMemory());
+                bool predicate(MimeTypeParameter x) => x.Equals(asciiCharsetParameter);
 
                 thisParameters = Parameters.SkipWhile(predicate).OrderBy(KeySelector, comparer);
                 otherParameters = other.Parameters.SkipWhile(predicate).OrderBy(KeySelector, comparer);
@@ -185,7 +185,7 @@ namespace FolkerKinzel.Uris
         }
 
 
-        public override bool Equals(object? obj) => obj is InternetMediaType type && Equals(type);
+        public override bool Equals(object? obj) => obj is MimeType type && Equals(type);
 
         #endregion
         
@@ -193,21 +193,31 @@ namespace FolkerKinzel.Uris
 
         #region Static Members
 
-        public static InternetMediaType Empty => default;
+        public static MimeType Empty => default;
 
         #region Static Methods
 
         public static void ClearCache() => MimeCache.Clear();
 
-        public static InternetMediaType Parse(string? value)
+        public static MimeType Parse(string? value)
             => value is null
                 ? throw new ArgumentNullException(value)
-                : TryParse(value.AsMemory(), out InternetMediaType mediaType)
+                : TryParse(value.AsMemory(), out MimeType mediaType)
                     ? mediaType
                     : throw new ArgumentException(string.Format(Res.InvalidMediaType, nameof(value)), nameof(value));
 
 
-        public static bool TryParse(ReadOnlyMemory<char> value, out InternetMediaType mediaType)
+        public static bool TryParse(string value, out MimeType mimeType)
+        {
+            if(value is null)
+            {
+                mimeType = default;
+                return false;
+            }
+            return TryParse(value.AsMemory(), out mimeType);
+        }
+
+        public static bool TryParse(ReadOnlyMemory<char> value, out MimeType mimeType)
         {
             int parameterStartIndex = value.Span.IndexOf(';');
 
@@ -219,11 +229,11 @@ namespace FolkerKinzel.Uris
 
             if (mediaTypeSeparatorIndex == -1 || mediaTypeSeparatorIndex == value.Length)
             {
-                mediaType = default;
+                mimeType = default;
                 return false;
             }
 
-            mediaType = new InternetMediaType(
+            mimeType = new MimeType(
                 mediaPart.Slice(0, mediaTypeSeparatorIndex),
                 mediaPart.Slice(mediaTypeSeparatorIndex + 1),
                 parameterStartIndex < 0 ? ReadOnlyMemory<char>.Empty : value.Slice(parameterStartIndex + 1));
@@ -231,7 +241,7 @@ namespace FolkerKinzel.Uris
             return true;
         }
 
-        public static InternetMediaType FromFileTypeExtension(string fileTypeExtension)
+        public static MimeType FromFileTypeExtension(string fileTypeExtension)
         {
             if (fileTypeExtension is null)
             {
@@ -239,7 +249,7 @@ namespace FolkerKinzel.Uris
             }
             else
             {
-                _ = TryParse(MimeCache.GetMimeType(fileTypeExtension).AsMemory(), out InternetMediaType inetMediaType);
+                _ = TryParse(MimeCache.GetMimeType(fileTypeExtension).AsMemory(), out MimeType inetMediaType);
                 return inetMediaType;
             }
         }
@@ -248,8 +258,8 @@ namespace FolkerKinzel.Uris
 
         #region Operators
 
-        public static bool operator ==(InternetMediaType mediaType1, InternetMediaType mediaType2) => mediaType1.Equals(mediaType2);
-        public static bool operator !=(InternetMediaType mediaType1, InternetMediaType mediaType2) => !(mediaType1 == mediaType2);
+        public static bool operator ==(MimeType mediaType1, MimeType mediaType2) => mediaType1.Equals(mediaType2);
+        public static bool operator !=(MimeType mediaType1, MimeType mediaType2) => !(mediaType1 == mediaType2);
 
         #endregion
 
@@ -257,15 +267,15 @@ namespace FolkerKinzel.Uris
 
         #region private
 
-        private static string KeySelector(MediaTypeParameter parameter) => parameter.Key.ToString();
+        private static string KeySelector(MimeTypeParameter parameter) => parameter.Key.ToString();
 
 
-        private IEnumerable<MediaTypeParameter> ParseParameters()
+        private IEnumerable<MimeTypeParameter> ParseParameters()
         {
             int parameterStartIndex = 0;
             do
             {
-                if (TryParseParameter(ref parameterStartIndex, out MediaTypeParameter parameter))
+                if (TryParseParameter(ref parameterStartIndex, out MimeTypeParameter parameter))
                 {
                     yield return parameter;
                 }
@@ -274,7 +284,7 @@ namespace FolkerKinzel.Uris
         }
 
 
-        private bool TryParseParameter(ref int parameterStartIndex, out MediaTypeParameter parameter)
+        private bool TryParseParameter(ref int parameterStartIndex, out MimeTypeParameter parameter)
         {
             int nextParameterSeparatorIndex = GetNextParameterSeparatorIndex(_parameters.Span.Slice(parameterStartIndex));
             ReadOnlyMemory<char> currentParameterString;
@@ -290,7 +300,7 @@ namespace FolkerKinzel.Uris
                 parameterStartIndex += nextParameterSeparatorIndex + 1;
             }
 
-            return MediaTypeParameter.TryParse(currentParameterString, out parameter);
+            return MimeTypeParameter.TryParse(currentParameterString, out parameter);
         }
 
 

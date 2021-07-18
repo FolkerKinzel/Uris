@@ -34,7 +34,7 @@ namespace FolkerKinzel.Uris
             return sb.Append(protocol);
         }
 
-        internal static StringBuilder AppendMediaType(this StringBuilder builder, InternetMediaType mediaType)
+        internal static StringBuilder AppendMediaType(this StringBuilder builder, MimeType mediaType)
         {
             if (mediaType.Equals(DataUrl.DefaultMediaType()))
             {
@@ -43,7 +43,7 @@ namespace FolkerKinzel.Uris
 
             if (mediaType.IsTextPlainType())
             {
-                foreach (MediaTypeParameter parameter in mediaType.Parameters)
+                foreach (MimeTypeParameter parameter in mediaType.Parameters)
                 {
                     parameter.AppendTo(builder);
                 }

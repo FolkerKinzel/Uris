@@ -14,17 +14,17 @@ namespace FolkerKinzel.Uris.Tests
         [TestMethod()]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ParseTest1()
-            => _ = InternetMediaType.Parse(null!);
+            => _ = MimeType.Parse(null!);
 
         [TestMethod()]
         [ExpectedException(typeof(ArgumentException))]
-        public void ParseTest2() => _ = InternetMediaType.Parse(" \t \r\n");
+        public void ParseTest2() => _ = MimeType.Parse(" \t \r\n");
 
 
         [TestMethod()]
         public void ToStringTest1()
         {
-            var result = new InternetMediaType().ToString();
+            var result = new MimeType().ToString();
 
             Assert.IsNotNull(result);
             Assert.AreEqual(0, result.Length);
@@ -34,7 +34,7 @@ namespace FolkerKinzel.Uris.Tests
         public void ToStringTest2()
         {
             var input = "text/plain";
-            Assert.IsTrue(InternetMediaType.TryParse(input.AsMemory(), out var media));
+            Assert.IsTrue(MimeType.TryParse(input.AsMemory(), out var media));
             var result = media.ToString();
 
             Assert.IsNotNull(result);
@@ -44,7 +44,7 @@ namespace FolkerKinzel.Uris.Tests
         [TestMethod]
         public void ToStringTest3()
         {
-            Assert.IsTrue(InternetMediaType.TryParse("TEXT/PLAIN ; CHARSET=ISO-8859-1".AsMemory(), out var inetMedia));
+            Assert.IsTrue(MimeType.TryParse("TEXT/PLAIN ; CHARSET=ISO-8859-1".AsMemory(), out var inetMedia));
 
             Assert.AreEqual("text/plain;charset=iso-8859-1", inetMedia.ToString());
         }
@@ -56,7 +56,7 @@ namespace FolkerKinzel.Uris.Tests
         [DataRow("text / plain; charset=iso-8859-1;second=\"Second ; Value\"", true, 2)]
         public void TryParseTest1(string input, bool expected, int parametersCount)
         {
-            Assert.AreEqual(expected, InternetMediaType.TryParse(input.AsMemory(), out var mediaType));
+            Assert.AreEqual(expected, MimeType.TryParse(input.AsMemory(), out var mediaType));
 
             var arr = mediaType.Parameters.ToArray();
 
@@ -90,8 +90,8 @@ namespace FolkerKinzel.Uris.Tests
         [TestMethod]
         public void EqualsTest3()
         {
-            Assert.IsTrue(InternetMediaType.TryParse("text/plain; charset=us-ascii".AsMemory(), out var media1));
-            Assert.IsTrue(InternetMediaType.TryParse("text/plain".AsMemory(), out var media2));
+            Assert.IsTrue(MimeType.TryParse("text/plain; charset=us-ascii".AsMemory(), out var media1));
+            Assert.IsTrue(MimeType.TryParse("text/plain".AsMemory(), out var media2));
 
             Assert.IsTrue(media1 == media2);
             Assert.IsFalse(media1 != media2);
@@ -102,8 +102,8 @@ namespace FolkerKinzel.Uris.Tests
         [TestMethod]
         public void EqualsTest4()
         {
-            Assert.IsTrue(InternetMediaType.TryParse("text/plain; charset=iso-8859-1".AsMemory(), out var media1));
-            Assert.IsTrue(InternetMediaType.TryParse("text/plain".AsMemory(), out var media2));
+            Assert.IsTrue(MimeType.TryParse("text/plain; charset=iso-8859-1".AsMemory(), out var media1));
+            Assert.IsTrue(MimeType.TryParse("text/plain".AsMemory(), out var media2));
 
             Assert.IsTrue(media1 != media2);
             Assert.IsFalse(media1 == media2);
@@ -114,8 +114,8 @@ namespace FolkerKinzel.Uris.Tests
         [TestMethod]
         public void EqualsTest5()
         {
-            Assert.IsTrue(InternetMediaType.TryParse("text/plain; charset=iso-8859-1".AsMemory(), out var media1));
-            Assert.IsTrue(InternetMediaType.TryParse("TEXT/PLAIN ; CHARSET=ISO-8859-1".AsMemory(), out var media2));
+            Assert.IsTrue(MimeType.TryParse("text/plain; charset=iso-8859-1".AsMemory(), out var media1));
+            Assert.IsTrue(MimeType.TryParse("TEXT/PLAIN ; CHARSET=ISO-8859-1".AsMemory(), out var media2));
 
             Assert.IsTrue(media1 == media2);
             Assert.IsFalse(media1 != media2);
@@ -126,8 +126,8 @@ namespace FolkerKinzel.Uris.Tests
         [TestMethod]
         public void EqualsTest6()
         {
-            Assert.IsTrue(InternetMediaType.TryParse("text/plain; charset=iso-8859-1;other=value".AsMemory(), out var media1));
-            Assert.IsTrue(InternetMediaType.TryParse("text/plain;charset=iso-8859-1;OTHER=VALUE".AsMemory(), out var media2));
+            Assert.IsTrue(MimeType.TryParse("text/plain; charset=iso-8859-1;other=value".AsMemory(), out var media1));
+            Assert.IsTrue(MimeType.TryParse("text/plain;charset=iso-8859-1;OTHER=VALUE".AsMemory(), out var media2));
 
             Assert.IsTrue(media1 != media2);
             Assert.IsFalse(media1 == media2);

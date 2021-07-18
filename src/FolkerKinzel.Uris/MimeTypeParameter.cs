@@ -9,7 +9,7 @@ using FolkerKinzel.Strings.Polyfills;
 
 namespace FolkerKinzel.Uris
 {
-    public readonly struct MediaTypeParameter : IEquatable<MediaTypeParameter>
+    public readonly struct MimeTypeParameter : IEquatable<MimeTypeParameter>
     {
         private readonly ReadOnlyMemory<char> _key;
         private readonly ReadOnlyMemory<char> _value;
@@ -17,7 +17,7 @@ namespace FolkerKinzel.Uris
 
         internal const int StringLength = 32;
 
-        public MediaTypeParameter(ReadOnlyMemory<char> key, ReadOnlyMemory<char> value)
+        public MimeTypeParameter(ReadOnlyMemory<char> key, ReadOnlyMemory<char> value)
         {
             this._key = key.Trim();
 
@@ -48,7 +48,7 @@ namespace FolkerKinzel.Uris
 
         public bool IsEmpty => _key.IsEmpty;
 
-        public static MediaTypeParameter Empty => default;
+        public static MimeTypeParameter Empty => default;
 
         public bool IsCharsetParameter()
         {
@@ -57,7 +57,7 @@ namespace FolkerKinzel.Uris
         }
 
 
-        internal static bool TryParse(ReadOnlyMemory<char> parameterString, out MediaTypeParameter parameter)
+        internal static bool TryParse(ReadOnlyMemory<char> parameterString, out MimeTypeParameter parameter)
         {
             int keyValueSeparatorIndex = parameterString.Span.IndexOf('=');
 
@@ -69,7 +69,7 @@ namespace FolkerKinzel.Uris
 
             try
             {
-                parameter = new MediaTypeParameter(
+                parameter = new MimeTypeParameter(
                     parameterString.Slice(0, keyValueSeparatorIndex),
                     parameterString.Slice(keyValueSeparatorIndex + 1));
             }
@@ -84,14 +84,14 @@ namespace FolkerKinzel.Uris
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0075:Bedingten Ausdruck vereinfachen", Justification = "<Ausstehend>")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
-        public bool Equals(MediaTypeParameter other)
+        public bool Equals(MimeTypeParameter other)
             => !Key.Equals(other.Key, StringComparison.OrdinalIgnoreCase)
                 ? false
                 : Key.Equals(CHARSET_KEY.AsSpan(), StringComparison.OrdinalIgnoreCase)
                     ? Value.Equals(other.Value, StringComparison.OrdinalIgnoreCase)
                     : Value.Equals(other.Value, StringComparison.Ordinal);
 
-        public override bool Equals(object? obj) => obj is MediaTypeParameter parameter && Equals(parameter);
+        public override bool Equals(object? obj) => obj is MimeTypeParameter parameter && Equals(parameter);
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
         public override int GetHashCode()
@@ -124,9 +124,9 @@ namespace FolkerKinzel.Uris
             return hash.ToHashCode();
         }
 
-        public static bool operator ==(MediaTypeParameter mediaTypeParameter1, MediaTypeParameter mediaTypeParameter2) => mediaTypeParameter1.Equals(mediaTypeParameter2);
+        public static bool operator ==(MimeTypeParameter mediaTypeParameter1, MimeTypeParameter mediaTypeParameter2) => mediaTypeParameter1.Equals(mediaTypeParameter2);
 
-        public static bool operator !=(MediaTypeParameter mediaTypeParameter1, MediaTypeParameter mediaTypeParameter2) => !(mediaTypeParameter1 == mediaTypeParameter2);
+        public static bool operator !=(MimeTypeParameter mediaTypeParameter1, MimeTypeParameter mediaTypeParameter2) => !(mediaTypeParameter1 == mediaTypeParameter2);
 
 
         public override string ToString()
