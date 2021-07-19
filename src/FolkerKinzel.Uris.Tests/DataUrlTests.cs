@@ -117,6 +117,20 @@ namespace FolkerKinzel.Uris.Tests
             CollectionAssert.AreEqual(bytes, outBytes);
         }
 
+        [TestMethod]
+        public void FromBytesTest3()
+        {
+            string outText = DataUrl.FromBytes(null, MimeType.Empty);
+
+            Assert.IsNotNull(outText);
+
+            Assert.IsTrue(DataUrl.TryParse(outText, out DataUrl dataUrl));
+
+            Assert.IsTrue(dataUrl.TryGetEmbeddedBytes(out byte[]? outBytes));
+
+            CollectionAssert.AreEqual(Array.Empty<byte>(), outBytes);
+        }
+
 
         [TestMethod]
         public void FromFileTest1()
@@ -133,9 +147,24 @@ namespace FolkerKinzel.Uris.Tests
         }
 
         [TestMethod]
+        public void FromFileTest2()
+        {
+            string path = TestFiles.EmptyTextFile;
+            string url = DataUrl.FromFile(path);
+            Assert.IsNotNull(url);
+            Assert.IsTrue(DataUrl.TryParse(url, out DataUrl dataUrl));
+            Assert.IsTrue(dataUrl.TryGetEmbeddedBytes(out byte[]? outBytes));
+            CollectionAssert.AreEqual(outBytes, File.ReadAllBytes(path));
+        }
+
+        [TestMethod]
         public void FromTextOnNull()
         {
-            Assert.IsNotNull(DataUrl.FromText(null));
+            string urlString = DataUrl.FromText(null);
+            Assert.IsNotNull(urlString);
+            Assert.IsTrue(DataUrl.TryParse(urlString, out DataUrl dataUrl));
+            Assert.IsTrue(dataUrl.TryGetEmbeddedText(out string? output));
+            Assert.AreEqual(string.Empty, output);
         }
 
         [TestMethod]
@@ -172,12 +201,9 @@ namespace FolkerKinzel.Uris.Tests
             string dataUrl1 = DataUrl.FromText(TEXT);
 
             Assert.IsTrue(DataUrl.TryParse(dataUrl1, out DataUrl dataUrl2));
-
             Assert.AreEqual(dataUrl2.MimeType.MediaType.ToString(), "text");
             Assert.AreEqual(dataUrl2.MimeType.SubType.ToString(), "plain");
-
             Assert.AreEqual(0, dataUrl2.MimeType.Parameters.Count());
-
             Assert.IsTrue(dataUrl2.TryGetEmbeddedText(out string? outText));
             Assert.AreEqual(TEXT, outText);
         }

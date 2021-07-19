@@ -21,6 +21,8 @@ namespace FolkerKinzel.Uris.Tests
         internal static string ProjectDirectory { get; }
 
         internal static string FolkerPng => Path.Combine(_testFileDirectory, "Folker.png");
+        internal static string EmptyTextFile => Path.Combine(_testFileDirectory, "Empty.txt");
+
 
     }
 }
