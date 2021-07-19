@@ -1,17 +1,17 @@
 ﻿namespace FolkerKinzel.Uris
 {
     /// <summary>
-    /// Benannte Konstanten, um die Kodierung eingebetteter Daten anzugeben.
+    /// Named constants to specify the encoding of embedded data.
     /// </summary>
     public enum DataEncoding
     {
         /// <summary>
-        /// Url-Kodierung
+        /// URL encoding
         /// </summary>
         UrlEncoded,
 
         /// <summary>
-        /// Base64-Kodierung
+        /// Base64 encoding
         /// </summary>
         Base64
     }

@@ -48,7 +48,7 @@ namespace FolkerKinzel.Uris.Tests
         public void TryParseTest2()
         {
             string text = "http://www.fölkerchen.de";
-            string test = DATA_PROTOCOL + "text/plain;charset=utf-8" + ";" + DEFAULT_ENCODING + "," + Uri.EscapeDataString(text);
+            //string test = DATA_PROTOCOL + "text/plain;charset=utf-8" + ";" + DEFAULT_ENCODING + "," + Uri.EscapeDataString(text);
 
             string outText = DataUrl.FromText(text);
 
@@ -86,19 +86,23 @@ namespace FolkerKinzel.Uris.Tests
             Assert.AreEqual("Text", outString);
         }
 
-
         [TestMethod]
-        public void FromBytesTest1()
+        public void TryParseTest5()
         {
-            string text = "http://www.fölkerchen.de";
-            string test = DATA_PROTOCOL + "text/plain;charset=utf-8" + ";" + DEFAULT_ENCODING + "," + Uri.EscapeDataString(text);
+            const string url = "data:application/x-octet,A%42C";
+            byte[] data = new byte[] { 0x41, 0x42, 0x43 };
 
-            string outText = DataUrl.FromText(text);
+            Assert.IsTrue(DataUrl.TryParse(url, out DataUrl dataUrl));
+            Assert.AreEqual(DataEncoding.UrlEncoded, dataUrl.DataEncoding);
+            Assert.IsTrue(dataUrl.ContainsBytes);
 
-            Assert.IsNotNull(outText);
+            Assert.IsTrue(dataUrl.TryGetEmbeddedBytes(out byte[]? output));
 
-            
+            CollectionAssert.AreEqual(data, output);
         }
+
+
+        
 
         [TestMethod]
         public void FromBytesTest2()
@@ -170,7 +174,10 @@ namespace FolkerKinzel.Uris.Tests
         [TestMethod]
         public void FromTextOnStringEmpty()
         {
-            Assert.IsNotNull(DataUrl.FromText(""));
+            string urlString = DataUrl.FromText("");
+            Assert.IsTrue(DataUrl.TryParse(urlString, out DataUrl dataUrl));
+            Assert.IsTrue(dataUrl.TryGetEmbeddedText(out string? output));
+            Assert.AreEqual(string.Empty, output);
         }
 
         [TestMethod()]
@@ -208,5 +215,18 @@ namespace FolkerKinzel.Uris.Tests
             Assert.AreEqual(TEXT, outText);
         }
 
+        [TestMethod]
+        public void FromTextTest3()
+        {
+            string text = "http://www.fölkerchen.de";
+            //string test = DATA_PROTOCOL + "text/plain;charset=utf-8" + ";" + DEFAULT_ENCODING + "," + Uri.EscapeDataString(text);
+
+            string outText = DataUrl.FromText(text);
+
+            Assert.IsNotNull(outText);
+            Assert.IsTrue(DataUrl.TryParse(outText, out DataUrl dataUrl));
+            Assert.IsTrue(dataUrl.TryGetEmbeddedText(out string? output));
+            Assert.AreEqual(text, output);
+        }
     }
 }
