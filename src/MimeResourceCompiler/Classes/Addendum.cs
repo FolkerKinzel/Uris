@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 using Serilog;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace MimeResourceCompiler.Classes
 {
@@ -29,6 +32,7 @@ namespace MimeResourceCompiler.Classes
             string? line;
             while ((line = reader.ReadLine()) is not null)
             {
+                line = line.Trim();
                 if (line.StartsWith('#') || string.IsNullOrWhiteSpace(line))
                 {
                     continue;
@@ -37,9 +41,14 @@ namespace MimeResourceCompiler.Classes
                 string[] parts = line.Split(' ');
 
 
-                if (line.StartsWith(' ') || line.EndsWith(' ') || parts.Length != 2)
+                if (parts.Length != 2)
                 {
                     throw new InvalidDataException("The resource Addendum.csv contains invalid data.");
+                }
+
+                if (parts[0].Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
                 }
 
                 AddendumRecord row = BuildRow(parts[0], parts[1], out string mediaType);
@@ -85,7 +94,7 @@ namespace MimeResourceCompiler.Classes
                         _ = _data.Remove(mediaType);
                     }
 
-                    _log.Warning("{mimeType} {extension} have been removed from the addendum because they are already present in the Apache file.");
+                    _log.Warning("{mimeType} {extension} has been removed from the addendum because it's already present in the Apache file.", mimeType, extension);
 
                     return true;
                 }

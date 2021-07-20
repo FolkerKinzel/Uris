@@ -346,10 +346,10 @@ namespace FolkerKinzel.Uris
 
 
         /// <summary>
-        /// Returns a suitable file type extension for the data embedded in the <see cref="DataUrl"/>. The file type extension contains the 
+        /// Returns an appropriate file type extension for the data embedded in the <see cref="DataUrl"/>. The file type extension contains the 
         /// period (".").
         /// </summary>
-        /// <returns>A suitable file type extension for the data embedded in the <see cref="DataUrl"/>.</returns>
+        /// <returns>An appropriate file type extension for the data embedded in the <see cref="DataUrl"/>.</returns>
         /// <remarks>The search for a file type extension can be an expensive operation. To make subsequent calls of the method faster, the
         /// recent file type extensions are stored in a cache. You can call <see cref="MimeType.ClearCache"/> to clear this cache.</remarks>
         public string GetFileTypeExtension() => MimeType.GetFileTypeExtension();
