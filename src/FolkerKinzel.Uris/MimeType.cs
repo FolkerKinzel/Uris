@@ -17,7 +17,7 @@ namespace FolkerKinzel.Uris
         private readonly ReadOnlyMemory<char> _subType;
         private readonly ReadOnlyMemory<char> _parameters;
 
-        internal const int StringLength = 64;
+        internal const int StringLength = 80;
 
         private MimeType(ReadOnlyMemory<char> mediaType, ReadOnlyMemory<char> subType, ReadOnlyMemory<char> parameters)
         {

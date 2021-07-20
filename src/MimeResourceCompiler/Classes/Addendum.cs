@@ -15,7 +15,7 @@ namespace MimeResourceCompiler.Classes
 
     public class Addendum : IAddendum
     {
-        private readonly SortedDictionary<string, List<AddendumRecord>> _data = new(StringComparer.OrdinalIgnoreCase);
+        private readonly SortedDictionary<string, List<AddendumRecord>> _data = new(StringComparer.Ordinal);
         private readonly ILogger _log;
 
         /// <summary>
@@ -43,10 +43,13 @@ namespace MimeResourceCompiler.Classes
 
                 if (parts.Length != 2)
                 {
-                    throw new InvalidDataException("The resource Addendum.csv contains invalid data.");
+                    throw new InvalidDataException(string.Format("The resource Addendum.csv contains invalid data: {0}", line));
                 }
 
-                if (parts[0].Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
+                parts[0] = parts[0].PrepareMimeType();
+                parts[1] = parts[1].PrepareFileTypeExtension();
+
+                if (parts[0].Equals("application/octet-stream", StringComparison.Ordinal))
                 {
                     continue;
                 }

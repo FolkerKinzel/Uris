@@ -34,9 +34,9 @@ namespace MimeResourceCompiler.Classes
         /// <param name="extension">File type extension.</param>
         public void WriteRow(string mimeType, string extension)
         {
-            _writer.Write(mimeType.ToLowerInvariant());
+            _writer.Write(mimeType.PrepareMimeType());
             _writer.Write(SEPARATOR);
-            _writer.WriteLine(extension.Replace(".", null, StringComparison.Ordinal).ToLowerInvariant());
+            _writer.WriteLine(extension.PrepareFileTypeExtension());
             //_writer.Flush();
         }
 

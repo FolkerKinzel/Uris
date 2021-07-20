@@ -102,7 +102,12 @@ namespace MimeResourceCompiler
                 return;
             }
 
-            string? mimeType = parts[0];
+            string mimeType = parts[0].PrepareMimeType();
+            
+            if(mimeType.Equals(defaultMime, StringComparison.Ordinal))
+            {
+                return;
+            }
 
             if (MediaType is null)
             {
@@ -117,7 +122,7 @@ namespace MimeResourceCompiler
 
             for (int i = 1; i < parts.Length; i++)
             {
-                string extension = parts[i];
+                string extension = parts[i].PrepareFileTypeExtension();
 
                 //if (_dllCache.TryGetMimeTypeFromFileTypeExtension(extension, out string? cacheResult))
                 //{
