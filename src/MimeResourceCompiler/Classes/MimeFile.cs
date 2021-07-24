@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Serilog;
@@ -28,16 +29,17 @@ namespace MimeResourceCompiler.Classes
         }
 
         /// <summary>
-        /// Writes a row of data to the MIME file.
+        /// Writes the rows of data for a common media type to the MIME file.
         /// </summary>
-        /// <param name="mimeType">Internet media type</param>
-        /// <param name="extension">File type extension.</param>
-        public void WriteRow(string mimeType, string extension)
+        /// <param name="entries">The data to be written.</param>
+        public void WriteMediaType(IEnumerable<Entry> entries)
         {
-            _writer.Write(mimeType.PrepareMimeType());
-            _writer.Write(SEPARATOR);
-            _writer.WriteLine(extension.PrepareFileTypeExtension());
-            //_writer.Flush();
+            foreach (Entry entry in entries)
+            {
+                _writer.Write(entry.MimeType);
+                _writer.Write(SEPARATOR);
+                _writer.WriteLine(entry.Extension);
+            }
         }
 
         /// <summary>
@@ -55,6 +57,7 @@ namespace MimeResourceCompiler.Classes
             TruncateLastEmptyRow();
             _writer?.Close();
             GC.SuppressFinalize(this);
+            _log.Debug("{0} closed.", MIME_FILE_NAME);
         }
 
         private void TruncateLastEmptyRow()
@@ -62,7 +65,8 @@ namespace MimeResourceCompiler.Classes
             _writer.Flush();
 
             Stream mimeFileStream = _writer.BaseStream;
-            mimeFileStream.SetLength(mimeFileStream.Length - NEW_LINE.Length);
+            long newLength = mimeFileStream.Length - NEW_LINE.Length;
+            mimeFileStream.SetLength(newLength > 0 ? newLength : 0);
 
             _log.Debug("Last empty row in {mimeFile} successfully truncated.", MIME_FILE_NAME);
         }

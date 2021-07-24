@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Serilog;
 
@@ -14,41 +16,51 @@ namespace MimeResourceCompiler
         private readonly IApacheData _apacheData;
         private readonly IMimeFile _mimeFile;
         private readonly IIndexFile _indexFile;
-        //private readonly IDllCache _dllCache;
-        private readonly IAddendum _addendum;
+        private readonly IResourceParser _defaultEntry;
+        private readonly IResourceParser _addendum;
         private readonly ILogger _log;
+        private readonly ICompressor _compressor;
         private bool _disposedValue;
-        private string? _mediaType;
 
         public Compiler(IApacheData apacheData,
                         IMimeFile mimeFile,
                         IIndexFile indexFile,
-                        IAddendum addendum,
-                        ILogger log)
+                        IResourceParser defaultEntry,
+                        IResourceParser addendum,
+                        ILogger log,
+                        ICompressor compressor)
         {
             _apacheData = apacheData;
             _mimeFile = mimeFile;
             _indexFile = indexFile;
-            //_dllCache = dllCache;
+            this._defaultEntry = defaultEntry;
             _addendum = addendum;
             _log = log;
+            _compressor = compressor;
+
+            _log.Debug("Compiler initialized.");
         }
 
-
-        public string? MediaType
+        public void CompileResources()
         {
-            get => _mediaType;
-            private set 
-            {
-                if (value is not null && !value.Equals(_mediaType, StringComparison.OrdinalIgnoreCase))
-                {
-                    _apacheData.TestApacheFile(value);
-                }
-                _mediaType = value;
-            }
-        }
+            _log.Debug("Start Compiling.");
+            List<Entry> list = CollectData();
+            list = list.GroupBy(x => x.MediaType, StringComparer.Ordinal).SelectMany(group => group).Distinct().ToList();
 
-        public int Line { get; private set; }
+            _log.Debug("Start removing unreachable entries.");
+            _compressor.RemoveUnreachableEntries(list);
+            _log.Debug("Unreachable entries completely removed.");
+
+            _log.Debug("Start writing the data files.");
+
+            foreach (IGrouping<string, Entry> group in list.GroupBy(x => x.MediaType, StringComparer.Ordinal))
+            {
+                _indexFile.WriteNewMediaType(group.Key, _mimeFile.GetCurrentStreamPosition(), group.Count());
+                _mimeFile.WriteMediaType(group);
+            }
+
+            _log.Debug("Data files completely written.");
+        }
 
         public void Dispose()
         {
@@ -56,116 +68,45 @@ namespace MimeResourceCompiler
             GC.SuppressFinalize(this);
         }
 
-        public void CompileResources()
-        {
-            _log.Debug("Start Compiling.");
+        #region private
 
+        private List<Entry> CollectData()
+        {
+            _log.Debug("Start collecting the data.");
+            var list = new List<Entry>(2048);
+            CollectResourceFile(list, _defaultEntry);
+            CollectApacheData(list);
+            CollectResourceFile(list, _addendum);
+
+            _log.Debug("Data completely collected.");
+
+            return list;
+        }
+
+        private void CollectResourceFile(List<Entry> list, IResourceParser parser)
+        {
+            _log.Debug("Start parsing the resource {0}.", parser.FileName);
+            
+            Entry? entry;
+            while ((entry = parser.GetNextLine()) is not null)
+            {
+                list.Add(entry);
+            }
+
+            _log.Debug("The resource {0} has been completely parsed.", parser.FileName);
+        }
+
+
+        private void CollectApacheData(List<Entry> list)
+        {
             _log.Debug("Start parsing the Apache data.");
-            string? line;
+            IEnumerable<Entry>? line;
             while ((line = _apacheData.GetNextLine()) != null)
             {
-                ProcessApacheLine(line);
+                list.AddRange(line);
             }
+            _log.Debug("Apache data completely parsed.");
 
-            _log.Debug("Start adding the rest of the Addendum.");
-            string? mediaTp = null;
-            while (_addendum.TryGetNextLine(ref mediaTp, out AddendumRecord? row))
-            {
-                if (MediaType is null) // Die könnte nur sein, wenn das Apache file leer ist
-                {
-                    WriteIndex(mediaTp, true);
-                }
-                else if (!StringComparer.OrdinalIgnoreCase.Equals(MediaType, mediaTp))
-                {
-                    WriteIndex(mediaTp, false);
-                }
-
-                _log.Debug("Write addendum {addendum}.", row);
-                AppendToMimeFile(row.MimeType, row.Extension);
-            }
-
-            _indexFile.WriteRowsCount(Line);
-
-            _log.Debug("Addendum completely added.");
-        }
-
-
-
-        private void ProcessApacheLine(string line)
-        {
-            const string defaultMime = "application/octet-stream";
-
-            string[] parts = Regex.Split(line, @"\s+");
-
-            if (parts.Length < 2 || parts[0] == defaultMime)
-            {
-                return;
-            }
-
-            string mimeType = parts[0].PrepareMimeType();
-            
-            if(mimeType.Equals(defaultMime, StringComparison.Ordinal))
-            {
-                return;
-            }
-
-            if (MediaType is null)
-            {
-                WriteIndex(GetMediaType(mimeType), true);
-            }
-            else if (!mimeType.StartsWith(MediaType, StringComparison.OrdinalIgnoreCase))
-            {
-                WriteAddendum(MediaType);
-                WriteIndex(GetMediaType(mimeType), false);
-            }
-
-
-            for (int i = 1; i < parts.Length; i++)
-            {
-                string extension = parts[i].PrepareFileTypeExtension();
-
-                //if (_dllCache.TryGetMimeTypeFromFileTypeExtension(extension, out string? cacheResult))
-                //{
-                //    if (StringComparer.Ordinal.Equals(cacheResult, mimeType))
-                //    {
-                //        continue;
-                //    }
-                //}
-
-                AppendToMimeFile(mimeType, extension);
-                _ = _addendum.RemoveFromAddendum(mimeType, extension);
-            }
-        }
-
-        private void WriteAddendum([DisallowNull] string? mediaType)
-        {
-            while (_addendum.TryGetNextLine(ref mediaType, out AddendumRecord? row))
-            {
-                _mimeFile.WriteRow(row.MimeType, row.Extension);
-                _log.Debug("Write addendum {addendum}.", row);
-                Line++;
-            }
-        }
-
-        private void WriteIndex(string mediaType, bool firstIndex)
-        {
-            MediaType = mediaType;
-
-
-            if (!firstIndex)
-            {
-                _indexFile.WriteRowsCount(Line);
-            }
-
-            _indexFile.WriteNewMediaType(MediaType, _mimeFile.GetCurrentStreamPosition());
-            Line = 0;
-        }
-
-
-        private void AppendToMimeFile(string mimeType, string extension)
-        {
-            _mimeFile.WriteRow(mimeType, extension);
-            ++Line;
         }
 
         private void Dispose(bool disposing)
@@ -174,16 +115,17 @@ namespace MimeResourceCompiler
             {
                 if (disposing)
                 {
+                    _addendum.Dispose();
                     _indexFile.Dispose();
                     _mimeFile.Dispose();
                 }
 
                 _disposedValue = true;
+
+                _log.Debug("Compiler disposed.");
             }
         }
 
-
-        private static string GetMediaType(string mimeType) => mimeType.Substring(0, mimeType.IndexOf('/'));
-
+        #endregion
     }
 }

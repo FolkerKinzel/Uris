@@ -12,7 +12,7 @@
 # (Take one space character as separator.) The file type extension MUST NOT contain the period (".") and should be lowercase.
 # A line MUST contain exactly one MIME type and one file type extension.
 
-# Lines that begin with the '#' character are treated as comments.
+# Lines, which begin with the '#' character are treated as comments.
 # Empty lines are allowed.
 
 # https://wiki.selfhtml.org/wiki/MIME-Type/%C3%9Cbersicht :

@@ -8,16 +8,11 @@ namespace MimeResourceCompiler
     public interface IResourceLoader
     {
         /// <summary>
-        /// Loads Readme.txt from the resources.
+        /// Returns a stream to a resource.
         /// </summary>
-        /// <returns>Readme.txt as byte array.</returns>
-        byte[] LoadReadmeFile();
-
-        /// <summary>
-        /// Returns a stream to the addendum.
-        /// </summary>
-        /// <returns>A stream to the addendum.</returns>
-        public Stream GetAddendumStream();
+        /// <param name="fileName">The name of the resource file.</param>
+        /// <returns>A stream from the resource.</returns>
+        Stream GetResourceStream(string fileName);
 
     }
 }

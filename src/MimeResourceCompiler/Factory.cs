@@ -25,11 +25,13 @@ namespace MimeResourceCompiler
             var apacheData = new ApacheData(logger.ForContext<ApacheData>());
             var streamFactory = new StreamFactory(_outputDirectory, logger.ForContext<StreamFactory>());
             var mimeFile = new MimeFile(streamFactory, logger.ForContext<MimeFile>());
-            var indexFile = new IndexFile(streamFactory);
+            var indexFile = new IndexFile(streamFactory, logger.ForContext<IndexFile>());
             //var dllCache = new DllCache(logger.ForContext<DllCache>());
-            var resourceLoader = new ResourceLoader(logger.ForContext<ResourceLoader>());
+            var resourceLoader = new ResourceLoader();
+            var defaultEntry = new DefaultEntry(resourceLoader, logger.ForContext<Addendum>());
             var addendum = new Addendum(resourceLoader, logger.ForContext<Addendum>());
-            _compiler = new Compiler(apacheData, mimeFile, indexFile, addendum, logger.ForContext<Compiler>());
+            var compressor = new Compressor(logger.ForContext<Compressor>());
+            _compiler = new Compiler(apacheData, mimeFile, indexFile, defaultEntry, addendum, logger.ForContext<Compiler>(), compressor);
             _readmeFile = new ReadmeFile(_outputDirectory, resourceLoader, logger.ForContext<ReadmeFile>());
         }
 

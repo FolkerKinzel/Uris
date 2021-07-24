@@ -19,12 +19,19 @@
   <ItemGroup>
     <Compile Remove="Classes\DllCache.cs" />
     <Compile Remove="IDllCache.cs" />
+    <Compile Remove="Records.cs" />
+    <Compile Remove="StringExtension.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\Default.csv" />
   </ItemGroup>
 
   
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\Addendum.csv" />
+    <EmbeddedResource Include="Resources\Default.csv" />
     <EmbeddedResource Include="Resources\Readme.txt" />
   </ItemGroup>
 

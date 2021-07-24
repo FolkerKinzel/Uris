@@ -26,8 +26,23 @@ namespace MimeResourceCompiler
         public void Create()
         {
             string path = Path.Combine(_outputDirectory.FullName, FILENAME);
-            File.WriteAllBytes(path, _resourceLoader.LoadReadmeFile());
-            _log.Debug("Readme file successfully created.");
+            File.WriteAllBytes(path, LoadReadmeFile());
+            _log.Debug("{0} successfully created.", path);
+        }
+
+        /// <summary>
+        /// Loads Readme.txt from the resources.
+        /// </summary>
+        /// <returns>Readme.txt as byte array.</returns>
+        private byte[] LoadReadmeFile()
+        {
+            using Stream? stream = _resourceLoader.GetResourceStream(FILENAME);
+
+            byte[] arr = new byte[stream.Length];
+            _ = stream.Read(arr, 0, arr.Length);
+
+            _log.Debug("{0} successfully loaded from the resources.", FILENAME);
+            return arr;
         }
     }
 }

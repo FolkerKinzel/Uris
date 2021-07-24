@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Serilog;
 
@@ -18,9 +19,9 @@ namespace MimeResourceCompiler.Classes
         private const string APACHE_URL = @"http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types";
 
         private static readonly HttpClient _httpClient = new();
-        private readonly StringReader _reader;
-        private readonly Dictionary<string, object?> _testDic = new();
+        private readonly StreamReader _reader;
         private readonly ILogger _log;
+        private readonly List<Entry> _list = new(8);
 
         /// <summary>
         /// ctor
@@ -29,51 +30,59 @@ namespace MimeResourceCompiler.Classes
         {
             this._log = log;
 
-            _log.Debug("Start downloading Apache data.");
-            string data = _httpClient.GetStringAsync(APACHE_URL).GetAwaiter().GetResult();
-            _log.Debug("Apache data successfully loaded.");
-            _reader = new StringReader(data);
+            _log.Debug("Start connecting to Apache data.");
+            Stream data = _httpClient.GetStreamAsync(APACHE_URL).GetAwaiter().GetResult();
+            _log.Debug("Apache data successfully connected.");
+            _reader = new StreamReader(data);
         }
 
         /// <summary>
         /// Gets the next line with data from the apache file, or null if the file is completely read.
         /// </summary>
         /// <returns>The next line with data from the apache file or null if the file is completely read.</returns>
-        public string? GetNextLine()
+        public IEnumerable<Entry>? GetNextLine()
         {
             string? line;
 
             while ((line = _reader.ReadLine()) is not null)
             {
-                if (line.TrimStart().StartsWith('#') || string.IsNullOrWhiteSpace(line))
+                line = line.Trim();
+                if (line.StartsWith('#') || line.Length == 0)
                 {
                     continue;
                 }
 
-                return line;
+                if (AddApacheLine(line))
+                {
+                    if (_list.Count != 0)
+                    {
+                        return _list;
+                    }
+                }
             }
 
-            _log.Debug("Apache data completely parsed.");
             return null;
         }
 
-        /// <summary>
-        /// Verifies the apache file.
-        /// </summary>
-        /// <param name="mediaType">The first part of an Internet media type (mediatype/subtype) that's used
-        /// to test the apache file.</param>
-        /// <remarks>The program is based on the assertion that the apache file is ordered bei media types.</remarks>
-        public void TestApacheFile(string mediaType)
+
+        private bool AddApacheLine(string line)
         {
-            try
+            string[] parts = Regex.Split(line, @"\s+");
+
+            if (parts.Length < 2)
             {
-                _testDic.Add(mediaType, null);
+                return false;
             }
-            catch (ArgumentException e)
+
+            _list.Clear();
+
+            for (int i = 1; i < parts.Length; i++)
             {
-                throw new InvalidDataException($"The Apache data source {APACHE_URL} has the Media Type \"{mediaType}\" at several positions in the file.", e);
+                _list.Add(new Entry(parts[0], parts[i]));
             }
+            return true;
         }
+
 
         /// <summary>
         /// Releases the resources.
@@ -82,6 +91,7 @@ namespace MimeResourceCompiler.Classes
         {
             _reader?.Close();
             GC.SuppressFinalize(this);
+            _log.Debug("Apache file closed.");
         }
     }
 }

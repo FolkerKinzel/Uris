@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace MimeResourceCompiler
 {
@@ -8,11 +9,10 @@ namespace MimeResourceCompiler
     public interface IMimeFile : IDisposable
     {
         /// <summary>
-        /// Writes a row of data to the MIME file.
+        /// Writes the rows of data for a common media type to the MIME file.
         /// </summary>
-        /// <param name="mimeType">Internet media type</param>
-        /// <param name="extension">File type extension.</param>
-        void WriteRow(string mimeType, string extension);
+        /// <param name="entries">The data to be written.</param>
+        void WriteMediaType(IEnumerable<Entry> entries);
 
         /// <summary>
         /// Returns the current file position in Mime.csv.
