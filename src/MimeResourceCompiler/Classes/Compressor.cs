@@ -38,7 +38,7 @@ namespace MimeResourceCompiler.Classes
                     if (equalsMimeType && equalsExtension)
                     {
                         list.RemoveAt(i);
-                        _log.Debug("{0} removed.", currentEntry);
+                        _log.Debug("  {0} removed.", currentEntry);
                         break;
                     }
                 }

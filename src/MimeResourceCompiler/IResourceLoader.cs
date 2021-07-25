@@ -11,7 +11,7 @@ namespace MimeResourceCompiler
         /// Returns a stream to a resource.
         /// </summary>
         /// <param name="fileName">The name of the resource file.</param>
-        /// <returns>A stream from the resource.</returns>
+        /// <returns>A stream to the resource.</returns>
         Stream GetResourceStream(string fileName);
 
     }

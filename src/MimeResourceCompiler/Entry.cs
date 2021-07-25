@@ -3,9 +3,20 @@ using System.Text.RegularExpressions;
 
 namespace MimeResourceCompiler
 {
+    /// <summary>
+    /// Encapsulates the data of one entry im Mime.csv.
+    /// </summary>
     public class Entry : IEquatable<Entry?>
     {
-
+        /// <summary>
+        /// ctor
+        /// </summary>
+        /// <param name="mimeType">A MIME type ("Internet media type").</param>
+        /// <param name="fileTypeExtension">An appropriate file type extension for <paramref name="mimeType"/>.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="mimeType"/> or <paramref name="fileTypeExtension"/>
+        /// is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="mimeType"/> is not a valid Internet Media Type or
+        /// <paramref name="fileTypeExtension"/> is empty or consists only of whitespace.</exception>
         public Entry(string mimeType, string fileTypeExtension)
         {
             if (mimeType is null)
@@ -35,8 +46,19 @@ namespace MimeResourceCompiler
             }
         }
 
+        /// <summary>
+        /// Internet media type - The left part of the entry (Format: mediaType/SubType).
+        /// </summary>
         public string MimeType { get; }
+
+        /// <summary>
+        /// The file type extension.
+        /// </summary>
         public string Extension { get; }
+
+        /// <summary>
+        /// The left part of <see cref="MimeType"/>. Used to order the entries.
+        /// </summary>
         public string MediaType { get; }
 
         private static string PrepareMimeType(string mimeType)

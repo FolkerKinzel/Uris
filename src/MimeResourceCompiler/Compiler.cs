@@ -13,6 +13,8 @@ namespace MimeResourceCompiler
     /// </summary>
     public sealed class Compiler : IDisposable
     {
+        private const string DEFAULT_MIME_TYPE = "application/octet-stream";
+
         private readonly IApacheData _apacheData;
         private readonly IMimeFile _mimeFile;
         private readonly IIndexFile _indexFile;
@@ -45,7 +47,12 @@ namespace MimeResourceCompiler
         {
             _log.Debug("Start Compiling.");
             List<Entry> list = CollectData();
-            list = list.GroupBy(x => x.MediaType, StringComparer.Ordinal).SelectMany(group => group).Distinct().ToList();
+            list = list
+                .GroupBy(x => x.MediaType, StringComparer.Ordinal)
+                .SelectMany(group => group)
+                .Distinct()
+                .SkipWhile(x => x.MimeType.Equals(DEFAULT_MIME_TYPE, StringComparison.Ordinal))
+                .ToList();
 
             _log.Debug("Start removing unreachable entries.");
             _compressor.RemoveUnreachableEntries(list);

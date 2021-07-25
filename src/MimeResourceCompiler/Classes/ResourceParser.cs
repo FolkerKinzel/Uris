@@ -43,10 +43,23 @@ namespace MimeResourceCompiler.Classes
 
                 string[] parts = Regex.Split(line, @"\s+");
 
-
-                return parts.Length < 2
-                    ? throw new InvalidDataException(string.Format("The resource {0} contains invalid data: {1}", FileName, line))
-                    : new Entry(parts[0], parts[1]);
+                if(parts.Length < 2)
+                {
+                    throw new InvalidDataException(
+                        string.Format("The resource {0} contains invalid data: {1}", FileName, line));
+                }
+                else
+                {
+                    try
+                    { 
+                        return new Entry(parts[0], parts[1]); 
+                    } 
+                    catch (ArgumentException e) 
+                    {
+                        throw new InvalidDataException(
+                            string.Format("The resource {0} contains invalid data: {1}", FileName, line), e);
+                    };
+                }
             }
 
             return null;
