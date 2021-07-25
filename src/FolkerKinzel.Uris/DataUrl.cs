@@ -38,7 +38,7 @@ namespace FolkerKinzel.Uris
         #region Properties
 
         /// <summary>
-        /// The data type of the embedded data.
+        /// The internet media type of the embedded data.
         /// </summary>
         public MimeType MimeType { get; }
 
@@ -189,7 +189,7 @@ namespace FolkerKinzel.Uris
         /// <param name="text">The text to embed into the "data" URL.</param>
         /// <returns>A "data" URL, into which the text provided by the parameter <paramref name="text"/> is embedded.</returns>
         /// <exception cref="FormatException">The <see cref="Uri"/> class was not able to encode <paramref name="text"/> correctly.</exception>
-        public static string FromText(string? text)
+        public static string CreateFromText(string? text)
         {
             string data = text is null ? string.Empty : Uri.EscapeDataString(Uri.UnescapeDataString(text));
 
@@ -207,7 +207,7 @@ namespace FolkerKinzel.Uris
         /// <param name="bytes">The binary data to embed into the "data" URL.</param>
         /// <param name="mediaType">The <see cref="MimeType"/> of the data passed to the parameter <paramref name="bytes"/>.</param>
         /// <returns>A "data" URL, into which the binary data provided by the parameter <paramref name="bytes"/> is embedded.</returns>
-        public static string FromBytes(byte[]? bytes, MimeType mediaType)
+        public static string CreateFromBytes(byte[]? bytes, MimeType mediaType)
         {
             string data = bytes is null ? string.Empty : Convert.ToBase64String(bytes);
 
@@ -250,23 +250,23 @@ namespace FolkerKinzel.Uris
         /// <summary>
         /// Embeds the content of a file in a "data" URL (RFC 2397).
         /// </summary>
-        /// <param name="path">Abolute path to the file which content is to embed into the "data" URL.</param>
+        /// <param name="filePath">Abolute path to the file which content is to embed into the "data" URL.</param>
         /// <param name="mimeType">The <see cref="MimeType"/> of the file to embed or <c>null</c> to let the method automatically
         /// retrieve the <see cref="MimeType"/> from the file type extension.</param>
-        /// <returns>A "data" URL, into which the content of the file provided by the parameter <paramref name="path"/> is embedded.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="path"/> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException"><paramref name="path"/> is not a valid file path.</exception>
+        /// <returns>A "data" URL, into which the content of the file provided by the parameter <paramref name="filePath"/> is embedded.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="filePath"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="filePath"/> is not a valid file path.</exception>
         /// <exception cref="IOException">I/O error.</exception>
-        public static string FromFile(string path, MimeType? mimeType = null)
+        public static string CreateFromFile(string filePath, MimeType? mimeType = null)
         {
-            byte[] bytes = LoadFile(path);
+            byte[] bytes = LoadFile(filePath);
 
             if (mimeType is null)
             {
-                mimeType = MimeType.FromFileTypeExtension(Path.GetExtension(path));
+                mimeType = MimeType.FromFileTypeExtension(Path.GetExtension(filePath));
             }
 
-            return FromBytes(bytes, mimeType.Value);
+            return CreateFromBytes(bytes, mimeType.Value);
         }
 
         #endregion
@@ -318,7 +318,7 @@ namespace FolkerKinzel.Uris
         /// <summary>
         /// Tries to retrieve the binary data that is embedded in the <see cref="DataUrl"/>.
         /// </summary>
-        /// <param name="embeddedText">If the method returns <c>true</c> the parameter contains the binary data, which was embedded in the <see cref="DataUrl"/>.
+        /// <param name="embeddedBytes">If the method returns <c>true</c> the parameter contains the binary data, which was embedded in the <see cref="DataUrl"/>.
         /// The parameter is passed uninitialized.</param>
         /// <returns><c>true</c> if the data embedded in the data url could be parsed as binary data, <c>false</c> otherwise.</returns>
         public bool TryGetEmbeddedBytes([NotNullWhen(true)] out byte[]? embeddedBytes)

@@ -9,14 +9,21 @@ using FolkerKinzel.Strings.Polyfills;
 
 namespace FolkerKinzel.Uris
 {
+    /// <summary>
+    /// Encapsulates a parameter of a <see cref="MimeType"/>.
+    /// </summary>
     public readonly struct MimeTypeParameter : IEquatable<MimeTypeParameter>
     {
         private readonly ReadOnlyMemory<char> _key;
         private readonly ReadOnlyMemory<char> _value;
-        private const string CHARSET_KEY = "charset";
 
         internal const int StringLength = 32;
 
+        /// <summary>
+        /// Initializes a new <see cref="MimeTypeParameter"/> struct.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <param name="value">The value.</param>
         public MimeTypeParameter(ReadOnlyMemory<char> key, ReadOnlyMemory<char> value)
         {
             this._key = key.Trim();
@@ -42,19 +49,32 @@ namespace FolkerKinzel.Uris
             }
         }
 
+        /// <summary>
+        /// The <see cref="MimeTypeParameter"/>'s key.
+        /// </summary>
         public ReadOnlySpan<char> Key => _key.Span;
 
+         /// <summary>
+        /// The <see cref="MimeTypeParameter"/>'s value.
+        /// </summary>
         public ReadOnlySpan<char> Value => _value.Span;
 
+        /// <summary>
+        /// <c>true</c> indicates that the instance contains no data.
+        /// </summary>
         public bool IsEmpty => _key.IsEmpty;
 
+        /// <summary>
+        /// Returns an empty <see cref="MimeTypeParameter"/> struct.
+        /// </summary>
         public static MimeTypeParameter Empty => default;
 
+        /// <summary>
+        /// Indicates that the <see cref="MimeTypeParameter"/> has the <see cref="Key"/> "charset".
+        /// </summary>
+        /// <returns><c>true</c> if <see cref="Key"/> equals "charset". The comparison is case-insensitive.</returns>
         public bool IsCharsetParameter()
-        {
-            ReadOnlySpan<char> charset = stackalloc char[] { 'c', 'h', 'a', 'r', 's', 'e', 't' };
-            return charset.Equals(Key, StringComparison.OrdinalIgnoreCase);
-        }
+            => Key.Equals(stackalloc char[] { 'c', 'h', 'a', 'r', 's', 'e', 't' }, StringComparison.OrdinalIgnoreCase);
 
 
         internal static bool TryParse(ReadOnlyMemory<char> parameterString, out MimeTypeParameter parameter)
@@ -82,17 +102,35 @@ namespace FolkerKinzel.Uris
             return true;
         }
 
+        /// <summary>
+        /// Determines if the content of <paramref name="other"/> is equal to that of the 
+        /// current instance.
+        /// </summary>
+        /// <param name="other">A <see cref="MimeTypeParameter"/> struct to compare with.</param>
+        /// <returns><c>true</c> if the content of <paramref name="other"/> is equal to that of the 
+        /// current instance.</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0075:Bedingten Ausdruck vereinfachen", Justification = "<Ausstehend>")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
         public bool Equals(MimeTypeParameter other)
             => !Key.Equals(other.Key, StringComparison.OrdinalIgnoreCase)
                 ? false
-                : Key.Equals(CHARSET_KEY.AsSpan(), StringComparison.OrdinalIgnoreCase)
+                : IsCharsetParameter()
                     ? Value.Equals(other.Value, StringComparison.OrdinalIgnoreCase)
                     : Value.Equals(other.Value, StringComparison.Ordinal);
 
+        /// <summary>
+        /// Determines whether <paramref name="obj"/> is a <see cref="MimeTypeParameter"/> struct
+        /// whose content is equal to that of the current instance.
+        /// </summary>
+        /// <param name="obj">A <see cref="MimeTypeParameter"/> struct to compare with.</param>
+        /// <returns><c>true</c> if <paramref name="obj"/> is a <see cref="MimeTypeParameter"/> struct
+        /// whose content is equal to that of the current instance.</returns>
         public override bool Equals(object? obj) => obj is MimeTypeParameter parameter && Equals(parameter);
 
+        /// <summary>
+        /// Computes a hash code for the instance.
+        /// </summary>
+        /// <returns>The hash code for the instance.</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
         public override int GetHashCode()
         {
@@ -124,11 +162,30 @@ namespace FolkerKinzel.Uris
             return hash.ToHashCode();
         }
 
-        public static bool operator ==(MimeTypeParameter mediaTypeParameter1, MimeTypeParameter mediaTypeParameter2) => mediaTypeParameter1.Equals(mediaTypeParameter2);
+        /// <summary>
+        /// Returns a value that indicates whether two specified <see cref="MimeTypeParameter"/> instances are equal.
+        /// </summary>
+        /// <param name="mimeTypeParameter1">The first <see cref="MimeTypeParameter"/> to compare.</param>
+        /// <param name="mimeTypeParameter2">The second <see cref="MimeTypeParameter"/> to compare.</param>
+        /// <returns><c>true</c> if <paramref name="mimeTypeParameter1"/> and <paramref name="mimeTypeParameter2"/> are equal;
+        /// otherwise, false.</returns>
+        public static bool operator ==(MimeTypeParameter mimeTypeParameter1, MimeTypeParameter mimeTypeParameter2) => mimeTypeParameter1.Equals(mimeTypeParameter2);
 
-        public static bool operator !=(MimeTypeParameter mediaTypeParameter1, MimeTypeParameter mediaTypeParameter2) => !(mediaTypeParameter1 == mediaTypeParameter2);
+        /// <summary>
+        /// Returns a value that indicates whether two specified <see cref="MimeTypeParameter"/> instances are not equal.
+        /// </summary>
+        /// <param name="mimeTypeParameter1">The first <see cref="MimeTypeParameter"/> to compare.</param>
+        /// <param name="mimeTypeParameter2">The second <see cref="MimeTypeParameter"/> to compare.</param>
+        /// <returns><c>true</c> if <paramref name="mimeTypeParameter1"/> and <paramref name="mimeTypeParameter2"/> are not equal;
+        /// otherwise, false.</returns>
+        /// <returns></returns>
+        public static bool operator !=(MimeTypeParameter mimeTypeParameter1, MimeTypeParameter mimeTypeParameter2) => !(mimeTypeParameter1 == mimeTypeParameter2);
 
 
+        /// <summary>
+        /// Creates a <see cref="string"/> representation of the instance.
+        /// </summary>
+        /// <returns>A <see cref="string"/> representation of the instance.</returns>
         public override string ToString()
         {
             var sb = new StringBuilder(StringLength);
@@ -139,12 +196,6 @@ namespace FolkerKinzel.Uris
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
         internal void AppendTo(StringBuilder builder)
         {
-            //if (builder is null)
-            //{
-            //    throw new ArgumentNullException(nameof(builder));
-            //}
-
-
             // Standard ctor
             if (IsEmpty)
             {
@@ -168,8 +219,8 @@ namespace FolkerKinzel.Uris
             }
 
             int valueStart = builder.Length;
-            _ = Key.CompareTo(CHARSET_KEY.AsSpan(), StringComparison.OrdinalIgnoreCase) == 0
-                ? builder.Append(Value).ToLowerInvariant()
+            _ = IsCharsetParameter()
+                ? builder.Append(Value).ToLowerInvariant(valueStart)
                 : builder.Append(Value);
 
             if (mask)

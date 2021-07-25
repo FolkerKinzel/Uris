@@ -12,6 +12,9 @@ using FolkerKinzel.Strings.Polyfills;
 
 namespace FolkerKinzel.Uris
 {
+    /// <summary>
+    /// Extension methods, which support the <see cref="DataUrl"/> struct.
+    /// </summary>
     public static class DataUrlExtension
     {
         /// <summary>
