@@ -12,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\.github\ISSUE_TEMPLATE\feature_request.md = ..\.github\ISSUE_TEMPLATE\feature_request.md
 		..\README.md = ..\README.md
 		Reference.md = Reference.md
+		..\docs\PackageReleaseNotes\1.0.0-alpha1\ReleaseNotes.md = ..\docs\PackageReleaseNotes\1.0.0-alpha1\ReleaseNotes.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FolkerKinzel.Uris", "FolkerKinzel.Uris\FolkerKinzel.Uris.csproj", "{AD767983-0336-4630-84F2-CCF3D86C34FF}"
@@ -19,6 +20,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FolkerKinzel.Uris.Tests", "FolkerKinzel.Uris.Tests\FolkerKinzel.Uris.Tests.csproj", "{DBEC6873-384F-4357-9BC1-98AF1C757843}"
 EndProject
 Project("{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}") = "FolkerKinzel.Uris.Doku.de", "FolkerKinzel.Uris.Doku.de\FolkerKinzel.Uris.Doku.de.shfbproj", "{924B78A7-00D3-4C2C-9A6B-C57A20CEE13C}"
+EndProject
+Project("{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}") = "FolkerKinzel.Uris.Reference.en", "FolkerKinzel.Uris.Reference.en\FolkerKinzel.Uris.Reference.en.shfbproj", "{34043AB9-64D3-4E67-9FB9-B5871CDE354D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,6 +43,8 @@ Global
 		{DBEC6873-384F-4357-9BC1-98AF1C757843}.Release|Any CPU.Build.0 = Release|Any CPU
 		{924B78A7-00D3-4C2C-9A6B-C57A20CEE13C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{924B78A7-00D3-4C2C-9A6B-C57A20CEE13C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34043AB9-64D3-4E67-9FB9-B5871CDE354D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34043AB9-64D3-4E67-9FB9-B5871CDE354D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

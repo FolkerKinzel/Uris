@@ -257,14 +257,28 @@ namespace FolkerKinzel.Uris
         /// </summary>
         public static void ClearCache() => MimeCache.Clear();
 
+        /// <summary>
+        /// Parses a <see cref="string"/> as <see cref="MimeType"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="string"/> to parse.</param>
+        /// <returns>The <see cref="MimeType"/> instance, which <paramref name="value"/> represents.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="value"/> value could not be parsed as <see cref="MimeType"/>.</exception>
         public static MimeType Parse(string value)
             => value is null
                 ? throw new ArgumentNullException(value)
                 : TryParse(value.AsMemory(), out MimeType mediaType)
                     ? mediaType
-                    : throw new ArgumentException(string.Format(Res.InvalidMediaType, nameof(value)), nameof(value));
+                    : throw new ArgumentException(string.Format(Res.InvalidMimeType, nameof(value)), nameof(value));
 
 
+        /// <summary>
+        /// Tries to parse a <see cref="string"/> as <see cref="MimeType"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="string"/> to parse.</param>
+        /// <param name="mimeType">When the method successfully returns, the parameter contains the
+        /// <see cref="MimeType"/> parsed from <paramref name="value"/>. The parameter is passed uninitialized.</param>
+        /// <returns><c>true</c> if <paramref name="value"/> could be parsed as <see cref="MimeType"/>; otherwise, <c>false</c>.</returns>
         public static bool TryParse(string? value, out MimeType mimeType)
         {
             if (value is null)
@@ -275,6 +289,13 @@ namespace FolkerKinzel.Uris
             return TryParse(value.AsMemory(), out mimeType);
         }
 
+        /// <summary>
+        /// Tries to parse a <see cref="ReadOnlyMemory{T}">ReadOnlyMemory&lt;Char&gt;</see> as <see cref="MimeType"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="ReadOnlyMemory{T}">ReadOnlyMemory&lt;Char&gt;</see> to parse.</param>
+        /// <param name="mimeType">When the method successfully returns, the parameter contains the
+        /// <see cref="MimeType"/> parsed from <paramref name="value"/>. The parameter is passed uninitialized.</param>
+        /// <returns><c>true</c> if <paramref name="value"/> could be parsed as <see cref="MimeType"/>; otherwise, <c>false</c>.</returns>
         public static bool TryParse(ReadOnlyMemory<char> value, out MimeType mimeType)
         {
             int parameterStartIndex = value.Span.IndexOf(';');
@@ -325,7 +346,7 @@ namespace FolkerKinzel.Uris
 
         /// <summary>
         /// Returns a value that indicates whether two specified <see cref="MimeType"/> instances are equal.
-        /// The <see cref="Parameters"/> are take into account.
+        /// The <see cref="Parameters"/> are taken into account.
         /// </summary>
         /// <param name="mimeType1">The first <see cref="MimeType"/> to compare.</param>
         /// <param name="mimeType2">The second <see cref="MimeType"/> to compare.</param>
@@ -335,7 +356,7 @@ namespace FolkerKinzel.Uris
 
         /// <summary>
         /// Returns a value that indicates whether two specified <see cref="MimeType"/> instances are not equal.
-        /// The <see cref="Parameters"/> are take into account.
+        /// The <see cref="Parameters"/> are taken into account.
         /// </summary>
         /// <param name="mimeType1">The first <see cref="MimeType"/> to compare.</param>
         /// <param name="mimeType2">The second <see cref="MimeType"/> to compare.</param>

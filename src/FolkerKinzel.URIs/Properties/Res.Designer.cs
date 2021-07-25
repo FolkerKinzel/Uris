@@ -70,20 +70,11 @@ namespace FolkerKinzel.Uris.Properties {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die &quot;{0} is not a valid Media Type.&quot; ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die &quot;{0} is not a valid MIME type.&quot; ähnelt.
         /// </summary>
-        internal static string InvalidMediaType {
+        internal static string InvalidMimeType {
             get {
-                return ResourceManager.GetString("InvalidMediaType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die The argument contains no data. ähnelt.
-        /// </summary>
-        internal static string NoData {
-            get {
-                return ResourceManager.GetString("NoData", resourceCulture);
+                return ResourceManager.GetString("InvalidMimeType", resourceCulture);
             }
         }
         
