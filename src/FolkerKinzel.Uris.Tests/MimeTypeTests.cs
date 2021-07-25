@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace FolkerKinzel.Uris.Tests
 {
     [TestClass()]
-    public class InternetMediaTypeTests
+    public class MimeTypeTests
     {
         [TestMethod()]
         [ExpectedException(typeof(ArgumentNullException))]

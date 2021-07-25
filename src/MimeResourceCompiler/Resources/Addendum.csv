@@ -224,6 +224,7 @@ audio/wav wav
 # application/x-apple-diskimage dmg
 application/x-apple-diskimage smi
 application/x-apple-diskimage img
+application/x-apple-diskimage-udif udif
 application/vnd.rar rar
 application/vnd.rar rev
 application/vnd.rar r00

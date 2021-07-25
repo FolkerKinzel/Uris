@@ -106,6 +106,7 @@ namespace MimeResourceCompiler
                 list.AddRange(line);
             }
             _log.Debug("Apache data completely parsed.");
+            _apacheData.Dispose();
 
         }
 

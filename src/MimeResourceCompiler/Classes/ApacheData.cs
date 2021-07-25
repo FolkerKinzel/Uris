@@ -22,6 +22,7 @@ namespace MimeResourceCompiler.Classes
         private readonly StreamReader _reader;
         private readonly ILogger _log;
         private readonly List<Entry> _list = new(8);
+        private bool _disposedValue;
 
         /// <summary>
         /// ctor
@@ -83,15 +84,46 @@ namespace MimeResourceCompiler.Classes
             return true;
         }
 
+        private void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+                    _reader?.Close();
+                    _log.Debug("Apache file closed.");
+                }
 
-        /// <summary>
-        /// Releases the resources.
-        /// </summary>
+                // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
+                // TODO: Große Felder auf NULL setzen
+                _disposedValue = true;
+            }
+        }
+
+        // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+        // ~ApacheData()
+        // {
+        //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        //     Dispose(disposing: false);
+        // }
+
         public void Dispose()
         {
-            _reader?.Close();
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+            Dispose(disposing: true);
             GC.SuppressFinalize(this);
-            _log.Debug("Apache file closed.");
         }
+
+
+        ///// <summary>
+        ///// Releases the resources.
+        ///// </summary>
+        //public void Dispose()
+        //{
+        //    _reader?.Close();
+        //    GC.SuppressFinalize(this);
+        //    _log.Debug("Apache file closed.");
+        //}
     }
 }
