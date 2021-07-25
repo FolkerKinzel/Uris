@@ -49,7 +49,7 @@ namespace FolkerKinzel.Uris
                 return builder;
             }
 
-            if (mediaType.IsTextPlainType())
+            if (mediaType.IsTextPlain())
             {
                 foreach (MimeTypeParameter parameter in mediaType.Parameters)
                 {

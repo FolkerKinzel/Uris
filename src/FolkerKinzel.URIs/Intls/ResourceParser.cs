@@ -15,19 +15,18 @@ namespace FolkerKinzel.Uris.Intls
         private const string DEFAULT_FILE_TYPE_EXTENSION = "bin";
         private static readonly Lazy<ConcurrentDictionary<string, long>> _index = new(IndexFactory.CreateIndex, true);
 
-
         internal static string GetMimeType(string fileTypeExtension)
         {
             using StreamReader reader = InitReader();
 
+            ReadOnlySpan<char> fileTypeExtensionSpan = fileTypeExtension.AsSpan();
             string? line;
             while ((line = reader.ReadLine()) is not null)
             {
                 int separatorIndex = line.IndexOf(SEPARATOR);
-
                 ReadOnlySpan<char> span = line.AsSpan(separatorIndex + 1);
 
-                if (span.Equals(fileTypeExtension.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                if (span.Equals(fileTypeExtensionSpan, StringComparison.OrdinalIgnoreCase))
                 {
                     return line.Substring(0, separatorIndex);
                 }
@@ -62,6 +61,7 @@ namespace FolkerKinzel.Uris.Intls
 
             using StreamReader reader = InitReader(mediaTypeIndex.Start);
 
+            ReadOnlySpan<char> mimeSpan = mimeType.AsSpan();
             for (int i = 0; i < mediaTypeIndex.LinesCount; i++)
             {
                 string? line = reader.ReadLine();
@@ -75,7 +75,7 @@ namespace FolkerKinzel.Uris.Intls
 
                 ReadOnlySpan<char> span = line.AsSpan(0, separatorIndex);
 
-                if (span.Equals(mimeType.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                if (span.Equals(mimeSpan, StringComparison.OrdinalIgnoreCase))
                 {
                     return line.Substring(separatorIndex + 1);
                 }
@@ -114,14 +114,6 @@ namespace FolkerKinzel.Uris.Intls
             }
 
         }
-
-        //private static StreamReader InitReader()
-        //{
-        //    Stream? stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(RESOURCE_NAME);
-        //    return stream is null
-        //        ? throw new InvalidDataException(string.Format(Res.ResourceNotFound, RESOURCE_NAME))
-        //        : new StreamReader(stream);
-        //}
 
     }
 }

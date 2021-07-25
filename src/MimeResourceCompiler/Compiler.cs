@@ -48,7 +48,7 @@ namespace MimeResourceCompiler
             _log.Debug("Start Compiling.");
             List<Entry> list = CollectData();
             list = list
-                .GroupBy(x => x.MediaType, StringComparer.Ordinal)
+                .GroupBy(x => x.TopLevelMediaType, StringComparer.Ordinal)
                 .SelectMany(group => group)
                 .Distinct()
                 .SkipWhile(x => x.MimeType.Equals(DEFAULT_MIME_TYPE, StringComparison.Ordinal))
@@ -60,7 +60,7 @@ namespace MimeResourceCompiler
 
             _log.Debug("Start writing the data files.");
 
-            foreach (IGrouping<string, Entry> group in list.GroupBy(x => x.MediaType, StringComparer.Ordinal))
+            foreach (IGrouping<string, Entry> group in list.GroupBy(x => x.TopLevelMediaType, StringComparer.Ordinal))
             {
                 _indexFile.WriteNewMediaType(group.Key, _mimeFile.GetCurrentStreamPosition(), group.Count());
                 _mimeFile.WriteMediaType(group);

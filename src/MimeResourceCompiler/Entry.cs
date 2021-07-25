@@ -37,7 +37,7 @@ namespace MimeResourceCompiler
                 throw new ArgumentException(string.Format("Invalid MIME type: {0}", mimeType), nameof(mimeType));
             }
 
-            this.MediaType = mimeType.Substring(0, mediaTypeLength);
+            this.TopLevelMediaType = mimeType.Substring(0, mediaTypeLength);
             this.Extension = PrepareFileTypeExtension(fileTypeExtension);
 
             if (Extension.Length == 0)
@@ -59,7 +59,7 @@ namespace MimeResourceCompiler
         /// <summary>
         /// The left part of <see cref="MimeType"/>. Used to order the entries.
         /// </summary>
-        public string MediaType { get; }
+        public string TopLevelMediaType { get; }
 
         private static string PrepareMimeType(string mimeType)
             => Regex.Replace(mimeType, @"\s+", "").ToLowerInvariant();

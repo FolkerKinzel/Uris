@@ -24,6 +24,8 @@ namespace FolkerKinzel.Uris
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="value">The value.</param>
+        /// <exception cref="ArgumentException"><paramref name="key"/> or <paramref name="value"/> is 
+        /// empty or consists only of whitespace.</exception>
         public MimeTypeParameter(ReadOnlyMemory<char> key, ReadOnlyMemory<char> value)
         {
             this._key = key.Trim();
@@ -54,7 +56,7 @@ namespace FolkerKinzel.Uris
         /// </summary>
         public ReadOnlySpan<char> Key => _key.Span;
 
-         /// <summary>
+        /// <summary>
         /// The <see cref="MimeTypeParameter"/>'s value.
         /// </summary>
         public ReadOnlySpan<char> Value => _value.Span;
@@ -75,6 +77,15 @@ namespace FolkerKinzel.Uris
         /// <returns><c>true</c> if <see cref="Key"/> equals "charset". The comparison is case-insensitive.</returns>
         public bool IsCharsetParameter()
             => Key.Equals(stackalloc char[] { 'c', 'h', 'a', 'r', 's', 'e', 't' }, StringComparison.OrdinalIgnoreCase);
+
+
+        /// <summary>
+        /// Determines whether this instance equals "charset=us-ascii". The comparison is case-insensitive.
+        /// </summary>
+        /// <returns><c>true</c> if this instance equals "charset=us-ascii".</returns>
+        public bool IsAsciiCharsetParameter()
+            => IsCharsetParameter()
+               && Value.Equals(stackalloc char[] { 'u', 's', '-', 'a', 's', 'c', 'i', 'i' }, StringComparison.OrdinalIgnoreCase);
 
 
         internal static bool TryParse(ReadOnlyMemory<char> parameterString, out MimeTypeParameter parameter)
@@ -168,7 +179,7 @@ namespace FolkerKinzel.Uris
         /// <param name="mimeTypeParameter1">The first <see cref="MimeTypeParameter"/> to compare.</param>
         /// <param name="mimeTypeParameter2">The second <see cref="MimeTypeParameter"/> to compare.</param>
         /// <returns><c>true</c> if <paramref name="mimeTypeParameter1"/> and <paramref name="mimeTypeParameter2"/> are equal;
-        /// otherwise, false.</returns>
+        /// otherwise, <c>false</c>.</returns>
         public static bool operator ==(MimeTypeParameter mimeTypeParameter1, MimeTypeParameter mimeTypeParameter2) => mimeTypeParameter1.Equals(mimeTypeParameter2);
 
         /// <summary>
@@ -177,7 +188,7 @@ namespace FolkerKinzel.Uris
         /// <param name="mimeTypeParameter1">The first <see cref="MimeTypeParameter"/> to compare.</param>
         /// <param name="mimeTypeParameter2">The second <see cref="MimeTypeParameter"/> to compare.</param>
         /// <returns><c>true</c> if <paramref name="mimeTypeParameter1"/> and <paramref name="mimeTypeParameter2"/> are not equal;
-        /// otherwise, false.</returns>
+        /// otherwise, <c>false</c>.</returns>
         /// <returns></returns>
         public static bool operator !=(MimeTypeParameter mimeTypeParameter1, MimeTypeParameter mimeTypeParameter2) => !(mimeTypeParameter1 == mimeTypeParameter2);
 

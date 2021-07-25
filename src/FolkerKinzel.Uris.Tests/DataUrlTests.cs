@@ -76,7 +76,7 @@ namespace FolkerKinzel.Uris.Tests
             Assert.IsTrue(DataUrl.TryParse(test, out DataUrl dataUrl2));
 
             Assert.AreEqual(dataUrl2.EmbeddedData.ToString(), "Text");
-            Assert.AreEqual(dataUrl2.MimeType.MediaType.ToString(), "text");
+            Assert.AreEqual(dataUrl2.MimeType.TopLevelMediaType.ToString(), "text");
             Assert.AreEqual(dataUrl2.MimeType.SubType.ToString(), "plain");
 
             Assert.AreEqual(dataUrl2.MimeType.Parameters.First().Value.ToString(), "UTF-8");
@@ -189,7 +189,7 @@ namespace FolkerKinzel.Uris.Tests
 
             Assert.IsTrue(DataUrl.TryParse(dataUrl1, out DataUrl dataUrl2));
 
-            Assert.AreEqual(dataUrl2.MimeType.MediaType.ToString(), "text");
+            Assert.AreEqual(dataUrl2.MimeType.TopLevelMediaType.ToString(), "text");
             Assert.AreEqual(dataUrl2.MimeType.SubType.ToString(), "plain");
 
             Assert.AreEqual(0, dataUrl2.MimeType.Parameters.Count());
@@ -208,7 +208,7 @@ namespace FolkerKinzel.Uris.Tests
             string dataUrl1 = DataUrl.CreateFromText(TEXT);
 
             Assert.IsTrue(DataUrl.TryParse(dataUrl1, out DataUrl dataUrl2));
-            Assert.AreEqual(dataUrl2.MimeType.MediaType.ToString(), "text");
+            Assert.AreEqual(dataUrl2.MimeType.TopLevelMediaType.ToString(), "text");
             Assert.AreEqual(dataUrl2.MimeType.SubType.ToString(), "plain");
             Assert.AreEqual(0, dataUrl2.MimeType.Parameters.Count());
             Assert.IsTrue(dataUrl2.TryGetEmbeddedText(out string? outText));
