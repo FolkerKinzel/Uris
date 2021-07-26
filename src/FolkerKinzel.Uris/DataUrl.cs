@@ -200,7 +200,6 @@ namespace FolkerKinzel.Uris
             // $"data:,{Uri.EscapeDataString(text)}"
         }
 
-
         /// <summary>
         /// Embeds binary data in a "data" URL (RFC 2397).
         /// </summary>
@@ -209,10 +208,8 @@ namespace FolkerKinzel.Uris
         /// <returns>A "data" URL, into which the binary data provided by the parameter <paramref name="bytes"/> is embedded.</returns>
         public static string CreateFromBytes(byte[]? bytes, MimeType mediaType)
         {
-            string data = bytes is null ? string.Empty : Convert.ToBase64String(bytes);
-
+            string data = bytes is null ? string.Empty : Convert.ToBase64String(bytes, Base64FormattingOptions.None);
             var builder = new StringBuilder(PROTOCOL_LENGTH + MimeType.StringLength + BASE64_LENGTH + 1 + data.Length);
-
             return builder.AppendProtocol().AppendMediaType(mediaType).AppendBase64().Append(',').Append(data).ToString();
 
             // $"data:{mediaTypeString};base64,{Convert.ToBase64String(bytes)}"
