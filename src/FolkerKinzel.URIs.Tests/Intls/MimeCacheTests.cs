@@ -12,6 +12,7 @@ namespace FolkerKinzel.Uris.Intls.Tests
         [DataRow(".json", "application/json")]
         [DataRow(".psd", "image/vnd.adobe.photoshop")]
         [DataRow(".json", "application/json")]
+        [DataRow("##############++", "application/octet-stream")]
         public void GetMimeTypeTest1(string extension, string mimeType) => Assert.AreEqual(mimeType, MimeCache.GetMimeType(extension), true);
 
 
@@ -25,6 +26,7 @@ namespace FolkerKinzel.Uris.Intls.Tests
         [DataRow(".json", "application/json")]
         [DataRow(".psd", "image/vnd.adobe.photoshop")]
         [DataRow(".json", "application/json")]
+        [DataRow(".bin", "blabla/nichda")]
         public void GetFileTypeExtensionTest1(string extension, string mimeType) => Assert.AreEqual(extension, MimeCache.GetFileTypeExtension(mimeType), true);
 
 

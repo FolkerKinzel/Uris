@@ -17,9 +17,20 @@ namespace FolkerKinzel.Uris.Tests
         [DataRow("dotu:bla", false)]
         [DataRow("", false)]
         [DataRow(null, false)]
-        public void StartsWithDataUrlProtocolTest(string? input, bool expected)
-            => Assert.AreEqual(expected, input.StartsWithDataUrlProtocol());
+        public void IsDataUrlTest1(string? input, bool expected)
+            => Assert.AreEqual(expected, input.IsDataUrl());
 
+        [DataTestMethod]
+        [DataRow("data:,", true)]
+        [DataRow("DATA:,bla", true)]
+        [DataRow("dotu:,bla", false)]
+        [DataRow("http://www.contoso.com/", false)]
+        [DataRow(null, false)]
+        public void IsDataUrlTest2(string? input, bool expected)
+        {
+            Uri? uri = input is null ? null : new Uri(input);
+            Assert.AreEqual(expected, uri.IsDataUrl());
+        }
 
         [TestMethod]
         public void AppendDataUrlProtocolTest()

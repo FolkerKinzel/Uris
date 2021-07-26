@@ -14,6 +14,7 @@ namespace FolkerKinzel.Uris.Intls.Tests
         [DataRow(null, 65001)]
         [DataRow("iso-8859-1", 28591)]
         [DataRow("ISO-8859-1", 28591)]
+        [DataRow("unBekannt", 65001)]
         public void GetEncodingTest(string? input, int codePage)
         {
             Assert.AreEqual(codePage, TextEncodingConverter.GetEncoding(input).CodePage);

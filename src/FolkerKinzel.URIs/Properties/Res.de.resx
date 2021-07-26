@@ -120,8 +120,11 @@
   <data name="EmptyOrWhiteSpace" xml:space="preserve">
     <value>{0} hat die Länge 0 oder besteht nur aus Leerraum.</value>
   </data>
+  <data name="InvalidDataUrl" xml:space="preserve">
+    <value>{0} ist kein gültiger "data" URL.</value>
+  </data>
   <data name="InvalidMimeType" xml:space="preserve">
-    <value>"{0} ist kein gültiger Internet-Medientyp."</value>
+    <value>{0} ist kein gültiger Internet-Medientyp.</value>
   </data>
   <data name="ResourceNotFound" xml:space="preserve">
     <value>Die Ressource {0} wurde nicht gefunden.</value>

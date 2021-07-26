@@ -17,14 +17,7 @@ namespace FolkerKinzel.Uris
     /// </summary>
     public static class DataUrlExtension
     {
-        /// <summary>
-        /// Returns <c>true</c> if the <see cref="string"/> passed as parameter is a "data" URL. (RFC 2397)
-        /// </summary>
-        /// <param name="urlString">The <see cref="string"/> to examine.</param>
-        /// <returns><c>true</c> if <paramref name="urlString"/> is a "data" URL. If <paramref name="urlString"/> is 
-        /// <c>null</c> or empty <c>false</c> is returned.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsDataUrl([NotNullWhen(true)] this string? urlString) => urlString.StartsWithDataUrlProtocol();
+        
 
         /// <summary>
         /// Returns <c>true</c> if the <see cref="Uri"/> passed as parameter is a "data" URL. (RFC 2397)
@@ -35,9 +28,14 @@ namespace FolkerKinzel.Uris
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsDataUrl([NotNullWhen(true)] this Uri? uri) => uri is not null && uri.OriginalString.IsDataUrl();
 
-        internal static bool StartsWithDataUrlProtocol([NotNullWhen(true)] this string? input) 
-            => input is not null
-               && input.AsSpan().StartsWith(stackalloc char[] { 'd', 'a', 't', 'a', ':' }, StringComparison.OrdinalIgnoreCase);
+        /// <summary>
+        /// Returns <c>true</c> if the <see cref="string"/> passed as parameter is a "data" URL. (RFC 2397)
+        /// </summary>
+        /// <param name="urlString">The <see cref="string"/> to examine.</param>
+        /// <returns><c>true</c> if <paramref name="urlString"/> is a "data" URL. If <paramref name="urlString"/> is 
+        /// <c>null</c> or empty <c>false</c> is returned.</returns>
+        public static bool IsDataUrl([NotNullWhen(true)] this string? urlString)
+            => urlString.AsSpan().StartsWith(stackalloc char[] { 'd', 'a', 't', 'a', ':' }, StringComparison.OrdinalIgnoreCase);
 
         internal static StringBuilder AppendProtocol(this StringBuilder sb)
             => sb.Append(stackalloc char[] { 'd', 'a', 't', 'a', ':' });

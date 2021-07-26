@@ -34,12 +34,12 @@ namespace FolkerKinzel.Uris
         #region Properties
 
         /// <summary>
-        /// Top-Level Media Type. (The left part of a MIME-Type. Never <c>null</c>.)
+        /// Top-Level Media Type. (The left part of a MIME-Type.)
         /// </summary>
         public ReadOnlySpan<char> TopLevelMediaType => _mediaType.Span;
 
         /// <summary>
-        /// Sub Type (The right part of a MIME-Type. Never <c>null</c>.)
+        /// Sub Type (The right part of a MIME-Type.)
         /// </summary>
         public ReadOnlySpan<char> SubType => _subType.Span;
 
@@ -62,7 +62,7 @@ namespace FolkerKinzel.Uris
         /// The comparison is case-insensitive.
         /// </summary>
         /// <returns><c>true</c> if the <see cref="TopLevelMediaType"/> of this instance equals "text".</returns>
-        public bool IsTextMediaType()
+        public bool IsText()
             => TopLevelMediaType.Equals(stackalloc char[] { 't', 'e', 'x', 't' }, StringComparison.OrdinalIgnoreCase);
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace FolkerKinzel.Uris
         /// </summary>
         /// <returns><c>true</c> if this instance is equal to "text/plain".</returns>
         public bool IsTextPlain()
-            => IsTextMediaType() && SubType.Equals(stackalloc char[] { 'p', 'l', 'a', 'i', 'n' }, StringComparison.OrdinalIgnoreCase);
+            => IsText() && SubType.Equals(stackalloc char[] { 'p', 'l', 'a', 'i', 'n' }, StringComparison.OrdinalIgnoreCase);
 
         /// <summary>
         /// Finds an appropriate file type extension for the <see cref="MimeType"/> instance.
@@ -168,7 +168,7 @@ namespace FolkerKinzel.Uris
 
             StringComparer comparer = StringComparer.OrdinalIgnoreCase;
             IOrderedEnumerable<MimeTypeParameter> thisParameters =
-                IsTextMediaType()
+                IsText()
                 ? Parameters.SkipWhile(UsAsciiPredicate).OrderBy(KeySelector, comparer)
                 : Parameters.OrderBy(KeySelector, comparer);
 
@@ -214,7 +214,7 @@ namespace FolkerKinzel.Uris
             IOrderedEnumerable<MimeTypeParameter> thisParameters;
             IOrderedEnumerable<MimeTypeParameter> otherParameters;
 
-            if (IsTextMediaType())
+            if (IsText())
             {
                 thisParameters = Parameters.SkipWhile(UsAsciiPredicate).OrderBy(KeySelector, comparer);
                 otherParameters = other.Parameters.SkipWhile(UsAsciiPredicate).OrderBy(KeySelector, comparer);

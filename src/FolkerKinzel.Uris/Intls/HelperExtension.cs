@@ -28,6 +28,7 @@ namespace FolkerKinzel.Uris.Intls
                 throw new ArgumentNullException(nameof(builder));
             }
 
+            count += startIndex;
             for (int i = startIndex; i < count; i++)
             {
                 char current = builder[i];

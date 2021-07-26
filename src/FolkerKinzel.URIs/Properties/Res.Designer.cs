@@ -70,7 +70,16 @@ namespace FolkerKinzel.Uris.Properties {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die &quot;{0} is not a valid MIME type.&quot; ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die {0} is not a valid &quot;data&quot; URL. ähnelt.
+        /// </summary>
+        internal static string InvalidDataUrl {
+            get {
+                return ResourceManager.GetString("InvalidDataUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {0} is not a valid MIME type. ähnelt.
         /// </summary>
         internal static string InvalidMimeType {
             get {

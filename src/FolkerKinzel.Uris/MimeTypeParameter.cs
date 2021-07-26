@@ -26,7 +26,7 @@ namespace FolkerKinzel.Uris
         /// <param name="value">The value.</param>
         /// <exception cref="ArgumentException"><paramref name="key"/> or <paramref name="value"/> is 
         /// empty or consists only of whitespace.</exception>
-        public MimeTypeParameter(ReadOnlyMemory<char> key, ReadOnlyMemory<char> value)
+        private MimeTypeParameter(ReadOnlyMemory<char> key, ReadOnlyMemory<char> value)
         {
             this._key = key.Trim();
 
@@ -72,9 +72,9 @@ namespace FolkerKinzel.Uris
         public static MimeTypeParameter Empty => default;
 
         /// <summary>
-        /// Indicates that the <see cref="MimeTypeParameter"/> has the <see cref="Key"/> "charset".
+        /// Determines whether the <see cref="MimeTypeParameter"/> has the <see cref="Key"/> "charset". The comparison is case-insensitive.
         /// </summary>
-        /// <returns><c>true</c> if <see cref="Key"/> equals "charset". The comparison is case-insensitive.</returns>
+        /// <returns><c>true</c> if <see cref="Key"/> equals "charset"; otherwise, <c>false</c>.</returns>
         public bool IsCharsetParameter()
             => Key.Equals(stackalloc char[] { 'c', 'h', 'a', 'r', 's', 'e', 't' }, StringComparison.OrdinalIgnoreCase);
 
@@ -82,7 +82,7 @@ namespace FolkerKinzel.Uris
         /// <summary>
         /// Determines whether this instance equals "charset=us-ascii". The comparison is case-insensitive.
         /// </summary>
-        /// <returns><c>true</c> if this instance equals "charset=us-ascii".</returns>
+        /// <returns><c>true</c> if this instance equals "charset=us-ascii"; otherwise, <c>false</c>.</returns>
         public bool IsAsciiCharsetParameter()
             => IsCharsetParameter()
                && Value.Equals(stackalloc char[] { 'u', 's', '-', 'a', 's', 'c', 'i', 'i' }, StringComparison.OrdinalIgnoreCase);
@@ -219,7 +219,7 @@ namespace FolkerKinzel.Uris
             ReadOnlySpan<char> maskChars = stackalloc char[] { ' ', '(', ')', '<', '>', '@', ',', ';', ':', '\\', '\"', '/', '[', '>', ']', '?', '=' };
 
             int keyStart = builder.Length;
-            _ = builder.Append(';').Append(Key).ToLowerInvariant(keyStart).Append('=');
+            _ = builder.Append(';').Append(Key).ToLowerInvariant(keyStart + 1).Append('=');
 
 
             bool mask = Value.ContainsAny(maskChars);

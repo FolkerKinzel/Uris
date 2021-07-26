@@ -57,7 +57,7 @@ namespace FolkerKinzel.Uris
         /// <summary>
         /// <c>true</c> if <see cref="EmbeddedData"/> contains text.
         /// </summary>
-        public bool ContainsText => this.MimeType.IsTextMediaType();
+        public bool ContainsText => this.MimeType.IsText();
 
 
         /// <summary>
@@ -78,6 +78,21 @@ namespace FolkerKinzel.Uris
         #endregion
 
         #region Parser
+
+        /// <summary>
+        /// Parses a <see cref="string"/> as <see cref="DataUrl"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="string"/> to parse.</param>
+        /// <returns>The <see cref="DataUrl"/> instance, which <paramref name="value"/> represents.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="value"/> value could not be parsed as <see cref="DataUrl"/>.</exception>
+        public static DataUrl Parse(string value)
+            => value is null
+                ? throw new ArgumentNullException(nameof(value))
+                : TryParse(value, out DataUrl dataUrl)
+                    ? dataUrl
+                    : throw new ArgumentException(string.Format(Res.InvalidDataUrl, nameof(value)), nameof(value));
+
 
         /// <summary>
         /// Tries to parse a <see cref="string"/> as <see cref="DataUrl"/>.
@@ -103,10 +118,7 @@ namespace FolkerKinzel.Uris
             for (int i = PROTOCOL_LENGTH; i < value.Length; i++)
             {
                 char c = value[i];
-                if (char.IsWhiteSpace(c))
-                {
-                    return false;
-                }
+
 
                 if (c == ',')
                 {

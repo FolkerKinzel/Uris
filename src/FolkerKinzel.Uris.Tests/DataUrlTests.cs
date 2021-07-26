@@ -21,6 +21,16 @@ namespace FolkerKinzel.Uris.Tests
         //public void SchemeDelimiterTest() => Assert.AreEqual(":", DataUrl.SchemeDelimiter);
 
         [TestMethod]
+        public void IsEmptyTest1() => Assert.IsTrue(DataUrl.Empty.IsEmpty);
+
+        [TestMethod]
+        public void IsEmptyTest2()
+        {
+            _ = DataUrl.TryParse("data:,abc", out DataUrl dataUrl);
+            Assert.IsFalse(dataUrl.IsEmpty);
+        }
+
+        [TestMethod]
         public void TryParseTest1()
         {
             string text = "http://www.fölkerchen.de";
@@ -101,7 +111,20 @@ namespace FolkerKinzel.Uris.Tests
             CollectionAssert.AreEqual(data, output);
         }
 
+        [DataTestMethod]
+        [DataRow("data:abc")]
+        //[DataRow("data:,a bc")]
+        public void TryParseTest7(string input)
+        {
+            Assert.IsFalse(DataUrl.TryParse(input, out DataUrl _));
+        }
 
+        [TestMethod]
+        public void GetFileTypeExtension()
+        {
+            var dataUrl = DataUrl.Parse("data:,abc");
+            Assert.AreEqual(".txt", dataUrl.GetFileTypeExtension());
+        }
         
 
         [TestMethod]
