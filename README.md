@@ -11,7 +11,7 @@ to RFC 2045 and RFC 2046. The struct can be created automatically from a file ty
 
 .
 
-[Download Project Reference](https://github.com/FolkerKinzel/Uris/blob/master/ProjectReference/1.0.0-alpha1/FolkerKinzel.Uris.Reference.en.chm)
+[Project Reference](https://github.com/FolkerKinzel/Uris/blob/master/ProjectReference/1.0.0-alpha1/FolkerKinzel.Uris.Reference.en.chm)
 
 
 > IMPORTANT: On some systems the content of the .CHM file is blocked. Before opening the file right click on the file icon, select Properties, and check the "Allow" checkbox (if it is present) in the lower right corner of the General tab in the Properties dialog.
