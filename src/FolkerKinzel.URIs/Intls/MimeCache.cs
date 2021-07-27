@@ -29,6 +29,8 @@ namespace FolkerKinzel.Uris.Intls
             public string MimeType { get; }
             public string Extension { get; }
 
+            public override string ToString() => $"{MimeType} {Extension}";
+
             //public bool Equals(Entry? other)
             // => other is not null
             //    && StringComparer.Ordinal.Equals(MimeType, other.MimeType)

@@ -120,7 +120,7 @@ namespace FolkerKinzel.Uris.Tests
         }
 
         [TestMethod]
-        public void GetFileTypeExtension()
+        public void GetFileTypeExtensionTest()
         {
             var dataUrl = DataUrl.Parse("data:,abc");
             Assert.AreEqual(".txt", dataUrl.GetFileTypeExtension());

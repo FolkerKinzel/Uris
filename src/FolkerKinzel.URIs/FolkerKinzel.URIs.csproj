@@ -53,17 +53,17 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
-    <PackageReference Include="FolkerKinzel.Strings" Version="3.0.0-alpha2" />
+    <PackageReference Include="FolkerKinzel.Strings" Version="3.0.0-beta" />
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="FolkerKinzel.Strings" Version="3.0.0-alpha2" />
+    <PackageReference Include="FolkerKinzel.Strings" Version="3.0.0-beta" />
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
-    <PackageReference Include="FolkerKinzel.Strings" Version="3.0.0-alpha2" />
+    <PackageReference Include="FolkerKinzel.Strings" Version="3.0.0-beta" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
