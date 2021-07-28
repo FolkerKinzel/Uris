@@ -18,6 +18,7 @@ namespace MimeResourceCompiler
         private readonly IApacheData _apacheData;
         private readonly IMimeFile _mimeFile;
         private readonly IIndexFile _indexFile;
+        private readonly ICompiledFile _extensionFile;
         private readonly IResourceParser _defaultEntry;
         private readonly IResourceParser _addendum;
         private readonly ILogger _log;
@@ -27,6 +28,7 @@ namespace MimeResourceCompiler
         public Compiler(IApacheData apacheData,
                         IMimeFile mimeFile,
                         IIndexFile indexFile,
+                        ICompiledFile extensionFile,
                         IResourceParser defaultEntry,
                         IResourceParser addendum,
                         ILogger log,
@@ -35,6 +37,7 @@ namespace MimeResourceCompiler
             _apacheData = apacheData;
             _mimeFile = mimeFile;
             _indexFile = indexFile;
+            this._extensionFile = extensionFile;
             this._defaultEntry = defaultEntry;
             _addendum = addendum;
             _log = log;
@@ -59,14 +62,29 @@ namespace MimeResourceCompiler
             _log.Debug("Unreachable entries completely removed.");
 
             _log.Debug("Start writing the data files.");
+            CompileMimeFile(list);
+            CompileExtensionFile(list);
 
+            _log.Debug("Data files completely written.");
+        }
+
+        private void CompileMimeFile(List<Entry> list)
+        {
+            _log.Debug("Start writing {0} and {1}.", _mimeFile.FileName, _indexFile.FileName);
+            var comparer = new MimeTypeEqualityComparer();
             foreach (IGrouping<string, Entry> group in list.GroupBy(x => x.TopLevelMediaType, StringComparer.Ordinal))
             {
                 _indexFile.WriteNewMediaType(group.Key, _mimeFile.GetCurrentStreamPosition(), group.Count());
-                _mimeFile.WriteMediaType(group);
+                _mimeFile.WriteEntries(group.Distinct(comparer));
             }
+            _log.Debug("{0} and {1} successfully written.", _mimeFile.FileName, _indexFile.FileName);
+        }
 
-            _log.Debug("Data files completely written.");
+        private void CompileExtensionFile(List<Entry> list)
+        {
+            _log.Debug("Start writing {0}.", _extensionFile.FileName);
+            _extensionFile.WriteEntries(list.Distinct(new ExtensionEqualityComparer()));
+            _log.Debug("{0}  successfully written..", _extensionFile.FileName);
         }
 
         public void Dispose()
@@ -93,7 +111,7 @@ namespace MimeResourceCompiler
         private void CollectResourceFile(List<Entry> list, IResourceParser parser)
         {
             _log.Debug("Start parsing the resource {0}.", parser.FileName);
-            
+
             Entry? entry;
             while ((entry = parser.GetNextLine()) is not null)
             {

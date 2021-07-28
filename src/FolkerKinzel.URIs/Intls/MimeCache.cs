@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 #if NETSTANDARD2_0 || NET461
 using FolkerKinzel.Strings.Polyfills;
@@ -48,8 +49,9 @@ namespace FolkerKinzel.Uris.Intls
         private const int CACHE_MAX_SIZE = 32;
         private const int CACHE_CLEANUP_SIZE = 8;
 
-        private static readonly object _lockObj = new();
-        private static List<Entry>? _cache;
+        private static readonly object _lockObj = new ();
+        private static List<Entry>? _mimeCache;
+        private static List<Entry>? _extCache;
 
 
         internal static string GetMimeType(string fileTypeExtension)
@@ -72,12 +74,12 @@ namespace FolkerKinzel.Uris.Intls
 
                 lock (_lockObj)
                 {
-                    _cache ??= InitCache();
+                    _extCache ??= InitExtCache();
 
-                    if (_cache.Find(x => x.Extension.Equals(fileTypeExtension, StringComparison.Ordinal)) is Entry entry)
+                    if (_extCache.Find(x => x.Extension.Equals(fileTypeExtension, StringComparison.Ordinal)) is Entry entry)
                     {
                         mimeType = entry.MimeType;
-                        AddEntryToCache(entry);
+                        AddEntryToExtCache(entry);
 
                         return true;
                     }
@@ -89,7 +91,7 @@ namespace FolkerKinzel.Uris.Intls
             static string GetMimeTypeFromResources(string fileTypeExtension)
             {
                 string? mimeType = ResourceParser.GetMimeType(fileTypeExtension);
-                AddEntryToCache(new Entry(mimeType, fileTypeExtension));
+                AddEntryToExtCache(new Entry(mimeType, fileTypeExtension));
                 return mimeType;
             }
         }
@@ -113,12 +115,12 @@ namespace FolkerKinzel.Uris.Intls
 
                 lock (_lockObj)
                 {
-                    _cache ??= InitCache();
+                    _mimeCache ??= InitMimeCache();
 
-                    if (_cache.Find(x => x.MimeType.Equals(mimeType, StringComparison.Ordinal)) is Entry entry)
+                    if (_mimeCache.Find(x => x.MimeType.Equals(mimeType, StringComparison.Ordinal)) is Entry entry)
                     {
                         fileTypeExtension = entry.Extension;
-                        AddEntryToCache(entry);
+                        AddEntryToMimeCache(entry);
 
                         return true;
                     }
@@ -130,99 +132,122 @@ namespace FolkerKinzel.Uris.Intls
             static string GetFileTypeExtensionFromResources(string mimeType)
             {
                 string fileTypeExtension = ResourceParser.GetFileType(mimeType);
-                AddEntryToCache(new Entry(mimeType, fileTypeExtension));
+                AddEntryToMimeCache(new Entry(mimeType, fileTypeExtension));
                 return fileTypeExtension;
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string PrepareFileTypeExtension(string fileTypeExtension) => $".{fileTypeExtension}";
 
         internal static void Clear()
         {
             lock (_lockObj)
             {
-                _cache = null;
+                _mimeCache = null;
+                _extCache = null;
             }
         }
 
-        /// <summary>
-        /// Testet den vorgefüllten Cache auf Fehler.
-        /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        internal static void TestIt()
-        {
-            List<Entry>? cache = InitCache();
+        ///// <summary>
+        ///// Testet den vorgefüllten Cache auf Fehler.
+        ///// </summary>
+        //[EditorBrowsable(EditorBrowsableState.Never)]
+        //internal static void TestIt()
+        //{
+        //    List<Entry>? cache = InitCache();
 
-            string? error = cache.Select(entry => $"{entry.MimeType} {entry.Extension}").FirstOrDefault(x => x.Any(c => char.IsUpper(c)));
+        //    string? error = cache.Select(entry => $"{entry.MimeType} {entry.Extension}").FirstOrDefault(x => x.Any(c => char.IsUpper(c)));
 
-            if(error is not null)
-            {
-                throw new InvalidDataException($"{nameof(FolkerKinzel.Uris.Intls)}.{nameof(MimeCache)}: The cache contains an uppercase letter at \"{error}\".");
-            }
+        //    if(error is not null)
+        //    {
+        //        throw new InvalidDataException($"{nameof(FolkerKinzel.Uris.Intls)}.{nameof(MimeCache)}: The cache contains an uppercase letter at \"{error}\".");
+        //    }
 
-            error = cache.FirstOrDefault(entry => string.IsNullOrEmpty(entry.Extension) || entry.Extension.Contains(' ', StringComparison.Ordinal) || entry.Extension.Contains('.', StringComparison.Ordinal))?.Extension;
+        //    error = cache.FirstOrDefault(entry => string.IsNullOrEmpty(entry.Extension) || entry.Extension.Contains(' ', StringComparison.Ordinal) || entry.Extension.Contains('.', StringComparison.Ordinal))?.Extension;
 
-            if(error is not null)
-            {
-                throw new InvalidDataException($"{nameof(FolkerKinzel.Uris.Intls)}.{nameof(MimeCache)}: The cache contains an invalid file type extension at \"{error}\".");
-            }
+        //    if(error is not null)
+        //    {
+        //        throw new InvalidDataException($"{nameof(FolkerKinzel.Uris.Intls)}.{nameof(MimeCache)}: The cache contains an invalid file type extension at \"{error}\".");
+        //    }
 
-            error = cache.FirstOrDefault(entry => entry.MimeType.Contains(' ', StringComparison.Ordinal))?.MimeType;
+        //    error = cache.FirstOrDefault(entry => entry.MimeType.Contains(' ', StringComparison.Ordinal))?.MimeType;
 
-            if(error is not null)
-            {
-                throw new InvalidDataException($"{nameof(FolkerKinzel.Uris.Intls)}.{nameof(MimeCache)}: The cache contains an invalid MIME type at \"{error}\".");
-            }
-        }
+        //    if(error is not null)
+        //    {
+        //        throw new InvalidDataException($"{nameof(FolkerKinzel.Uris.Intls)}.{nameof(MimeCache)}: The cache contains an invalid MIME type at \"{error}\".");
+        //    }
+        //}
 
 
-        private static List<Entry> InitCache()
+        private static List<Entry> InitMimeCache()
             => new(CACHE_MAX_SIZE)
             {
                 new ("application/json", "json" ),
-                //new ("application/msword", "doc"),
                 new ("application/pdf", "pdf"),
                 new ("application/rtf", "rtf"),
-                //new ("application/vnd.ms-excel", "xls"),
-                //new ("application/vnd.ms-powerpoint", "ppt"),
-                //new ("application/vnd.oasis.opendocument.presentation", "odp"),
-                //new ("application/vnd.oasis.opendocument.spreadsheet", "ods"),
-                //new ("application/vnd.oasis.opendocument.text", "odt"),
-                //new ("application/vnd.openxmlformats-officedocument.presentationml.presentation", "pptx"),
-                //new ("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx"),
-                //new ("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx"),
                 new ("application/xml", "xml"),
                 new ("application/zip", "zip"),
-                //new ("audio/mpeg", "mp3"),
+                new ("image/gif", "gif"),
+                new ("image/jpeg", "jpg"),
+                new ("image/png", "png"),
+                new ("image/svg+xml", "svg"),
+                new ("message/rfc822", "eml"),
+                new ("text/html", "htm"),
+                new ("text/plain", "txt"),
+            };
+
+
+        private static List<Entry> InitExtCache()
+            => new(CACHE_MAX_SIZE)
+            {
+                new ("application/json", "json" ),
+                new ("application/pdf", "pdf"),
+                new ("application/rtf", "rtf"),
+                new ("application/xml", "xml"),
+                new ("application/zip", "zip"),
                 new ("image/gif", "gif"),
                 new ("image/jpeg", "jpg"),
                 new ("image/jpeg", "jpeg"),
                 new ("image/png", "png"),
                 new ("image/svg+xml", "svg"),
-                //new ("image/x-icon", "ico"),
                 new ("message/rfc822", "eml"),
-                //new ("text/csv", "csv"),
                 new ("text/html", "htm"),
                 new ("text/html", "html"),
                 new ("text/plain", "txt"),
                 new ("text/plain", "log"),
-                //new ("text/x-vcard", "vcf")
             };
 
-
-        private static void AddEntryToCache(Entry entry)
+        private static void AddEntryToExtCache(Entry entry)
         {
             lock (_lockObj)
             {
-                _cache ??= InitCache();
+                _extCache ??= InitExtCache();
 
-                if (_cache.Count.Equals(CACHE_MAX_SIZE))
+                if (_extCache.Count.Equals(CACHE_MAX_SIZE))
                 {
-                    _cache.RemoveRange(0, CACHE_CLEANUP_SIZE);
+                    _extCache.RemoveRange(0, CACHE_CLEANUP_SIZE);
                 }
 
-                _ = _cache.Remove(entry);
-                _cache.Add(entry);
+                _ = _extCache.Remove(entry);
+                _extCache.Add(entry);
+            }
+        }
+
+
+        private static void AddEntryToMimeCache(Entry entry)
+        {
+            lock (_lockObj)
+            {
+                _mimeCache ??= InitMimeCache();
+
+                if (_mimeCache.Count.Equals(CACHE_MAX_SIZE))
+                {
+                    _mimeCache.RemoveRange(0, CACHE_CLEANUP_SIZE);
+                }
+
+                _ = _mimeCache.Remove(entry);
+                _mimeCache.Add(entry);
             }
         }
 

@@ -35,6 +35,7 @@
     <Compile Remove="MimeCacheFactory.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Resources\Extension.csv" />
     <None Remove="Resources\Mime.csv" />
     <None Remove="Resources\MimeIdx.csv" />
     <None Include="..\..\..\..\Nuget-Logo\Logo.png">
@@ -43,6 +44,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Extension.csv" />
     <EmbeddedResource Include="Resources\Mime.csv" />
     <EmbeddedResource Include="Resources\MimeIdx.csv" />
   </ItemGroup>

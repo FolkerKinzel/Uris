@@ -14,5 +14,7 @@ namespace MimeResourceCompiler
         /// <param name="startPosition">Byte index in Mime.csv where the <paramref name="mediaType"/> starts.</param>
         /// <param name="rowsCount">The number of rows of <paramref name="mediaType"/> in Mime.csv.</param>
         void WriteNewMediaType(string mediaType, long startPosition, int rowsCount);
+
+        string FileName { get; }
     }
 }

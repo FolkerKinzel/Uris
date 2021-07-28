@@ -21,7 +21,7 @@ namespace FolkerKinzel.Uris.Intls
 
             using var reader = new StreamReader(stream);
 
-            var dic = new ConcurrentDictionary<string, long>(StringComparer.OrdinalIgnoreCase);
+            var dic = new ConcurrentDictionary<string, long>(Environment.ProcessorCount * 4, 16, StringComparer.Ordinal);
             string? line;
             while ((line = reader.ReadLine()) is not null)
             {

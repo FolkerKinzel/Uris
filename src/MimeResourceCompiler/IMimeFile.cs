@@ -6,14 +6,8 @@ namespace MimeResourceCompiler
     /// <summary>
     /// Represents the mime file "Mime.csv".
     /// </summary>
-    public interface IMimeFile : IDisposable
+    public interface IMimeFile : ICompiledFile
     {
-        /// <summary>
-        /// Writes the rows of data for a common media type to the MIME file.
-        /// </summary>
-        /// <param name="entries">The data to be written.</param>
-        void WriteMediaType(IEnumerable<Entry> entries);
-
         /// <summary>
         /// Returns the current file position in Mime.csv.
         /// </summary>

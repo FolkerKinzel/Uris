@@ -9,7 +9,9 @@ namespace FolkerKinzel.Uris.Intls
 {
     internal static class ResourceParser
     {
-        private const string RESOURCE_NAME = "FolkerKinzel.Uris.Resources.Mime.csv";
+        private const string MIME_FILE_RESOURCE_NAME = "FolkerKinzel.Uris.Resources.Mime.csv";
+        private const string EXTENSION_FILE_RESOURCE_NAME = "FolkerKinzel.Uris.Resources.Extension.csv";
+
         private const char SEPARATOR = ' ';
         private const string DEFAULT_MIME_TYPE = "application/octet-stream";
         private const string DEFAULT_FILE_TYPE_EXTENSION = "bin";
@@ -17,7 +19,7 @@ namespace FolkerKinzel.Uris.Intls
 
         internal static string GetMimeType(string fileTypeExtension)
         {
-            using StreamReader reader = InitReader();
+            using StreamReader reader = InitReader(EXTENSION_FILE_RESOURCE_NAME);
 
             ReadOnlySpan<char> fileTypeExtensionSpan = fileTypeExtension.AsSpan();
             string? line;
@@ -26,23 +28,13 @@ namespace FolkerKinzel.Uris.Intls
                 int separatorIndex = line.IndexOf(SEPARATOR);
                 ReadOnlySpan<char> span = line.AsSpan(separatorIndex + 1);
 
-                if (span.Equals(fileTypeExtensionSpan, StringComparison.OrdinalIgnoreCase))
+                if (span.Equals(fileTypeExtensionSpan, StringComparison.Ordinal))
                 {
                     return line.Substring(0, separatorIndex);
                 }
             }
 
             return DEFAULT_MIME_TYPE;
-
-            //////////////////////////
-
-            static StreamReader InitReader()
-            {
-                Stream? stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(RESOURCE_NAME);
-                return stream is null
-                    ? throw new InvalidDataException(string.Format(Res.ResourceNotFound, RESOURCE_NAME))
-                    : new StreamReader(stream);
-            }
         }
 
 
@@ -59,23 +51,24 @@ namespace FolkerKinzel.Uris.Intls
                 return DEFAULT_FILE_TYPE_EXTENSION;
             }
 
-            using StreamReader reader = InitReader(mediaTypeIndex.Start);
+            using StreamReader reader = InitReader(MIME_FILE_RESOURCE_NAME);
+            reader.BaseStream.Position = mediaTypeIndex.Start;
 
             ReadOnlySpan<char> mimeSpan = mimeType.AsSpan();
             for (int i = 0; i < mediaTypeIndex.LinesCount; i++)
             {
                 string? line = reader.ReadLine();
 
-                if(line is null)
+                if (line is null)
                 {
                     break;
                 }
-            
+
                 int separatorIndex = line.IndexOf(SEPARATOR);
 
                 ReadOnlySpan<char> span = line.AsSpan(0, separatorIndex);
 
-                if (span.Equals(mimeSpan, StringComparison.OrdinalIgnoreCase))
+                if (span.Equals(mimeSpan, StringComparison.Ordinal))
                 {
                     return line.Substring(separatorIndex + 1);
                 }
@@ -84,20 +77,6 @@ namespace FolkerKinzel.Uris.Intls
             return DEFAULT_FILE_TYPE_EXTENSION;
 
             ////////////////////////////////////
-            
-            static StreamReader InitReader(int start)
-            {
-                Stream? stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(RESOURCE_NAME);
-
-                if(stream is null)
-                {
-                    throw new InvalidDataException(string.Format(Res.ResourceNotFound, RESOURCE_NAME));
-                }
-
-                stream.Position = start;
-
-                return new StreamReader(stream);
-            }
 
             static string GetMediaTypeFromMimeType(string mimeType)
             {
@@ -113,6 +92,14 @@ namespace FolkerKinzel.Uris.Intls
                 return (start, linesCount);
             }
 
+        }
+
+        private static StreamReader InitReader(string resourcePath)
+        {
+            Stream? stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath);
+            return stream is null
+                ? throw new InvalidDataException(string.Format(Res.ResourceNotFound, resourcePath))
+                : new StreamReader(stream);
         }
 
     }

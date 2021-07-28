@@ -1,4 +1,4 @@
-﻿# This file allows to specify the defaults for MIME type and file type extension. The order of the the entries in this file
+﻿# This file allows to specify the default MIME type for a file type extension. The order of the the entries in this file
 # determines how they are selected.
 
 # SYNTAX:

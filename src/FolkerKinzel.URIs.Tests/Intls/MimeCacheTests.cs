@@ -5,8 +5,8 @@ namespace FolkerKinzel.Uris.Intls.Tests
     [TestClass]
     public class MimeCacheTests
     {
-        [TestMethod()]
-        public void TestItTest() => MimeCache.TestIt();
+        //[TestMethod()]
+        //public void TestItTest() => MimeCache.TestIt();
 
         [DataTestMethod]
         [DataRow(".json", "application/json")]

@@ -2,9 +2,10 @@
 ==================
 
 Copy the files
-- Mime.csv and
+- Mime.csv
 - MimeIdx.csv
+- Extension.csv
 
 and paste it to the directory FolkerKinzel.Uris/Resources by replacing the existing files.
 
-Start Visual Studio and make sure that the Build action of both pasted files is set to "Embedded Resource".
+Start Visual Studio and make sure that the Build Action of all pasted files is set to "Embedded Resource".

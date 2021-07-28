@@ -17,6 +17,7 @@ namespace MimeResourceCompiler.Classes
         private readonly StreamWriter _writer;
         private readonly ILogger _log;
 
+
         public IndexFile(IStreamFactory streamFactory, ILogger log)
         {
             Stream stream = streamFactory.CreateWriteStream(INDEX_FILE_NAME);
@@ -26,6 +27,9 @@ namespace MimeResourceCompiler.Classes
             };
             this._log = log;
         }
+
+        public string FileName => INDEX_FILE_NAME;
+
 
         /// <summary>
         /// Writes the index for the media type to the file.
