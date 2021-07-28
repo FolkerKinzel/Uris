@@ -63,3 +63,6 @@ dotnet_style_qualification_for_field = false:suggestion
 
 # CA1303: Literale nicht als lokalisierte Parameter übergeben
 dotnet_diagnostic.CA1303.severity = none
+
+# IDE0007: Impliziten Typ verwenden
+csharp_style_var_when_type_is_apparent = true

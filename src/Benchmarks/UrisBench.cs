@@ -12,7 +12,7 @@ namespace Benchmarks
     public class UrisBench
     {
         private readonly StringBuilder _builder = new(16);
-        private const string _test = "test";
+        private const string TEST = "test";
 
         //[Benchmark]
         //public StringBuilder AppendStackallock()
@@ -25,16 +25,16 @@ namespace Benchmarks
 
         [Benchmark]
         public bool StartsWithString1()
-            => _test.AsSpan().StartsWith("test", StringComparison.OrdinalIgnoreCase);
+            => TEST.AsSpan().StartsWith("test", StringComparison.OrdinalIgnoreCase);
         
         [Benchmark]
         public bool StartsWithString2()
-            => _test.StartsWith("test", StringComparison.OrdinalIgnoreCase);
+            => TEST.StartsWith("test", StringComparison.OrdinalIgnoreCase);
 
 
         [Benchmark]
         public bool StartsWithStackallock()
-            => _test.AsSpan().StartsWith(stackalloc char[] { 't', 'e', 's', 't' }, StringComparison.OrdinalIgnoreCase);
+            => TEST.AsSpan().StartsWith(stackalloc char[] { 't', 'e', 's', 't' }, StringComparison.OrdinalIgnoreCase);
 
     }
 }

@@ -20,9 +20,9 @@ namespace FolkerKinzel.Uris
     {
         #region private const
 
+        private const string BASE64 = ";base64";
+        internal const string PROTOCOL = "data:";
         private const string DEFAULT_MEDIA_TYPE = "text/plain";
-        private const int PROTOCOL_LENGTH = 5;
-        private const int BASE64_LENGTH = 7;
 
         #endregion
 
@@ -115,7 +115,7 @@ namespace FolkerKinzel.Uris
             int mimeTypeEndIndex = -1;
             int startOfData = -1;
 
-            for (int i = PROTOCOL_LENGTH; i < value.Length; i++)
+            for (int i = PROTOCOL.Length; i < value.Length; i++)
             {
                 char c = value[i];
 
@@ -133,11 +133,11 @@ namespace FolkerKinzel.Uris
             }
 
             // dies ändert ggf. auch mimeTypeEndIndex
-            ReadOnlySpan<char> mimePart = value.AsSpan(PROTOCOL_LENGTH, mimeTypeEndIndex - PROTOCOL_LENGTH);
+            ReadOnlySpan<char> mimePart = value.AsSpan(PROTOCOL.Length, mimeTypeEndIndex - PROTOCOL.Length);
             if (HasBase64Encoding(mimePart))
             {
-                mimePart = mimePart.Slice(0, mimePart.Length - BASE64_LENGTH);
-                mimeTypeEndIndex -= BASE64_LENGTH;
+                mimePart = mimePart.Slice(0, mimePart.Length - BASE64.Length);
+                mimeTypeEndIndex -= BASE64.Length;
                 dataEncoding = DataEncoding.Base64;
             }
 
@@ -147,12 +147,12 @@ namespace FolkerKinzel.Uris
             {
                 mediaType = DataUrl.DefaultMediaType();
             }
-            else if (!MimeType.TryParse(value[PROTOCOL_LENGTH] == ';'
+            else if (!MimeType.TryParse(value[PROTOCOL.Length] == ';'
                 ? new StringBuilder(10 + mimePart.Length)
-                    .Append(stackalloc char[] { 't', 'e', 'x', 't', '/', 'p', 'l', 'a', 'i', 'n' })
+                    .Append(DEFAULT_MEDIA_TYPE)
                     .Append(mimePart).ToString()
                     .AsMemory()
-                : value.AsMemory(PROTOCOL_LENGTH, mimeTypeEndIndex - PROTOCOL_LENGTH), out mediaType))
+                : value.AsMemory(PROTOCOL.Length, mimeTypeEndIndex - PROTOCOL.Length), out mediaType))
             {
                 return false;
             }
@@ -166,20 +166,18 @@ namespace FolkerKinzel.Uris
             static bool HasBase64Encoding(ReadOnlySpan<char> val)
             {
                 //Suche ";base64"
-                if (val.Length < BASE64_LENGTH)
+                if (val.Length < BASE64.Length)
                 {
                     return false;
                 }
 
-                ReadOnlySpan<char> hayStack = val.Slice(val.Length - BASE64_LENGTH);
-
-                ReadOnlySpan<char> base64 = stackalloc char[] { ';', 'b', 'a', 's', 'e', '6', '4' };
+                ReadOnlySpan<char> hayStack = val.Slice(val.Length - BASE64.Length);
 
                 for (int i = 0; i < hayStack.Length; i++)
                 {
                     char c = char.ToLowerInvariant(hayStack[i]);
 
-                    if (c != base64[i])
+                    if (c != BASE64[i])
                     {
                         return false;
                     }
@@ -205,9 +203,9 @@ namespace FolkerKinzel.Uris
         {
             string data = text is null ? string.Empty : Uri.EscapeDataString(Uri.UnescapeDataString(text));
 
-            var sb = new StringBuilder(PROTOCOL_LENGTH + 1 + data.Length);
+            var sb = new StringBuilder(PROTOCOL.Length + 1 + data.Length);
 
-            return sb.AppendProtocol().Append(',').Append(data).ToString();
+            return sb.Append(PROTOCOL).Append(',').Append(data).ToString();
 
             // $"data:,{Uri.EscapeDataString(text)}"
         }
@@ -221,8 +219,8 @@ namespace FolkerKinzel.Uris
         public static string CreateFromBytes(byte[]? bytes, MimeType mediaType)
         {
             string data = bytes is null ? string.Empty : Convert.ToBase64String(bytes, Base64FormattingOptions.None);
-            var builder = new StringBuilder(PROTOCOL_LENGTH + MimeType.StringLength + BASE64_LENGTH + 1 + data.Length);
-            return builder.AppendProtocol().AppendMediaType(mediaType).AppendBase64().Append(',').Append(data).ToString();
+            var builder = new StringBuilder(PROTOCOL.Length + MimeType.StringLength + BASE64.Length + 1 + data.Length);
+            return builder.Append(PROTOCOL).AppendMediaType(mediaType).Append(BASE64).Append(',').Append(data).ToString();
 
             // $"data:{mediaTypeString};base64,{Convert.ToBase64String(bytes)}"
         }

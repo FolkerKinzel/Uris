@@ -17,7 +17,6 @@ namespace FolkerKinzel.Uris
     /// </summary>
     public static class DataUrlExtension
     {
-        
 
         /// <summary>
         /// Returns <c>true</c> if the <see cref="Uri"/> passed as parameter is a "data" URL. (RFC 2397)
@@ -34,11 +33,10 @@ namespace FolkerKinzel.Uris
         /// <param name="urlString">The <see cref="string"/> to examine.</param>
         /// <returns><c>true</c> if <paramref name="urlString"/> is a "data" URL. If <paramref name="urlString"/> is 
         /// <c>null</c> or empty <c>false</c> is returned.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsDataUrl([NotNullWhen(true)] this string? urlString)
-            => urlString.AsSpan().StartsWith(stackalloc char[] { 'd', 'a', 't', 'a', ':' }, StringComparison.OrdinalIgnoreCase);
+            => urlString is not null && urlString.StartsWith(DataUrl.PROTOCOL, StringComparison.OrdinalIgnoreCase);
 
-        internal static StringBuilder AppendProtocol(this StringBuilder sb)
-            => sb.Append(stackalloc char[] { 'd', 'a', 't', 'a', ':' });
 
         internal static StringBuilder AppendMediaType(this StringBuilder builder, MimeType mediaType)
         {
@@ -60,8 +58,5 @@ namespace FolkerKinzel.Uris
             return mediaType.AppendTo(builder);
         }
 
-
-        internal static StringBuilder AppendBase64(this StringBuilder builder) 
-            => builder.Append(stackalloc char[] { ';', 'b', 'a', 's', 'e', '6', '4' });
     }
 }

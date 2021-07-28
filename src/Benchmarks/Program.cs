@@ -1,13 +1,14 @@
-﻿using System;
+﻿using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
 namespace Benchmarks
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059:Unnötige Zuweisung eines Werts.", Justification = "<Ausstehend>")]
+        private static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<UrisBench>();
+            Summary summary = BenchmarkRunner.Run<UrisBench>();
         }
     }
 }
