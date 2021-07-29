@@ -324,9 +324,21 @@ namespace FolkerKinzel.Uris
                 return "data:,";
             }
 
-            string data = Convert.ToBase64String(Encoding.UTF8.GetBytes(text));
-            var sb = new StringBuilder(PROTOCOL.Length + charset.Length + BASE64.Length + 1 + data.Length);
-            return sb.Append(PROTOCOL).Append(charset).Append(BASE64).Append(',').Append(data).ToString();
+            text = Uri.UnescapeDataString(text);
+
+            if (text.IsAscii())
+            {
+                string data = Uri.EscapeDataString(text);
+                var sb = new StringBuilder(PROTOCOL.Length + 1 + data.Length);
+                return sb.Append(PROTOCOL).Append(',').Append(data).ToString();
+            }
+            else
+            {
+
+                string data = Convert.ToBase64String(Encoding.UTF8.GetBytes(text));
+                var sb = new StringBuilder(PROTOCOL.Length + charset.Length + BASE64.Length + 1 + data.Length);
+                return sb.Append(PROTOCOL).Append(charset).Append(BASE64).Append(',').Append(data).ToString();
+            }
 
             // $"data:,{Uri.EscapeDataString(text)}"
         }
