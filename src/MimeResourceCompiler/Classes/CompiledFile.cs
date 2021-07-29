@@ -51,7 +51,7 @@ namespace MimeResourceCompiler.Classes
         /// Writes an <see cref="Entry"/> to the compiled file.
         /// </summary>
         /// <param name="entries">The data to be written.</param>
-        public void WriteEntry(Entry entry)
+        private void WriteEntry(Entry entry)
         {
             _writer.Write(entry.MimeType);
             _writer.Write(SEPARATOR);
