@@ -319,7 +319,12 @@ namespace FolkerKinzel.Uris
         {
             const string charset = ";charset=utf-8";
 
-            string data = text is null ? string.Empty : Convert.ToBase64String(Encoding.UTF8.GetBytes(text));
+            if(string.IsNullOrEmpty(text))
+            {
+                return "data:,";
+            }
+
+            string data = Convert.ToBase64String(Encoding.UTF8.GetBytes(text));
             var sb = new StringBuilder(PROTOCOL.Length + charset.Length + BASE64.Length + 1 + data.Length);
             return sb.Append(PROTOCOL).Append(charset).Append(BASE64).Append(',').Append(data).ToString();
 
