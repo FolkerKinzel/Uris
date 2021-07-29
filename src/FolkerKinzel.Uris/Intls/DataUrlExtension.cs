@@ -13,19 +13,26 @@ using FolkerKinzel.Strings.Polyfills;
 namespace FolkerKinzel.Uris.Intls
 {
     /// <summary>
-    /// Extension methods, which support the <see cref="DataUrl"/> struct.
+    /// Extension methods, which support the <see cref="DataUrl"/> structure.
     /// </summary>
-    public static class DataUrlExtension
+    internal static class DataUrlExtension
     {
-        internal static StringBuilder AppendMediaType(this StringBuilder builder, MimeType mediaType)
+        internal static StringBuilder AppendMediaType(this StringBuilder builder, in MimeType mediaType)
         {
-            if (mediaType.IsEmpty || mediaType.Equals(DataUrl.DefaultMediaType()))
+            if (mediaType.IsEmpty)
             {
                 return builder;
             }
 
             if (mediaType.IsTextPlain())
             {
+                MimeType defaultMediaType = DataUrl.DefaultMediaType();
+
+                if (mediaType.Equals(in defaultMediaType))
+                {
+                    return builder;
+                }
+
                 foreach (MimeTypeParameter parameter in mediaType.Parameters)
                 {
                     parameter.AppendTo(builder);

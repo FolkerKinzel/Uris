@@ -10,7 +10,7 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageIcon>Logo.png</PackageIcon>
     <PackageVersion>1.0.0-alpha1</PackageVersion>
-    <FileVersion>1.0.0.33</FileVersion>
+    <FileVersion>1.0.0.47</FileVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <Description>
       .NET library that supports URIs and Internet Media Types ("MIME Types").

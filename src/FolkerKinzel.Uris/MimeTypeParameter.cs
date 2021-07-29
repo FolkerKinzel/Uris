@@ -2,6 +2,7 @@
 using FolkerKinzel.Uris.Properties;
 using System.Text;
 using FolkerKinzel.Uris.Intls;
+using System.Runtime.CompilerServices;
 
 #if NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
 using FolkerKinzel.Strings.Polyfills;
@@ -14,19 +15,22 @@ namespace FolkerKinzel.Uris
     /// </summary>
     public readonly struct MimeTypeParameter : IEquatable<MimeTypeParameter>
     {
+        private const string CHARSET_KEY = "charset";
+        private const string ASCII_CHARSET_VALUE = "us-ascii";
+
         private readonly ReadOnlyMemory<char> _key;
         private readonly ReadOnlyMemory<char> _value;
 
         internal const int StringLength = 32;
 
         /// <summary>
-        /// Initializes a new <see cref="MimeTypeParameter"/> struct.
+        /// Initializes a new <see cref="MimeTypeParameter"/> structure.
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="value">The value.</param>
         /// <exception cref="ArgumentException"><paramref name="key"/> or <paramref name="value"/> is 
         /// empty or consists only of whitespace.</exception>
-        private MimeTypeParameter(ReadOnlyMemory<char> key, ReadOnlyMemory<char> value)
+        private MimeTypeParameter(in ReadOnlyMemory<char> key, in ReadOnlyMemory<char> value)
         {
             this._key = key.Trim();
 
@@ -67,28 +71,31 @@ namespace FolkerKinzel.Uris
         public bool IsEmpty => _key.IsEmpty;
 
         /// <summary>
-        /// Returns an empty <see cref="MimeTypeParameter"/> struct.
+        /// Returns an empty <see cref="MimeTypeParameter"/> structure.
         /// </summary>
         public static MimeTypeParameter Empty => default;
+
 
         /// <summary>
         /// Determines whether the <see cref="MimeTypeParameter"/> has the <see cref="Key"/> "charset". The comparison is case-insensitive.
         /// </summary>
         /// <returns><c>true</c> if <see cref="Key"/> equals "charset"; otherwise, <c>false</c>.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
         public bool IsCharsetParameter()
-            => Key.Equals(stackalloc char[] { 'c', 'h', 'a', 'r', 's', 'e', 't' }, StringComparison.OrdinalIgnoreCase);
+            => Key.Equals(CHARSET_KEY.AsSpan(), StringComparison.OrdinalIgnoreCase);
 
 
         /// <summary>
         /// Determines whether this instance equals "charset=us-ascii". The comparison is case-insensitive.
         /// </summary>
         /// <returns><c>true</c> if this instance equals "charset=us-ascii"; otherwise, <c>false</c>.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
         public bool IsAsciiCharsetParameter()
             => IsCharsetParameter()
-               && Value.Equals(stackalloc char[] { 'u', 's', '-', 'a', 's', 'c', 'i', 'i' }, StringComparison.OrdinalIgnoreCase);
+               && Value.Equals(ASCII_CHARSET_VALUE.AsSpan(), StringComparison.OrdinalIgnoreCase);
 
 
-        internal static bool TryParse(ReadOnlyMemory<char> parameterString, out MimeTypeParameter parameter)
+        internal static bool TryParse(in ReadOnlyMemory<char> parameterString, out MimeTypeParameter parameter)
         {
             int keyValueSeparatorIndex = parameterString.Span.IndexOf('=');
 
@@ -100,9 +107,10 @@ namespace FolkerKinzel.Uris
 
             try
             {
-                parameter = new MimeTypeParameter(
-                    parameterString.Slice(0, keyValueSeparatorIndex),
-                    parameterString.Slice(keyValueSeparatorIndex + 1));
+                ReadOnlyMemory<char> key = parameterString.Slice(0, keyValueSeparatorIndex);
+                ReadOnlyMemory<char> value = parameterString.Slice(keyValueSeparatorIndex + 1);
+
+                parameter = new MimeTypeParameter(in key, in value);
             }
             catch (ArgumentException)
             {
@@ -117,12 +125,24 @@ namespace FolkerKinzel.Uris
         /// Determines if the content of <paramref name="other"/> is equal to that of the 
         /// current instance.
         /// </summary>
-        /// <param name="other">A <see cref="MimeTypeParameter"/> struct to compare with.</param>
+        /// <param name="other">A <see cref="MimeTypeParameter"/> structure to compare with.</param>
         /// <returns><c>true</c> if the content of <paramref name="other"/> is equal to that of the 
         /// current instance.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Equals(MimeTypeParameter other) => Equals(in other);
+
+
+            /// <summary>
+            /// Determines if the content of <paramref name="other"/> is equal to that of the 
+            /// current instance.
+            /// </summary>
+            /// <param name="other">A <see cref="MimeTypeParameter"/> structure to compare with.</param>
+            /// <returns><c>true</c> if the content of <paramref name="other"/> is equal to that of the 
+            /// current instance.</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0075:Bedingten Ausdruck vereinfachen", Justification = "<Ausstehend>")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
-        public bool Equals(MimeTypeParameter other)
+        [CLSCompliant(false)]
+        public bool Equals(in MimeTypeParameter other)
             => !Key.Equals(other.Key, StringComparison.OrdinalIgnoreCase)
                 ? false
                 : IsCharsetParameter()
@@ -130,13 +150,13 @@ namespace FolkerKinzel.Uris
                     : Value.Equals(other.Value, StringComparison.Ordinal);
 
         /// <summary>
-        /// Determines whether <paramref name="obj"/> is a <see cref="MimeTypeParameter"/> struct
+        /// Determines whether <paramref name="obj"/> is a <see cref="MimeTypeParameter"/> structure
         /// whose content is equal to that of the current instance.
         /// </summary>
-        /// <param name="obj">A <see cref="MimeTypeParameter"/> struct to compare with.</param>
-        /// <returns><c>true</c> if <paramref name="obj"/> is a <see cref="MimeTypeParameter"/> struct
+        /// <param name="obj">A <see cref="MimeTypeParameter"/> structure to compare with.</param>
+        /// <returns><c>true</c> if <paramref name="obj"/> is a <see cref="MimeTypeParameter"/> structure
         /// whose content is equal to that of the current instance.</returns>
-        public override bool Equals(object? obj) => obj is MimeTypeParameter parameter && Equals(parameter);
+        public override bool Equals(object? obj) => obj is MimeTypeParameter parameter && Equals(in parameter);
 
         /// <summary>
         /// Computes a hash code for the instance.
@@ -180,7 +200,7 @@ namespace FolkerKinzel.Uris
         /// <param name="mimeTypeParameter2">The second <see cref="MimeTypeParameter"/> to compare.</param>
         /// <returns><c>true</c> if <paramref name="mimeTypeParameter1"/> and <paramref name="mimeTypeParameter2"/> are equal;
         /// otherwise, <c>false</c>.</returns>
-        public static bool operator ==(MimeTypeParameter mimeTypeParameter1, MimeTypeParameter mimeTypeParameter2) => mimeTypeParameter1.Equals(mimeTypeParameter2);
+        public static bool operator ==(MimeTypeParameter mimeTypeParameter1, MimeTypeParameter mimeTypeParameter2) => mimeTypeParameter1.Equals(in mimeTypeParameter2);
 
         /// <summary>
         /// Returns a value that indicates whether two specified <see cref="MimeTypeParameter"/> instances are not equal.
@@ -190,7 +210,7 @@ namespace FolkerKinzel.Uris
         /// <returns><c>true</c> if <paramref name="mimeTypeParameter1"/> and <paramref name="mimeTypeParameter2"/> are not equal;
         /// otherwise, <c>false</c>.</returns>
         /// <returns></returns>
-        public static bool operator !=(MimeTypeParameter mimeTypeParameter1, MimeTypeParameter mimeTypeParameter2) => !(mimeTypeParameter1 == mimeTypeParameter2);
+        public static bool operator !=(MimeTypeParameter mimeTypeParameter1, MimeTypeParameter mimeTypeParameter2) => !mimeTypeParameter1.Equals(in mimeTypeParameter2);
 
 
         /// <summary>

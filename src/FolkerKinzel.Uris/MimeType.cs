@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using FolkerKinzel.Uris.Intls;
 using FolkerKinzel.Uris.Properties;
@@ -22,7 +23,7 @@ namespace FolkerKinzel.Uris
 
         internal const int StringLength = 80;
 
-        private MimeType(ReadOnlyMemory<char> mediaType, ReadOnlyMemory<char> subType, ReadOnlyMemory<char> parameters)
+        private MimeType(in ReadOnlyMemory<char> mediaType, in ReadOnlyMemory<char> subType, in ReadOnlyMemory<char> parameters)
         {
             this._mediaType = mediaType.Trim();
             this._subType = subType.Trim();
@@ -62,16 +63,19 @@ namespace FolkerKinzel.Uris
         /// The comparison is case-insensitive.
         /// </summary>
         /// <returns><c>true</c> if the <see cref="TopLevelMediaType"/> of this instance equals "text".</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
         public bool IsText()
-            => TopLevelMediaType.Equals(stackalloc char[] { 't', 'e', 'x', 't' }, StringComparison.OrdinalIgnoreCase);
+            => TopLevelMediaType.Equals("text".AsSpan(), StringComparison.OrdinalIgnoreCase);
+
 
         /// <summary>
         /// Determines whether this instance is equal to the MIME type "text/plain". The parameters are not taken into account.
         /// The comparison is case-insensitive.
         /// </summary>
         /// <returns><c>true</c> if this instance is equal to "text/plain".</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
         public bool IsTextPlain()
-            => IsText() && SubType.Equals(stackalloc char[] { 'p', 'l', 'a', 'i', 'n' }, StringComparison.OrdinalIgnoreCase);
+            => IsText() && SubType.Equals("plain".AsSpan(), StringComparison.OrdinalIgnoreCase);
 
         /// <summary>
         /// Finds an appropriate file type extension for the <see cref="MimeType"/> instance.
@@ -181,12 +185,22 @@ namespace FolkerKinzel.Uris
         }
 
         /// <summary>
-        /// Determines whether this instance is equal to <paramref name="other"/>. The <see cref="Parameters"/>
+        /// Determines whether the value of this instance is equal to the value of <paramref name="other"/>. The <see cref="Parameters"/>
         /// are taken into account.
         /// </summary>
         /// <param name="other">The <see cref="MimeType"/> instance to compare with.</param>
-        /// <returns><c>true</c> if this  instance is equal to <paramref name="other"/>; <c>false</c>, otherwise.</returns>
-        public bool Equals(MimeType other) => Equals(other, false);
+        /// <returns><c>true</c> if this the value of this instance is equal to that of <paramref name="other"/>; <c>false</c>, otherwise.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Equals(MimeType other) => Equals(in other, false);
+
+        /// <summary>
+        /// Determines whether the value of this instance is equal to the value of <paramref name="other"/>. The <see cref="Parameters"/>
+        /// are taken into account.
+        /// </summary>
+        /// <param name="other">The <see cref="MimeType"/> instance to compare with.</param>
+        /// <returns><c>true</c> if this the value of this instance is equal to that of <paramref name="other"/>; <c>false</c>, otherwise.</returns>
+        [CLSCompliant(false)]
+        public bool Equals(in MimeType other) => Equals(in other, false);
 
         /// <summary>
         /// Determines whether this instance is equal to <paramref name="other"/> and allows to specify
@@ -197,7 +211,20 @@ namespace FolkerKinzel.Uris
         /// <c>true</c>, otherwise.</param>
         /// <returns><c>true</c> if this  instance is equal to <paramref name="other"/>; false, otherwise.</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
-        public bool Equals(MimeType other, bool ignoreParameters)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Equals(MimeType other, bool ignoreParameters) => Equals(in other, ignoreParameters);
+
+        /// <summary>
+        /// Determines whether this instance is equal to <paramref name="other"/> and allows to specify
+        /// whether or not the <see cref="Parameters"/> are taken into account.
+        /// </summary>
+        /// <param name="other">The <see cref="MimeType"/> instance to compare with.</param>
+        /// <param name="ignoreParameters">Pass <c>false</c> to take the <see cref="Parameters"/> into account;
+        /// <c>true</c>, otherwise.</param>
+        /// <returns><c>true</c> if this  instance is equal to <paramref name="other"/>; false, otherwise.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
+        [CLSCompliant(false)]
+        public bool Equals(in MimeType other, bool ignoreParameters)
         {
             if (!TopLevelMediaType.Equals(other.TopLevelMediaType, StringComparison.OrdinalIgnoreCase) ||
                !SubType.Equals(other.SubType, StringComparison.OrdinalIgnoreCase))
@@ -229,14 +256,14 @@ namespace FolkerKinzel.Uris
         }
 
         /// <summary>
-        /// Determines whether <paramref name="obj"/> is a <see cref="MimeType"/> struct whose
-        /// content is equal to that of this instance. The <see cref="Parameters"/>
+        /// Determines whether <paramref name="obj"/> is a <see cref="MimeType"/> structure whose
+        /// value is equal to that of this instance. The <see cref="Parameters"/>
         /// are taken into account.
         /// </summary>
         /// <param name="obj">The <see cref="object"/> to compare with.</param>
-        /// <returns><c>true</c> if <paramref name="obj"/> is a <see cref="MimeType"/> struct whose
-        /// content is equal to that of this instance; <c>false</c>, otherwise.</returns>
-        public override bool Equals(object? obj) => obj is MimeType type && Equals(type);
+        /// <returns><c>true</c> if <paramref name="obj"/> is a <see cref="MimeType"/> structure whose
+        /// value is equal to that of this instance; <c>false</c>, otherwise.</returns>
+        public override bool Equals(object? obj) => obj is MimeType type && Equals(in type, false);
 
         #endregion
 
@@ -245,7 +272,7 @@ namespace FolkerKinzel.Uris
         #region Static Members
 
         /// <summary>
-        /// Returns a <see cref="MimeType"/> struct, which contains no data.
+        /// Returns a <see cref="MimeType"/> structure, which contains no data.
         /// </summary>
         public static MimeType Empty => default;
 
@@ -265,11 +292,18 @@ namespace FolkerKinzel.Uris
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException"><paramref name="value"/> value could not be parsed as <see cref="MimeType"/>.</exception>
         public static MimeType Parse(string value)
-            => value is null
-                ? throw new ArgumentNullException(value)
-                : TryParse(value.AsMemory(), out MimeType mediaType)
+        {
+            if (value is null)
+            {
+                throw new ArgumentNullException(value);
+            }
+
+            ReadOnlyMemory<char> memory = value.AsMemory();
+
+            return TryParse(in memory, out MimeType mediaType)
                     ? mediaType
                     : throw new ArgumentException(string.Format(Res.InvalidMimeType, nameof(value)), nameof(value));
+        }
 
 
         /// <summary>
@@ -286,7 +320,10 @@ namespace FolkerKinzel.Uris
                 mimeType = default;
                 return false;
             }
-            return TryParse(value.AsMemory(), out mimeType);
+
+            ReadOnlyMemory<char> memory = value.AsMemory();
+
+            return TryParse(in memory, out mimeType);
         }
 
         /// <summary>
@@ -296,7 +333,7 @@ namespace FolkerKinzel.Uris
         /// <param name="mimeType">When the method successfully returns, the parameter contains the
         /// <see cref="MimeType"/> parsed from <paramref name="value"/>. The parameter is passed uninitialized.</param>
         /// <returns><c>true</c> if <paramref name="value"/> could be parsed as <see cref="MimeType"/>; otherwise, <c>false</c>.</returns>
-        public static bool TryParse(ReadOnlyMemory<char> value, out MimeType mimeType)
+        public static bool TryParse(in ReadOnlyMemory<char> value, out MimeType mimeType)
         {
             int parameterStartIndex = value.Span.IndexOf(';');
 
@@ -312,10 +349,14 @@ namespace FolkerKinzel.Uris
                 return false;
             }
 
+            ReadOnlyMemory<char> mediaType = mediaPart.Slice(0, mediaTypeSeparatorIndex);
+            ReadOnlyMemory<char> subType = mediaPart.Slice(mediaTypeSeparatorIndex + 1);
+            ReadOnlyMemory<char> parameters = parameterStartIndex < 0 ? ReadOnlyMemory<char>.Empty : value.Slice(parameterStartIndex + 1);
+
             mimeType = new MimeType(
-                mediaPart.Slice(0, mediaTypeSeparatorIndex),
-                mediaPart.Slice(mediaTypeSeparatorIndex + 1),
-                parameterStartIndex < 0 ? ReadOnlyMemory<char>.Empty : value.Slice(parameterStartIndex + 1));
+                in mediaType,
+                in subType,
+                in parameters);
 
             return true;
         }
@@ -352,7 +393,7 @@ namespace FolkerKinzel.Uris
         /// <param name="mimeType2">The second <see cref="MimeType"/> to compare.</param>
         /// <returns><c>true</c> if <paramref name="mimeType1"/> and <paramref name="mimeType2"/> are equal;
         /// otherwise, <c>false</c>.</returns>
-        public static bool operator ==(MimeType mimeType1, MimeType mimeType2) => mimeType1.Equals(mimeType2);
+        public static bool operator ==(MimeType mimeType1, MimeType mimeType2) => mimeType1.Equals(in mimeType2, false);
 
         /// <summary>
         /// Returns a value that indicates whether two specified <see cref="MimeType"/> instances are not equal.
@@ -362,7 +403,7 @@ namespace FolkerKinzel.Uris
         /// <param name="mimeType2">The second <see cref="MimeType"/> to compare.</param>
         /// <returns><c>true</c> if <paramref name="mimeType1"/> and <paramref name="mimeType2"/> are not equal;
         /// otherwise, <c>false</c>.</returns>
-        public static bool operator !=(MimeType mimeType1, MimeType mimeType2) => !(mimeType1 == mimeType2);
+        public static bool operator !=(MimeType mimeType1, MimeType mimeType2) => !mimeType1.Equals(in mimeType2, false);
 
         #endregion
 
@@ -405,7 +446,7 @@ namespace FolkerKinzel.Uris
                 parameterStartIndex += nextParameterSeparatorIndex + 1;
             }
 
-            return MimeTypeParameter.TryParse(currentParameterString, out parameter);
+            return MimeTypeParameter.TryParse(in currentParameterString, out parameter);
         }
 
 

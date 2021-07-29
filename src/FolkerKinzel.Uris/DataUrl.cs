@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using FolkerKinzel.Uris.Intls;
@@ -28,7 +29,7 @@ namespace FolkerKinzel.Uris
 
         private readonly ReadOnlyMemory<char> _embeddedData;
 
-        internal DataUrl(MimeType mediaType, DataEncoding dataEncoding, ReadOnlyMemory<char> embeddedData)
+        internal DataUrl(in MimeType mediaType, DataEncoding dataEncoding, in ReadOnlyMemory<char> embeddedData)
         {
             MimeType = mediaType;
             DataEncoding = dataEncoding;
@@ -83,29 +84,38 @@ namespace FolkerKinzel.Uris
         #region Operators
 
         /// <summary>
-        /// Returns a value that indicates whether the value of two specified <see cref="DataUrl"/> instances is equal.
+        /// Returns a value that indicates whether the values of two specified <see cref="DataUrl"/> instances are equal.
         /// </summary>
         /// <param name="dataUrl1">The first <see cref="DataUrl"/> to compare.</param>
         /// <param name="dataUrl2">The second <see cref="DataUrl"/> to compare.</param>
         /// <returns><c>true</c> if the values of <paramref name="dataUrl1"/> and <paramref name="dataUrl2"/> are equal;
         /// otherwise, <c>false</c>.</returns>
-        public static bool operator ==(DataUrl dataUrl1, DataUrl dataUrl2) => dataUrl1.Equals(dataUrl2);
+        public static bool operator ==(DataUrl dataUrl1, DataUrl dataUrl2) => dataUrl1.Equals(in dataUrl2);
 
         /// <summary>
-        /// Returns a value that indicates whether the value of two specified <see cref="DataUrl"/> instances is not equal.
+        /// Returns a value that indicates whether the values of two specified <see cref="DataUrl"/> instances are not equal.
         /// </summary>
         /// <param name="dataUrl1">The first <see cref="DataUrl"/> to compare.</param>
         /// <param name="dataUrl2">The second <see cref="DataUrl"/> to compare.</param>
         /// <returns><c>true</c> if the values of <paramref name="dataUrl1"/> and <paramref name="dataUrl2"/> are not equal;
         /// otherwise, <c>false</c>.</returns>
-        public static bool operator !=(DataUrl dataUrl1, DataUrl dataUrl2) => !(dataUrl1 == dataUrl2);
+        public static bool operator !=(DataUrl dataUrl1, DataUrl dataUrl2) => !dataUrl1.Equals(in dataUrl2);
 
         #endregion
 
-
-
+        /// <summary>
+        /// Determines whether <paramref name="obj"/> is a <see cref="DataUrl"/> structure whose
+        /// value is equal to that of this instance.
+        /// </summary>
+        /// <param name="obj">The <see cref="object"/> to compare with.</param>
+        /// <returns><c>true</c> if <paramref name="obj"/> is a <see cref="DataUrl"/> structure whose
+        /// value is equal to that of this instance; <c>false</c>, otherwise.</returns>
         public override bool Equals(object? obj) => obj is DataUrl other && Equals(in other);
 
+        /// <summary>
+        /// Creates a hash code for this instance.
+        /// </summary>
+        /// <returns>The hash code.</returns>
         public override int GetHashCode()
         {
             var hash = new HashCode();
@@ -125,16 +135,26 @@ namespace FolkerKinzel.Uris
             return hash.ToHashCode();
         }
 
-
+        /// <summary>
+        /// Determines whether the value of this instance is equal to the value of <paramref name="other"/>. 
+        /// </summary>
+        /// <param name="other">The <see cref="DataUrl"/> instance to compare with.</param>
+        /// <returns><c>true</c> if this the value of this instance is equal to that of <paramref name="other"/>; <c>false</c>, otherwise.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(DataUrl other) => Equals(in other);
 
-
+        /// <summary>
+        /// Determines whether the value of this instance is equal to the value of <paramref name="other"/>. 
+        /// </summary>
+        /// <param name="other">The <see cref="DataUrl"/> instance to compare with.</param>
+        /// <returns><c>true</c> if this the value of this instance is equal to that of <paramref name="other"/>; <c>false</c>, otherwise.</returns>
         [CLSCompliant(false)]
         public bool Equals(in DataUrl other)
             => this.IsEmpty || other.IsEmpty
                 ? this.IsEmpty && other.IsEmpty
                 : EqualsData(in other) && StringComparer.Ordinal.Equals(this.GetFileTypeExtension(), other.GetFileTypeExtension());
 
+        #region private
         private bool EqualsData(in DataUrl other)
             => this.ContainsText
                 ? EqualsText(in other)
@@ -170,6 +190,7 @@ namespace FolkerKinzel.Uris
         }
 
         #endregion
+        #endregion
 
         #region Parser
 
@@ -192,7 +213,7 @@ namespace FolkerKinzel.Uris
         /// Tries to parse a <see cref="string"/> as <see cref="DataUrl"/>.
         /// </summary>
         /// <param name="value">The <see cref="string"/> to parse.</param>
-        /// <param name="dataUrl">If the method returns <c>true</c> the parameter contains a <see cref="DataUrl"/> struct that provides the contents
+        /// <param name="dataUrl">If the method returns <c>true</c> the parameter contains a <see cref="DataUrl"/> structure that provides the contents
         /// of value. The parameter is passed uninitialized.</param>
         /// <returns><c>true</c> if <paramref name="value"/> could be parsed as <see cref="DataUrl"/>, <c>false</c> otherwise.</returns>
         public static bool TryParse(string? value, out DataUrl dataUrl)
@@ -242,7 +263,7 @@ namespace FolkerKinzel.Uris
                 mediaType = DataUrl.DefaultMediaType();
             }
             else if (!MimeType.TryParse(value[PROTOCOL.Length] == ';'
-                ? new StringBuilder(10 + mimePart.Length)
+                ? new StringBuilder(DEFAULT_MEDIA_TYPE.Length + mimePart.Length)
                     .Append(DEFAULT_MEDIA_TYPE)
                     .Append(mimePart).ToString()
                     .AsMemory()
@@ -251,7 +272,8 @@ namespace FolkerKinzel.Uris
                 return false;
             }
 
-            dataUrl = new DataUrl(mediaType, dataEncoding, value.AsMemory(startOfData + 1));
+            ReadOnlyMemory<char> embeddedData = value.AsMemory(startOfData + 1);
+            dataUrl = new DataUrl(in mediaType, dataEncoding, in embeddedData);
 
             return true;
 
@@ -310,11 +332,11 @@ namespace FolkerKinzel.Uris
         /// <param name="bytes">The binary data to embed into the "data" URL.</param>
         /// <param name="mediaType">The <see cref="MimeType"/> of the data passed to the parameter <paramref name="bytes"/>.</param>
         /// <returns>A "data" URL, into which the binary data provided by the parameter <paramref name="bytes"/> is embedded.</returns>
-        public static string FromBytes(byte[]? bytes, MimeType mediaType)
+        public static string FromBytes(byte[]? bytes, in MimeType mediaType)
         {
             string data = bytes is null ? string.Empty : Convert.ToBase64String(bytes, Base64FormattingOptions.None);
             var builder = new StringBuilder(PROTOCOL.Length + MimeType.StringLength + BASE64.Length + 1 + data.Length);
-            return builder.Append(PROTOCOL).AppendMediaType(mediaType).Append(BASE64).Append(',').Append(data).ToString();
+            return builder.Append(PROTOCOL).AppendMediaType(in mediaType).Append(BASE64).Append(',').Append(data).ToString();
 
             // $"data:{mediaTypeString};base64,{Convert.ToBase64String(bytes)}"
         }
@@ -358,16 +380,12 @@ namespace FolkerKinzel.Uris
         /// <exception cref="ArgumentNullException"><paramref name="filePath"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException"><paramref name="filePath"/> is not a valid file path.</exception>
         /// <exception cref="IOException">I/O error.</exception>
-        public static string FromFile(string filePath, MimeType? mimeType = null)
+        public static string FromFile(string filePath, in MimeType? mimeType = null)
         {
             byte[] bytes = LoadFile(filePath);
 
-            if (mimeType is null)
-            {
-                mimeType = MimeType.FromFileTypeExtension(Path.GetExtension(filePath));
-            }
-
-            return FromBytes(bytes, mimeType.Value);
+            MimeType mimeTypeValue = mimeType ?? MimeType.FromFileTypeExtension(Path.GetExtension(filePath));
+            return FromBytes(bytes, in mimeTypeValue);
         }
 
         #endregion
@@ -460,7 +478,8 @@ namespace FolkerKinzel.Uris
         [SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
         internal static MimeType DefaultMediaType()
         {
-            _ = MimeType.TryParse(DEFAULT_MEDIA_TYPE.AsMemory(), out MimeType mediaType);
+            ReadOnlyMemory<char> memory = DEFAULT_MEDIA_TYPE.AsMemory();
+            _ = MimeType.TryParse(in memory, out MimeType mediaType);
             return mediaType;
         }
 

@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using BenchmarkDotNet.Attributes;
 using FolkerKinzel.Uris;
 
@@ -56,10 +58,84 @@ namespace Benchmarks
         //    => TEST.AsSpan().StartsWith(stackalloc char[] { 't', 'e', 's', 't' }, StringComparison.OrdinalIgnoreCase);
 
 
+        //[Benchmark]
+        //public bool EqualsBench()
+        //{
+        //    return _dataUrlText1.Equals(_dataUrlText2);
+        //}
+
         [Benchmark]
-        public bool EqualsBench()
+        public bool ReadOnlyMemoryByValue()
         {
-            return _dataUrlText1.Equals(_dataUrlText2);
+            var memory = default(ReadOnlyMemory<char>);
+            return DoReadOnlyMemoryByValue(memory);
         }
+
+        [Benchmark]
+        public bool ReadOnlyMemoryByIn()
+        {
+            var memory = default(ReadOnlyMemory<char>);
+            return DoReadOnlyMemoryByIn(in memory);
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static bool DoReadOnlyMemoryByValue(ReadOnlyMemory<char> largeStruct) => largeStruct.IsEmpty;
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static bool DoReadOnlyMemoryByIn(in ReadOnlyMemory<char> largeStruct) => largeStruct.IsEmpty;
+
+        [Benchmark]
+        public bool DataUrlByValue()
+        {
+            var dataUrl = default(DataUrl);
+            return DoDataUrlByValue(dataUrl);
+        }
+
+        [Benchmark]
+        public bool DataUrlByIn()
+        {
+            var dataUrl = default(DataUrl);
+            return DoDataUrlByIn(in dataUrl);
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static bool DoDataUrlByValue(DataUrl largeStruct) => largeStruct.IsEmpty;
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static bool DoDataUrlByIn(in DataUrl largeStruct) => largeStruct.IsEmpty;
+
+        //[Benchmark]
+        //public bool DataUrlEqualsByValue()
+        //{
+        //    var dataUrl = default(DataUrl);
+        //    return dataUrl.Equals(dataUrl);
+        //}
+
+        //[Benchmark]
+        //public bool DataUrlEqualsByIn()
+        //{
+        //    var dataUrl = default(DataUrl);
+        //    return dataUrl.Equals(in dataUrl);
+        //}
+
+
+
+
+        //[Benchmark]
+        //public bool MimeTypeByValue() => DoMimeTypeByValue(MimeType.Empty);
+
+        //[Benchmark]
+        //public bool MimeTypeByIn() => DoMimeTypeByIn(MimeType.Empty);
+
+        //[MethodImpl(MethodImplOptions.NoInlining)]
+        //private static bool DoMimeTypeByValue(MimeType largeStruct) => largeStruct.IsEmpty;
+
+        //[MethodImpl(MethodImplOptions.NoInlining)]
+        //private static bool DoMimeTypeByIn(in MimeType largeStruct) => largeStruct.IsEmpty;
+
+
+
+
+
     }
 }

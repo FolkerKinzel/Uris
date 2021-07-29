@@ -199,6 +199,14 @@ namespace FolkerKinzel.Uris.Tests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void FromFileTest3() => _ = DataUrl.FromFile(null!);
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void FromFileTest4() => _ = DataUrl.FromFile("   ");
+
+        [TestMethod]
         public void FromTextOnNull()
         {
             string urlString = DataUrl.FromText(null);
@@ -222,35 +230,35 @@ namespace FolkerKinzel.Uris.Tests
         {
             const string TEXT = "In Märchenbüchern herumstöbern.";
 
-            string dataUrl1 = DataUrl.FromText(Uri.EscapeDataString(TEXT));
-
-            Assert.IsTrue(DataUrl.TryParse(dataUrl1, out DataUrl dataUrl2));
-
-            Assert.AreEqual(dataUrl2.MimeType.TopLevelMediaType.ToString(), "text");
-            Assert.AreEqual(dataUrl2.MimeType.SubType.ToString(), "plain");
-
-            Assert.AreEqual(0, dataUrl2.MimeType.Parameters.Count());
-
-            Assert.IsTrue(dataUrl2.TryGetEmbeddedText(out string? outText));
-            Assert.AreEqual(TEXT, outText);
-        }
-
-
-
-        [TestMethod()]
-        public void FromTextTest2()
-        {
-            const string TEXT = "In Märchenbüchern herumstöbern.";
-
             string dataUrl1 = DataUrl.FromText(TEXT);
 
             Assert.IsTrue(DataUrl.TryParse(dataUrl1, out DataUrl dataUrl2));
+
             Assert.AreEqual(dataUrl2.MimeType.TopLevelMediaType.ToString(), "text");
             Assert.AreEqual(dataUrl2.MimeType.SubType.ToString(), "plain");
-            Assert.AreEqual(0, dataUrl2.MimeType.Parameters.Count());
+
+            Assert.AreEqual(1, dataUrl2.MimeType.Parameters.Count());
+
             Assert.IsTrue(dataUrl2.TryGetEmbeddedText(out string? outText));
             Assert.AreEqual(TEXT, outText);
         }
+
+
+
+        //[TestMethod()]
+        //public void FromTextTest2()
+        //{
+        //    const string TEXT = "In Märchenbüchern herumstöbern.";
+
+        //    string dataUrl1 = DataUrl.FromText(TEXT);
+
+        //    Assert.IsTrue(DataUrl.TryParse(dataUrl1, out DataUrl dataUrl2));
+        //    Assert.AreEqual(dataUrl2.MimeType.TopLevelMediaType.ToString(), "text");
+        //    Assert.AreEqual(dataUrl2.MimeType.SubType.ToString(), "plain");
+        //    Assert.AreEqual(1, dataUrl2.MimeType.Parameters.Count());
+        //    Assert.IsTrue(dataUrl2.TryGetEmbeddedText(out string? outText));
+        //    Assert.AreEqual(TEXT, outText);
+        //}
 
         [TestMethod]
         public void FromTextTest3()
