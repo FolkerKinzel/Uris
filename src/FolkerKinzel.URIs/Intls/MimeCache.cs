@@ -140,14 +140,14 @@ namespace FolkerKinzel.Uris.Intls
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string PrepareFileTypeExtension(string fileTypeExtension) => $".{fileTypeExtension}";
 
-        internal static void Clear()
-        {
-            lock (_lockObj)
-            {
-                _mimeCache = null;
-                _extCache = null;
-            }
-        }
+        //internal static void Clear()
+        //{
+        //    lock (_lockObj)
+        //    {
+        //        _mimeCache = null;
+        //        _extCache = null;
+        //    }
+        //}
 
         ///// <summary>
         ///// Testet den vorgefüllten Cache auf Fehler.

@@ -1,6 +1,8 @@
 # FolkerKinzel.Uris
 .NET library that supports URIs and Internet Media Types ("MIME Types"). 
 
+The current version of the package is a preview version. Updates of this preview version might contain breaking changes: Therefore it's not recommended to use these preview versions in productivity code.
+
 The library contains:
 * `readonly struct MimeType`: Represents a MIME type ("Internet Media Type") according 
 to RFC 2045 and RFC 2046. The struct can be created automatically from a file type extension or parsed from a String or a `ReadOnlyMemory<Char>`.

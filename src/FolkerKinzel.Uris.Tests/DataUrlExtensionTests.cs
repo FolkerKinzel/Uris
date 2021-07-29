@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using FolkerKinzel.Uris.Extensions;
+using FolkerKinzel.Uris.Intls;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Text;
 

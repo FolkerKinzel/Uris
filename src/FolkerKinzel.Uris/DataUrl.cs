@@ -16,7 +16,7 @@ namespace FolkerKinzel.Uris
     /// <summary>
     /// Represents a "data" URL (RFC 2397) that embeds data in-line in a URL.
     /// </summary>
-    public readonly struct DataUrl
+    public readonly struct DataUrl : IEquatable<DataUrl>
     {
         #region private const
 
@@ -74,6 +74,100 @@ namespace FolkerKinzel.Uris
         /// Returns an empty <see cref="DataUrl"/>.
         /// </summary>
         public static DataUrl Empty => default;
+
+        #endregion
+
+        #region IEquatable
+
+
+        #region Operators
+
+        /// <summary>
+        /// Returns a value that indicates whether the value of two specified <see cref="DataUrl"/> instances is equal.
+        /// </summary>
+        /// <param name="dataUrl1">The first <see cref="DataUrl"/> to compare.</param>
+        /// <param name="dataUrl2">The second <see cref="DataUrl"/> to compare.</param>
+        /// <returns><c>true</c> if the values of <paramref name="dataUrl1"/> and <paramref name="dataUrl2"/> are equal;
+        /// otherwise, <c>false</c>.</returns>
+        public static bool operator ==(DataUrl dataUrl1, DataUrl dataUrl2) => dataUrl1.Equals(dataUrl2);
+
+        /// <summary>
+        /// Returns a value that indicates whether the value of two specified <see cref="DataUrl"/> instances is not equal.
+        /// </summary>
+        /// <param name="dataUrl1">The first <see cref="DataUrl"/> to compare.</param>
+        /// <param name="dataUrl2">The second <see cref="DataUrl"/> to compare.</param>
+        /// <returns><c>true</c> if the values of <paramref name="dataUrl1"/> and <paramref name="dataUrl2"/> are not equal;
+        /// otherwise, <c>false</c>.</returns>
+        public static bool operator !=(DataUrl dataUrl1, DataUrl dataUrl2) => !(dataUrl1 == dataUrl2);
+
+        #endregion
+
+
+
+        public override bool Equals(object? obj) => obj is DataUrl other && Equals(in other);
+
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(GetFileTypeExtension());
+
+            if(TryGetEmbeddedText(out string? text))
+            {
+                hash.Add(text);
+            }
+            else if(TryGetEmbeddedBytes(out byte[]? bytes))
+            {
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    hash.Add(bytes[i]);
+                }
+            }
+            return hash.ToHashCode();
+        }
+
+
+        public bool Equals(DataUrl other) => Equals(in other);
+
+
+        [CLSCompliant(false)]
+        public bool Equals(in DataUrl other)
+            => this.IsEmpty || other.IsEmpty
+                ? this.IsEmpty && other.IsEmpty
+                : EqualsData(in other) && StringComparer.Ordinal.Equals(this.GetFileTypeExtension(), other.GetFileTypeExtension());
+
+        private bool EqualsData(in DataUrl other)
+            => this.ContainsText
+                ? EqualsText(in other)
+                : this.DataEncoding == DataEncoding.Base64 && other.DataEncoding == DataEncoding.Base64
+                    ? this.EmbeddedData.Equals(other.EmbeddedData, StringComparison.Ordinal)
+                    : EqualsBytes(in other);
+
+
+        private bool EqualsText(in DataUrl other)
+        {
+            if (other.TryGetEmbeddedText(out string? otherText))
+            {
+                if (this.TryGetEmbeddedText(out string? thisText))
+                {
+                    return StringComparer.Ordinal.Equals(thisText, otherText);
+                }
+            }
+
+            return false;
+        }
+
+        private bool EqualsBytes(in DataUrl other)
+        {
+            if (other.TryGetEmbeddedBytes(out byte[]? otherBytes))
+            {
+                if (this.TryGetEmbeddedBytes(out byte[]? thisBytes))
+                {
+                    return thisBytes.SequenceEqual(otherBytes);
+                }
+            }
+
+            return false;
+        }
 
         #endregion
 
@@ -199,13 +293,13 @@ namespace FolkerKinzel.Uris
         /// <param name="text">The text to embed into the "data" URL.</param>
         /// <returns>A "data" URL, into which the text provided by the parameter <paramref name="text"/> is embedded.</returns>
         /// <exception cref="FormatException">The <see cref="Uri"/> class was not able to encode <paramref name="text"/> correctly.</exception>
-        public static string CreateFromText(string? text)
+        public static string FromText(string? text)
         {
-            string data = text is null ? string.Empty : Uri.EscapeDataString(Uri.UnescapeDataString(text));
+            const string charset = ";charset=utf-8";
 
-            var sb = new StringBuilder(PROTOCOL.Length + 1 + data.Length);
-
-            return sb.Append(PROTOCOL).Append(',').Append(data).ToString();
+            string data = text is null ? string.Empty : Convert.ToBase64String(Encoding.UTF8.GetBytes(text));
+            var sb = new StringBuilder(PROTOCOL.Length + charset.Length + BASE64.Length + 1 + data.Length);
+            return sb.Append(PROTOCOL).Append(charset).Append(BASE64).Append(',').Append(data).ToString();
 
             // $"data:,{Uri.EscapeDataString(text)}"
         }
@@ -216,7 +310,7 @@ namespace FolkerKinzel.Uris
         /// <param name="bytes">The binary data to embed into the "data" URL.</param>
         /// <param name="mediaType">The <see cref="MimeType"/> of the data passed to the parameter <paramref name="bytes"/>.</param>
         /// <returns>A "data" URL, into which the binary data provided by the parameter <paramref name="bytes"/> is embedded.</returns>
-        public static string CreateFromBytes(byte[]? bytes, MimeType mediaType)
+        public static string FromBytes(byte[]? bytes, MimeType mediaType)
         {
             string data = bytes is null ? string.Empty : Convert.ToBase64String(bytes, Base64FormattingOptions.None);
             var builder = new StringBuilder(PROTOCOL.Length + MimeType.StringLength + BASE64.Length + 1 + data.Length);
@@ -264,7 +358,7 @@ namespace FolkerKinzel.Uris
         /// <exception cref="ArgumentNullException"><paramref name="filePath"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException"><paramref name="filePath"/> is not a valid file path.</exception>
         /// <exception cref="IOException">I/O error.</exception>
-        public static string CreateFromFile(string filePath, MimeType? mimeType = null)
+        public static string FromFile(string filePath, MimeType? mimeType = null)
         {
             byte[] bytes = LoadFile(filePath);
 
@@ -273,7 +367,7 @@ namespace FolkerKinzel.Uris
                 mimeType = MimeType.FromFileTypeExtension(Path.GetExtension(filePath));
             }
 
-            return CreateFromBytes(bytes, mimeType.Value);
+            return FromBytes(bytes, mimeType.Value);
         }
 
         #endregion
@@ -357,8 +451,8 @@ namespace FolkerKinzel.Uris
         /// period (".").
         /// </summary>
         /// <returns>An appropriate file type extension for the data embedded in the <see cref="DataUrl"/>.</returns>
-        /// <remarks>The search for a file type extension can be an expensive operation. To make subsequent calls of the method faster, the
-        /// recent file type extensions are stored in a cache. You can call <see cref="MimeType.ClearCache"/> to clear this cache.</remarks>
+        ///// <remarks>The search for a file type extension can be an expensive operation. To make subsequent calls of the method faster, the
+        ///// recent file type extensions are stored in a cache. You can call <see cref="MimeType.ClearCache"/> to clear this cache.</remarks>
         public string GetFileTypeExtension() => MimeType.GetFileTypeExtension();
 
         #endregion
@@ -448,6 +542,7 @@ namespace FolkerKinzel.Uris
                 throw new IOException(e.Message, e);
             }
         }
+
 
 
 

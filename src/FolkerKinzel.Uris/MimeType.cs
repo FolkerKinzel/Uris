@@ -251,11 +251,11 @@ namespace FolkerKinzel.Uris
 
         #region Static Methods
 
-        /// <summary>
-        /// Clears the cache that's used to make subsequent searches for a
-        /// file type extension faster.
-        /// </summary>
-        public static void ClearCache() => MimeCache.Clear();
+        ///// <summary>
+        ///// Clears the cache that's used to make subsequent searches for a
+        ///// file type extension faster.
+        ///// </summary>
+        //public static void ClearCache() => MimeCache.Clear();
 
         /// <summary>
         /// Parses a <see cref="string"/> as <see cref="MimeType"/>.
