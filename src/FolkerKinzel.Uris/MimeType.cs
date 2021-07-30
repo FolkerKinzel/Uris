@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using FolkerKinzel.Uris.Intls;
 using FolkerKinzel.Uris.Properties;
@@ -15,19 +16,23 @@ namespace FolkerKinzel.Uris
     /// <summary>
     /// Represents a MIME type ("Internet Media Type") according to RFC 2045 and RFC 2046.
     /// </summary>
+    //[StructLayout(LayoutKind.Sequential, Pack = 0)]
     public readonly struct MimeType : IEquatable<MimeType>
     {
-        private readonly ReadOnlyMemory<char> _mediaType;
-        private readonly ReadOnlyMemory<char> _subType;
+        private readonly ReadOnlyMemory<char> _mediaPart;
         private readonly ReadOnlyMemory<char> _parameters;
+        private readonly int _topLevelMediaTypeLength;
+        private readonly int _subTypeStart;
 
         internal const int StringLength = 80;
 
-        private MimeType(in ReadOnlyMemory<char> mediaType, in ReadOnlyMemory<char> subType, in ReadOnlyMemory<char> parameters)
+        private MimeType(in ReadOnlyMemory<char> mediaPart, int topLevelMediaTypeLength, int subTypeStart, in ReadOnlyMemory<char> parameters)
         {
-            this._mediaType = mediaType.Trim();
-            this._subType = subType.Trim();
+            this._mediaPart = mediaPart;
             this._parameters = parameters;
+
+            this._topLevelMediaTypeLength = topLevelMediaTypeLength;
+            this._subTypeStart = subTypeStart;
         }
 
         #region Public Instance Members
@@ -37,12 +42,12 @@ namespace FolkerKinzel.Uris
         /// <summary>
         /// Top-Level Media Type. (The left part of a MIME-Type.)
         /// </summary>
-        public ReadOnlySpan<char> TopLevelMediaType => _mediaType.Span;
+        public ReadOnlySpan<char> TopLevelMediaType => _mediaPart.Span.Slice(0, _topLevelMediaTypeLength);
 
         /// <summary>
         /// Sub Type (The right part of a MIME-Type.)
         /// </summary>
-        public ReadOnlySpan<char> SubType => _subType.Span;
+        public ReadOnlySpan<char> SubType => _mediaPart.Span.Slice(_subTypeStart);
 
         /// <summary>
         /// Parameters (Never <c>null</c>.)
@@ -52,7 +57,7 @@ namespace FolkerKinzel.Uris
         /// <summary>
         /// <c>true</c> if the instance contains no data.
         /// </summary>
-        public bool IsEmpty => _mediaType.IsEmpty;
+        public bool IsEmpty => TopLevelMediaType.IsEmpty;
 
         #endregion
 
@@ -123,7 +128,8 @@ namespace FolkerKinzel.Uris
             }
 
             _ = builder.EnsureCapacity(builder.Length + StringLength);
-            _ = builder.Append(TopLevelMediaType).Append('/').Append(SubType).ToLowerInvariant();
+            int insertStartIndex = builder.Length;
+            _ = builder.Append(TopLevelMediaType).Append('/').Append(SubType).ToLowerInvariant(insertStartIndex);
 
             if (includeParameters)
             {
@@ -338,27 +344,44 @@ namespace FolkerKinzel.Uris
             int parameterStartIndex = value.Span.IndexOf(';');
 
             ReadOnlyMemory<char> mediaPart = parameterStartIndex < 0 ? value : value.Slice(0, parameterStartIndex);
+            mediaPart = mediaPart.Trim();
 
-            const char mediaTypeSeparator = '/';
+            ReadOnlySpan<char> mediaPartSpan = mediaPart.Span;
+            int mediaTypeSeparatorIndex = mediaPart.Span.IndexOf('/');
 
-            int mediaTypeSeparatorIndex = value.Span.IndexOf(mediaTypeSeparator);
-
-            if (mediaTypeSeparatorIndex == -1 || mediaTypeSeparatorIndex == value.Length)
+            if (mediaTypeSeparatorIndex == -1)
             {
-                mimeType = default;
-                return false;
+                goto Failed;
             }
 
-            ReadOnlyMemory<char> mediaType = mediaPart.Slice(0, mediaTypeSeparatorIndex);
-            ReadOnlyMemory<char> subType = mediaPart.Slice(mediaTypeSeparatorIndex + 1);
             ReadOnlyMemory<char> parameters = parameterStartIndex < 0 ? ReadOnlyMemory<char>.Empty : value.Slice(parameterStartIndex + 1);
 
+            int topLevelMediaTypeLength = mediaPartSpan.GetTrimmedLength(mediaTypeSeparatorIndex);
+
+            if(topLevelMediaTypeLength == 0)
+            {
+                goto Failed;
+            }
+
+            int subTypeStart = mediaPartSpan.GetTrimmedStart(mediaTypeSeparatorIndex + 1);
+
+            if (subTypeStart == mediaPartSpan.Length)
+            {
+                goto Failed;
+            }
+
             mimeType = new MimeType(
-                in mediaType,
-                in subType,
+                in mediaPart,
+                topLevelMediaTypeLength,
+                subTypeStart,
                 in parameters);
 
             return true;
+
+/////////////////////////////////////////////////////////////
+Failed:
+            mimeType = default;
+            return false;
         }
 
         /// <summary>
@@ -437,13 +460,18 @@ namespace FolkerKinzel.Uris
 
             if (nextParameterSeparatorIndex < 0) // last parameter
             {
-                currentParameterString = _parameters.Slice(parameterStartIndex);
+                currentParameterString = _parameters.Slice(parameterStartIndex).Trim();
                 parameterStartIndex = -1;
             }
             else
             {
-                currentParameterString = _parameters.Slice(parameterStartIndex, nextParameterSeparatorIndex);
+                currentParameterString = _parameters.Slice(parameterStartIndex, nextParameterSeparatorIndex).Trim();
                 parameterStartIndex += nextParameterSeparatorIndex + 1;
+            }
+
+            if(currentParameterString.Length > 0 && currentParameterString.Span[currentParameterString.Length - 1] == '"')
+            {
+                currentParameterString = currentParameterString.Slice(0, currentParameterString.Length - 1);
             }
 
             return MimeTypeParameter.TryParse(in currentParameterString, out parameter);

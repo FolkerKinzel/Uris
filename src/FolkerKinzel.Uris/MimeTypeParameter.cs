@@ -3,6 +3,7 @@ using FolkerKinzel.Uris.Properties;
 using System.Text;
 using FolkerKinzel.Uris.Intls;
 using System.Runtime.CompilerServices;
+using System.Diagnostics;
 
 #if NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
 using FolkerKinzel.Strings.Polyfills;
@@ -18,57 +19,38 @@ namespace FolkerKinzel.Uris
         private const string CHARSET_KEY = "charset";
         private const string ASCII_CHARSET_VALUE = "us-ascii";
 
-        private readonly ReadOnlyMemory<char> _key;
-        private readonly ReadOnlyMemory<char> _value;
-
+        private readonly ReadOnlyMemory<char> _parameterString;
+        private readonly int _keyLength;
+        private readonly int _valueStart;
         internal const int StringLength = 32;
 
         /// <summary>
         /// Initializes a new <see cref="MimeTypeParameter"/> structure.
         /// </summary>
-        /// <param name="key">The key.</param>
-        /// <param name="value">The value.</param>
-        /// <exception cref="ArgumentException"><paramref name="key"/> or <paramref name="value"/> is 
-        /// empty or consists only of whitespace.</exception>
-        private MimeTypeParameter(in ReadOnlyMemory<char> key, in ReadOnlyMemory<char> value)
+        /// <param name="parameterString">The trimmed Parameter.</param>
+        /// <param name="value">The length of the Key part.</param>
+        /// <param name="valueStart">The start index of the Value.</param>
+        private MimeTypeParameter(in ReadOnlyMemory<char> parameterString, int keyLength, int valueStart)
         {
-            this._key = key.Trim();
-
-            if (_key.Length == 0)
-            {
-                throw new ArgumentException(string.Format(Res.EmptyOrWhiteSpace, nameof(key)));
-            }
-
-            this._value = value.Trim();
-
-            ReadOnlySpan<char> span = Value;
-            if (span.Length > 0 && span[0] == '"')
-            {
-                _value = span.Length > 1 && span[span.Length - 1] == '"'
-                            ? value.Slice(1, value.Length - 2)
-                            : value.Slice(1);
-            }
-
-            if (_value.Length == 0)
-            {
-                throw new ArgumentException(string.Format(Res.EmptyOrWhiteSpace, nameof(value)));
-            }
+            this._parameterString = parameterString;
+            this._keyLength = keyLength;
+            this._valueStart = valueStart;
         }
 
         /// <summary>
         /// The <see cref="MimeTypeParameter"/>'s key.
         /// </summary>
-        public ReadOnlySpan<char> Key => _key.Span;
+        public ReadOnlySpan<char> Key => _parameterString.Span.Slice(0, _keyLength);
 
         /// <summary>
         /// The <see cref="MimeTypeParameter"/>'s value.
         /// </summary>
-        public ReadOnlySpan<char> Value => _value.Span;
+        public ReadOnlySpan<char> Value => _parameterString.Span.Slice(_valueStart);
 
         /// <summary>
         /// <c>true</c> indicates that the instance contains no data.
         /// </summary>
-        public bool IsEmpty => _key.IsEmpty;
+        public bool IsEmpty => Key.IsEmpty;
 
         /// <summary>
         /// Returns an empty <see cref="MimeTypeParameter"/> structure.
@@ -97,28 +79,50 @@ namespace FolkerKinzel.Uris
 
         internal static bool TryParse(in ReadOnlyMemory<char> parameterString, out MimeTypeParameter parameter)
         {
-            int keyValueSeparatorIndex = parameterString.Span.IndexOf('=');
+            ReadOnlySpan<char> span = parameterString.Span;
+            int keyValueSeparatorIndex = span.IndexOf('=');
 
             if (keyValueSeparatorIndex < 1)
             {
-                parameter = default;
-                return false;
+                goto Failed;
             }
 
-            try
-            {
-                ReadOnlyMemory<char> key = parameterString.Slice(0, keyValueSeparatorIndex);
-                ReadOnlyMemory<char> value = parameterString.Slice(keyValueSeparatorIndex + 1);
+            Debug.Assert(!char.IsWhiteSpace(parameterString.Span[0]));
+            Debug.Assert(!char.IsWhiteSpace(parameterString.Span[parameterString.Length - 1]));
+            Debug.Assert(parameterString.Span[parameterString.Length - 1] != '"');
 
-                parameter = new MimeTypeParameter(in key, in value);
-            }
-            catch (ArgumentException)
+            int keyLength = span.GetTrimmedLength(keyValueSeparatorIndex);
+
+            if (keyLength == 0)
             {
-                parameter = default;
-                return false;
+                goto Failed;
             }
+
+            int valueStart = span.GetTrimmedStart(keyValueSeparatorIndex + 1);
+
+            if(valueStart == span.Length)
+            {
+                goto Failed;
+            }
+
+            if(span[valueStart] == '"')
+            {
+                valueStart++;
+            }
+
+            if(valueStart == span.Length)
+            {
+                goto Failed;
+            }
+
+
+            parameter = new MimeTypeParameter(in parameterString, keyLength, valueStart);
 
             return true;
+            ///////////////////////////////
+Failed:
+            parameter = default;
+            return false;
         }
 
         /// <summary>
@@ -132,13 +136,13 @@ namespace FolkerKinzel.Uris
         public bool Equals(MimeTypeParameter other) => Equals(in other);
 
 
-            /// <summary>
-            /// Determines if the content of <paramref name="other"/> is equal to that of the 
-            /// current instance.
-            /// </summary>
-            /// <param name="other">A <see cref="MimeTypeParameter"/> structure to compare with.</param>
-            /// <returns><c>true</c> if the content of <paramref name="other"/> is equal to that of the 
-            /// current instance.</returns>
+        /// <summary>
+        /// Determines if the content of <paramref name="other"/> is equal to that of the 
+        /// current instance.
+        /// </summary>
+        /// <param name="other">A <see cref="MimeTypeParameter"/> structure to compare with.</param>
+        /// <returns><c>true</c> if the content of <paramref name="other"/> is equal to that of the 
+        /// current instance.</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0075:Bedingten Ausdruck vereinfachen", Justification = "<Ausstehend>")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
         [CLSCompliant(false)]

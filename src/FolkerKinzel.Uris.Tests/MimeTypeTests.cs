@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace FolkerKinzel.Uris.Tests
 {
@@ -57,6 +58,9 @@ namespace FolkerKinzel.Uris.Tests
         public void TryParseTest1(string input, bool expected, int parametersCount)
         {
             Assert.AreEqual(expected, MimeType.TryParse(input.AsMemory(), out MimeType mediaType));
+
+            //int size = Marshal.SizeOf(ReadOnlyMemory<char>.Empty);
+            //size = Marshal.SizeOf(mediaType);
 
             MimeTypeParameter[]? arr = mediaType.Parameters.ToArray();
 
