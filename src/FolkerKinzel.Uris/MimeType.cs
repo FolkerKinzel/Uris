@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Text;
 using FolkerKinzel.Uris.Intls;
 using FolkerKinzel.Uris.Properties;
@@ -19,20 +18,23 @@ namespace FolkerKinzel.Uris
     //[StructLayout(LayoutKind.Sequential, Pack = 0)]
     public readonly struct MimeType : IEquatable<MimeType>
     {
-        private readonly ReadOnlyMemory<char> _mediaPart;
-        private readonly ReadOnlyMemory<char> _parameters;
-        private readonly int _topLevelMediaTypeLength;
-        private readonly int _subTypeStart;
+        private readonly ReadOnlyMemory<char> _mimeTypeString;
+
+        // Stores all indexes in one int.
+        // | TopLevlMediaTp Length |  SubType Start  |  SubType Length  |  Parameters Start  |
+        // |      Byte 4           |     Byte 3      |     Byte 2       |      Byte 1        |
+        private readonly int _idx;
 
         internal const int StringLength = 80;
 
-        private MimeType(in ReadOnlyMemory<char> mediaPart, int topLevelMediaTypeLength, int subTypeStart, in ReadOnlyMemory<char> parameters)
-        {
-            this._mediaPart = mediaPart;
-            this._parameters = parameters;
+        private const int SUB_TYPE_LENGTH_SHIFT = 8;
+        private const int SUB_TYPE_START_SHIFT = 16;
+        private const int TOP_LEVEL_MEDIA_TYPE_SHIFT = 24;
 
-            this._topLevelMediaTypeLength = topLevelMediaTypeLength;
-            this._subTypeStart = subTypeStart;
+        private MimeType(in ReadOnlyMemory<char> mimeTypeString, int idx)
+        {
+            this._mimeTypeString = mimeTypeString;
+            this._idx = idx;
         }
 
         #region Public Instance Members
@@ -42,12 +44,12 @@ namespace FolkerKinzel.Uris
         /// <summary>
         /// Top-Level Media Type. (The left part of a MIME-Type.)
         /// </summary>
-        public ReadOnlySpan<char> TopLevelMediaType => _mediaPart.Span.Slice(0, _topLevelMediaTypeLength);
+        public ReadOnlySpan<char> TopLevelMediaType => _mimeTypeString.Span.Slice(0, (_idx >> TOP_LEVEL_MEDIA_TYPE_SHIFT) & 0xFF);
 
         /// <summary>
         /// Sub Type (The right part of a MIME-Type.)
         /// </summary>
-        public ReadOnlySpan<char> SubType => _mediaPart.Span.Slice(_subTypeStart);
+        public ReadOnlySpan<char> SubType => _mimeTypeString.Span.Slice((_idx >> SUB_TYPE_START_SHIFT) & 0xFF, (_idx >> SUB_TYPE_LENGTH_SHIFT) & 0xFF);
 
         /// <summary>
         /// Parameters (Never <c>null</c>.)
@@ -341,6 +343,13 @@ namespace FolkerKinzel.Uris
         /// <returns><c>true</c> if <paramref name="value"/> could be parsed as <see cref="MimeType"/>; otherwise, <c>false</c>.</returns>
         public static bool TryParse(in ReadOnlyMemory<char> value, out MimeType mimeType)
         {
+            ReadOnlyMemory<char> mimeTypeTrimmed = TrimHelper.TrimStart(in value);
+
+            //if(mimeTypeTrimmed.Length == 0)
+            //{
+            //    goto Failed;
+            //}
+
             int parameterStartIndex = value.Span.IndexOf(';');
 
             ReadOnlyMemory<char> mediaPart = parameterStartIndex < 0 ? value : value.Slice(0, parameterStartIndex);
@@ -358,7 +367,7 @@ namespace FolkerKinzel.Uris
 
             int topLevelMediaTypeLength = mediaPartSpan.Slice(0, mediaTypeSeparatorIndex).GetTrimmedLength();
 
-            if(topLevelMediaTypeLength == 0)
+            if (topLevelMediaTypeLength == 0)
             {
                 goto Failed;
             }
@@ -442,7 +451,7 @@ Failed:
 
         private IEnumerable<MimeTypeParameter> ParseParameters()
         {
-            int parameterStartIndex = 0;
+            int parameterStartIndex = _idx & 0xFF;
             do
             {
                 if (TryParseParameter(ref parameterStartIndex, out MimeTypeParameter parameter))
@@ -456,21 +465,19 @@ Failed:
 
         private bool TryParseParameter(ref int parameterStartIndex, out MimeTypeParameter parameter)
         {
-            int nextParameterSeparatorIndex = GetNextParameterSeparatorIndex(_parameters.Span.Slice(parameterStartIndex));
+            int nextParameterSeparatorIndex = GetNextParameterSeparatorIndex(_mimeTypeString.Span.Slice(parameterStartIndex));
             ReadOnlyMemory<char> currentParameterString;
 
             if (nextParameterSeparatorIndex < 0) // last parameter
             {
-                currentParameterString = _parameters.Slice(parameterStartIndex);
+                currentParameterString = _mimeTypeString.Slice(parameterStartIndex);
                 parameterStartIndex = -1;
             }
             else
             {
-                currentParameterString = _parameters.Slice(parameterStartIndex, nextParameterSeparatorIndex);
+                currentParameterString = _mimeTypeString.Slice(parameterStartIndex, nextParameterSeparatorIndex);
                 parameterStartIndex += nextParameterSeparatorIndex + 1;
             }
-
-            
 
             return MimeTypeParameter.TryParse(in currentParameterString, out parameter);
         }
