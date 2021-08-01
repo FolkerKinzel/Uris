@@ -60,14 +60,14 @@ namespace Benchmarks
         //}
 
         [Benchmark]
-        public bool ReadOnlyMemoryByValue()
+        public static bool ReadOnlyMemoryByValue()
         {
             var memory = default(ReadOnlyMemory<char>);
             return DoReadOnlyMemoryByValue(memory);
         }
 
         [Benchmark]
-        public bool ReadOnlyMemoryByIn()
+        public static bool ReadOnlyMemoryByIn()
         {
             var memory = default(ReadOnlyMemory<char>);
             return DoReadOnlyMemoryByIn(ref memory);
