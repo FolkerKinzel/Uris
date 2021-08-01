@@ -33,8 +33,7 @@ namespace FolkerKinzel.Uris
         /// Initializes a new <see cref="MimeTypeParameter"/> structure.
         /// </summary>
         /// <param name="parameterString">The trimmed Parameter.</param>
-        /// <param name="value">The length of the Key part.</param>
-        /// <param name="valueStart">The start index of the Value.</param>
+        /// <param name="idx">All indexes in one Int32.</param>
         private MimeTypeParameter(in ReadOnlyMemory<char> parameterString, int idx)
         {
             this._parameterString = parameterString;
@@ -81,21 +80,21 @@ namespace FolkerKinzel.Uris
                && Value.Equals(ASCII_CHARSET_VALUE.AsSpan(), StringComparison.OrdinalIgnoreCase);
 
 
-        internal static bool TryParse(in ReadOnlyMemory<char> parameterString, out MimeTypeParameter parameter)
+        internal static bool TryParse(ref ReadOnlyMemory<char> value, out MimeTypeParameter parameter)
         {
-            ReadOnlyMemory<char> parameterTrimmed = TrimHelper.Trim(in parameterString);
+            value = value.Trim();
 
-            if(parameterTrimmed.Length == 0)
+            if(value.Length == 0)
             {
                 goto Failed;
             }
 
-            ReadOnlySpan<char> span = parameterTrimmed.Span;
+            ReadOnlySpan<char> span = value.Span;
 
             if(span[span.Length - 1] == '"')
             {
-                parameterTrimmed = parameterTrimmed.Slice(0, parameterTrimmed.Length - 1);
-                span = parameterTrimmed.Span;
+                value = value.Slice(0, value.Length - 1);
+                span = value.Span;
             }
 
             int keyValueSeparatorIndex = span.IndexOf('=');
@@ -107,7 +106,7 @@ namespace FolkerKinzel.Uris
 
             int keyLength = span.Slice(0, keyValueSeparatorIndex).GetTrimmedLength();
 
-            if (keyLength == 0 || keyLength > short.MaxValue)
+            if (keyLength is 0 or > short.MaxValue)
             {
                 goto Failed;
             }
@@ -134,7 +133,7 @@ namespace FolkerKinzel.Uris
             int idx = keyLength << KEY_LENGTH_SHIFT;
             idx |= valueStart;
 
-            parameter = new MimeTypeParameter(in parameterTrimmed, idx);
+            parameter = new MimeTypeParameter(in value, idx);
 
             return true;
 ///////////////////////////////

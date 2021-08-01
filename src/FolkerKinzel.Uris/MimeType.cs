@@ -15,7 +15,6 @@ namespace FolkerKinzel.Uris
     /// <summary>
     /// Represents a MIME type ("Internet Media Type") according to RFC 2045 and RFC 2046.
     /// </summary>
-    //[StructLayout(LayoutKind.Sequential, Pack = 0)]
     public readonly struct MimeType : IEquatable<MimeType>
     {
         private readonly ReadOnlyMemory<char> _mimeTypeString;
@@ -210,17 +209,17 @@ namespace FolkerKinzel.Uris
         [CLSCompliant(false)]
         public bool Equals(in MimeType other) => Equals(in other, false);
 
-        /// <summary>
-        /// Determines whether this instance is equal to <paramref name="other"/> and allows to specify
-        /// whether or not the <see cref="Parameters"/> are taken into account.
-        /// </summary>
-        /// <param name="other">The <see cref="MimeType"/> instance to compare with.</param>
-        /// <param name="ignoreParameters">Pass <c>false</c> to take the <see cref="Parameters"/> into account;
-        /// <c>true</c>, otherwise.</param>
-        /// <returns><c>true</c> if this  instance is equal to <paramref name="other"/>; false, otherwise.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(MimeType other, bool ignoreParameters) => Equals(in other, ignoreParameters);
+        ///// <summary>
+        ///// Determines whether this instance is equal to <paramref name="other"/> and allows to specify
+        ///// whether or not the <see cref="Parameters"/> are taken into account.
+        ///// </summary>
+        ///// <param name="other">The <see cref="MimeType"/> instance to compare with.</param>
+        ///// <param name="ignoreParameters">Pass <c>false</c> to take the <see cref="Parameters"/> into account;
+        ///// <c>true</c>, otherwise.</param>
+        ///// <returns><c>true</c> if this  instance is equal to <paramref name="other"/>; false, otherwise.</returns>
+        //[System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
+        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        //public bool Equals(MimeType other, bool ignoreParameters) => Equals(in other, ignoreParameters);
 
         /// <summary>
         /// Determines whether this instance is equal to <paramref name="other"/> and allows to specify
@@ -231,7 +230,7 @@ namespace FolkerKinzel.Uris
         /// <c>true</c>, otherwise.</param>
         /// <returns><c>true</c> if this  instance is equal to <paramref name="other"/>; false, otherwise.</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
-        [CLSCompliant(false)]
+        //[CLSCompliant(false)]
         public bool Equals(in MimeType other, bool ignoreParameters)
         {
             if (!TopLevelMediaType.Equals(other.TopLevelMediaType, StringComparison.OrdinalIgnoreCase) ||
@@ -308,7 +307,7 @@ namespace FolkerKinzel.Uris
 
             ReadOnlyMemory<char> memory = value.AsMemory();
 
-            return TryParse(in memory, out MimeType mediaType)
+            return TryParse(ref memory, out MimeType mediaType)
                     ? mediaType
                     : throw new ArgumentException(string.Format(Res.InvalidMimeType, nameof(value)), nameof(value));
         }
@@ -331,20 +330,22 @@ namespace FolkerKinzel.Uris
 
             ReadOnlyMemory<char> memory = value.AsMemory();
 
-            return TryParse(in memory, out mimeType);
+            return TryParse(ref memory, out mimeType);
         }
 
         /// <summary>
         /// Tries to parse a <see cref="ReadOnlyMemory{T}">ReadOnlyMemory&lt;Char&gt;</see> as <see cref="MimeType"/>.
         /// </summary>
-        /// <param name="value">The <see cref="ReadOnlyMemory{T}">ReadOnlyMemory&lt;Char&gt;</see> to parse.</param>
+        /// <param name="value">The <see cref="ReadOnlyMemory{T}">ReadOnlyMemory&lt;Char&gt;</see> to parse. The method might replace the 
+        /// passed instance with a smaller one. Make a copy of the argument in the calling method if this is 
+        /// not desirable.</param>
         /// <param name="mimeType">When the method successfully returns, the parameter contains the
         /// <see cref="MimeType"/> parsed from <paramref name="value"/>. The parameter is passed uninitialized.</param>
         /// <returns><c>true</c> if <paramref name="value"/> could be parsed as <see cref="MimeType"/>; otherwise, <c>false</c>.</returns>
-        public static bool TryParse(in ReadOnlyMemory<char> value, out MimeType mimeType)
+        public static bool TryParse(ref ReadOnlyMemory<char> value, out MimeType mimeType)
         {
-            ReadOnlyMemory<char> mimeTypeTrimmed = TrimHelper.TrimStart(in value);
-            ReadOnlySpan<char> span = mimeTypeTrimmed.Span;
+            value = value.TrimStart();
+            ReadOnlySpan<char> span = value.Span;
 
             int parameterStartIndex = span.IndexOf(';');
 
@@ -389,7 +390,7 @@ namespace FolkerKinzel.Uris
             idx |= parameterStartIndex;
 
             mimeType = new MimeType(
-                in mimeTypeTrimmed,
+                in value,
                 idx);
 
             return true;
@@ -415,7 +416,8 @@ Failed:
             }
             else
             {
-                _ = TryParse(MimeCache.GetMimeType(fileTypeExtension).AsMemory(), out MimeType inetMediaType);
+                ReadOnlyMemory<char> memory = MimeCache.GetMimeType(fileTypeExtension).AsMemory();
+                _ = TryParse(ref memory, out MimeType inetMediaType);
                 return inetMediaType;
             }
         }
@@ -491,7 +493,7 @@ Failed:
                 parameterStartIndex += nextParameterSeparatorIndex + 1;
             }
 
-            return MimeTypeParameter.TryParse(in currentParameterString, out parameter);
+            return MimeTypeParameter.TryParse(ref currentParameterString, out parameter);
         }
 
 

@@ -121,11 +121,11 @@ namespace FolkerKinzel.Uris
             var hash = new HashCode();
             hash.Add(GetFileTypeExtension());
 
-            if(TryGetEmbeddedText(out string? text))
+            if (TryGetEmbeddedText(out string? text))
             {
                 hash.Add(text);
             }
-            else if(TryGetEmbeddedBytes(out byte[]? bytes))
+            else if (TryGetEmbeddedBytes(out byte[]? bytes))
             {
                 for (int i = 0; i < bytes.Length; i++)
                 {
@@ -262,327 +262,331 @@ namespace FolkerKinzel.Uris
             {
                 mediaType = DataUrl.DefaultMediaType();
             }
-            else if (!MimeType.TryParse(value[PROTOCOL.Length] == ';'
-                ? new StringBuilder(DEFAULT_MEDIA_TYPE.Length + mimePart.Length)
-                    .Append(DEFAULT_MEDIA_TYPE)
-                    .Append(mimePart).ToString()
-                    .AsMemory()
-                : value.AsMemory(PROTOCOL.Length, mimeTypeEndIndex - PROTOCOL.Length), out mediaType))
+            else
             {
-                return false;
+                ReadOnlyMemory<char> memory = value[PROTOCOL.Length] == ';'
+                                                ? new StringBuilder(DEFAULT_MEDIA_TYPE.Length + mimePart.Length)
+                                                    .Append(DEFAULT_MEDIA_TYPE)
+                                                    .Append(mimePart).ToString()
+                                                    .AsMemory()
+                                                : value.AsMemory(PROTOCOL.Length, mimeTypeEndIndex - PROTOCOL.Length);
+
+                if (!MimeType.TryParse(ref memory, out mediaType))
+                {
+                    return false;
+                }
+            }
+                ReadOnlyMemory<char> embeddedData = value.AsMemory(startOfData + 1);
+                dataUrl = new DataUrl(mediaType, dataEncoding, in embeddedData);
+
+                return true;
+
+                //////////////////////////////////////////////////////////////
+
+                static bool HasBase64Encoding(ReadOnlySpan<char> val)
+                {
+                    //Suche ";base64"
+                    if (val.Length < BASE64.Length)
+                    {
+                        return false;
+                    }
+
+                    ReadOnlySpan<char> hayStack = val.Slice(val.Length - BASE64.Length);
+
+                    for (int i = 0; i < hayStack.Length; i++)
+                    {
+                        char c = char.ToLowerInvariant(hayStack[i]);
+
+                        if (c != BASE64[i])
+                        {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+            }
+        
+
+
+            #endregion
+
+            #region Builder
+
+            /// <summary>
+            /// Embeds Text in a "data" URL (RFC 2397).
+            /// </summary>
+            /// <param name="text">The text to embed into the "data" URL.</param>
+            /// <returns>A "data" URL, into which the text provided by the parameter <paramref name="text"/> is embedded.</returns>
+            /// <exception cref="FormatException">The <see cref="Uri"/> class was not able to encode <paramref name="text"/> correctly.</exception>
+            public static string FromText(string? text)
+            {
+                const string charset = ";charset=utf-8";
+
+                if (string.IsNullOrEmpty(text))
+                {
+                    return "data:,";
+                }
+
+                text = Uri.UnescapeDataString(text);
+
+                if (text.IsAscii())
+                {
+                    string data = Uri.EscapeDataString(text);
+                    var sb = new StringBuilder(PROTOCOL.Length + 1 + data.Length);
+                    return sb.Append(PROTOCOL).Append(',').Append(data).ToString();
+                }
+                else
+                {
+
+                    string data = Convert.ToBase64String(Encoding.UTF8.GetBytes(text));
+                    var sb = new StringBuilder(PROTOCOL.Length + charset.Length + BASE64.Length + 1 + data.Length);
+                    return sb.Append(PROTOCOL).Append(charset).Append(BASE64).Append(',').Append(data).ToString();
+                }
+
+                // $"data:,{Uri.EscapeDataString(text)}"
             }
 
-            ReadOnlyMemory<char> embeddedData = value.AsMemory(startOfData + 1);
-            dataUrl = new DataUrl(in mediaType, dataEncoding, in embeddedData);
-
-            return true;
-
-            //////////////////////////////////////////////////////////////
-
-            static bool HasBase64Encoding(ReadOnlySpan<char> val)
+            /// <summary>
+            /// Embeds binary data in a "data" URL (RFC 2397).
+            /// </summary>
+            /// <param name="bytes">The binary data to embed into the "data" URL.</param>
+            /// <param name="mimeType">The <see cref="MimeType"/> of the data passed to the parameter <paramref name="bytes"/>.</param>
+            /// <returns>A "data" URL, into which the binary data provided by the parameter <paramref name="bytes"/> is embedded.</returns>
+            public static string FromBytes(byte[]? bytes, in MimeType mimeType)
             {
-                //Suche ";base64"
-                if (val.Length < BASE64.Length)
+                string data = bytes is null ? string.Empty : Convert.ToBase64String(bytes, Base64FormattingOptions.None);
+                var builder = new StringBuilder(PROTOCOL.Length + MimeType.StringLength + BASE64.Length + 1 + data.Length);
+                return builder.Append(PROTOCOL).AppendMediaType(in mimeType).Append(BASE64).Append(',').Append(data).ToString();
+
+                // $"data:{mediaTypeString};base64,{Convert.ToBase64String(bytes)}"
+            }
+
+
+
+
+            ///// <summary>
+            ///// Erzeugt einen <see cref="Uri"/>, in den der Inhalt einer Datei eingebettet ist.
+            ///// </summary>
+            ///// <param name="path">Absoluter Pfad zu der einzubettenden Datei.</param>
+            ///// <param name="mediaType">Der <see cref="MimeType"/> der einzubettenden Datei oder <c>null</c>. Wenn <c>null</c> angegeben wird,
+            ///// wird versucht, den <see cref="MimeType"/> aus der Dateiendung automatisch zu ermitteln.</param>
+            ///// <returns>Ein <see cref="DataUrlBuilder"/>, in den die Daten der mit <paramref name="path"/> referenzierten Datei
+            ///// eingebettet sind.</returns>
+            ///// <exception cref="ArgumentNullException"><paramref name="path"/> ist <c>null</c>.</exception>
+            ///// <exception cref="ArgumentException"><paramref name="path"/> ist kein gültiger Dateipfad.</exception>
+            ///// <exception cref="UriFormatException">Es kann kein <see cref="Uri"/> initialisiert werden, z.B.
+            ///// weil der URI-String länger als 65519 Zeichen ist.</exception>
+            ///// <exception cref="IOException">E/A-Fehler.</exception>
+            //public static async Task<string> FromFileAsync(string path, MimeType? mediaType = null)
+            //{
+            //    byte[] bytes = await LoadFileAsync(path).ConfigureAwait(false);
+
+            //    if (mediaType is null)
+            //    {
+            //        mediaType = MimeType.FromFileTypeExtension(Path.GetExtension(path));
+            //    }
+
+            //    return FromBytes(bytes, mediaType.Value);
+            //}
+
+
+            /// <summary>
+            /// Embeds the content of a file in a "data" URL (RFC 2397).
+            /// </summary>
+            /// <param name="filePath">Abolute path to the file which content is to embed into the "data" URL.</param>
+            /// <param name="mimeType">The <see cref="MimeType"/> of the file to embed or <c>null</c> to let the method automatically
+            /// retrieve the <see cref="MimeType"/> from the file type extension.</param>
+            /// <returns>A "data" URL, into which the content of the file provided by the parameter <paramref name="filePath"/> is embedded.</returns>
+            /// <exception cref="ArgumentNullException"><paramref name="filePath"/> is <c>null</c>.</exception>
+            /// <exception cref="ArgumentException"><paramref name="filePath"/> is not a valid file path.</exception>
+            /// <exception cref="IOException">I/O error.</exception>
+            public static string FromFile(string filePath, in MimeType? mimeType = null)
+            {
+                byte[] bytes = LoadFile(filePath);
+
+                MimeType mimeTypeValue = mimeType ?? MimeType.FromFileTypeExtension(Path.GetExtension(filePath));
+                return FromBytes(bytes, in mimeTypeValue);
+            }
+
+            #endregion
+
+            #region Data
+
+            /// <summary>
+            /// Tries to retrieve the text that is embedded in the <see cref="DataUrl"/>.
+            /// </summary>
+            /// <param name="embeddedText">If the method returns <c>true</c> the parameter contains the text, which was embedded in the <see cref="DataUrl"/>.
+            /// The parameter is passed uninitialized.</param>
+            /// <returns><c>true</c> if the data embedded in the data url could be parsed as text, <c>false</c> otherwise.</returns>
+            public bool TryGetEmbeddedText([NotNullWhen(true)] out string? embeddedText)
+            {
+                embeddedText = null;
+                if (!ContainsText)
                 {
                     return false;
                 }
 
-                ReadOnlySpan<char> hayStack = val.Slice(val.Length - BASE64.Length);
-
-                for (int i = 0; i < hayStack.Length; i++)
+                // als Base64 codierter Text:
+                if (DataEncoding == DataEncoding.Base64)
                 {
-                    char c = char.ToLowerInvariant(hayStack[i]);
+                    static bool Predicate(MimeTypeParameter p) => p.IsCharsetParameter();
 
-                    if (c != BASE64[i])
+                    MimeTypeParameter charsetParameter = MimeType.Parameters.FirstOrDefault(Predicate);
+
+                    Encoding enc = charsetParameter.IsEmpty ? Encoding.ASCII : TextEncodingConverter.GetEncoding(charsetParameter.Value.ToString());
+
+                    try
+                    {
+                        embeddedText = enc.GetString(Convert.FromBase64String(EmbeddedData.ToString()));
+                    }
+                    catch
                     {
                         return false;
                     }
+                }
+                else
+                {
+                    // Url-Codierter UTF-8-String:
+                    embeddedText = Uri.UnescapeDataString(EmbeddedData.ToString());
                 }
 
                 return true;
             }
 
-        }
 
-
-        #endregion
-
-        #region Builder
-
-        /// <summary>
-        /// Embeds Text in a "data" URL (RFC 2397).
-        /// </summary>
-        /// <param name="text">The text to embed into the "data" URL.</param>
-        /// <returns>A "data" URL, into which the text provided by the parameter <paramref name="text"/> is embedded.</returns>
-        /// <exception cref="FormatException">The <see cref="Uri"/> class was not able to encode <paramref name="text"/> correctly.</exception>
-        public static string FromText(string? text)
-        {
-            const string charset = ";charset=utf-8";
-
-            if(string.IsNullOrEmpty(text))
+            /// <summary>
+            /// Tries to retrieve the binary data that is embedded in the <see cref="DataUrl"/>.
+            /// </summary>
+            /// <param name="embeddedBytes">If the method returns <c>true</c> the parameter contains the binary data, which was embedded in the <see cref="DataUrl"/>.
+            /// The parameter is passed uninitialized.</param>
+            /// <returns><c>true</c> if the data embedded in the data url could be parsed as binary data, <c>false</c> otherwise.</returns>
+            public bool TryGetEmbeddedBytes([NotNullWhen(true)] out byte[]? embeddedBytes)
             {
-                return "data:,";
-            }
+                embeddedBytes = null;
 
-            text = Uri.UnescapeDataString(text);
-
-            if (text.IsAscii())
-            {
-                string data = Uri.EscapeDataString(text);
-                var sb = new StringBuilder(PROTOCOL.Length + 1 + data.Length);
-                return sb.Append(PROTOCOL).Append(',').Append(data).ToString();
-            }
-            else
-            {
-
-                string data = Convert.ToBase64String(Encoding.UTF8.GetBytes(text));
-                var sb = new StringBuilder(PROTOCOL.Length + charset.Length + BASE64.Length + 1 + data.Length);
-                return sb.Append(PROTOCOL).Append(charset).Append(BASE64).Append(',').Append(data).ToString();
-            }
-
-            // $"data:,{Uri.EscapeDataString(text)}"
-        }
-
-        /// <summary>
-        /// Embeds binary data in a "data" URL (RFC 2397).
-        /// </summary>
-        /// <param name="bytes">The binary data to embed into the "data" URL.</param>
-        /// <param name="mediaType">The <see cref="MimeType"/> of the data passed to the parameter <paramref name="bytes"/>.</param>
-        /// <returns>A "data" URL, into which the binary data provided by the parameter <paramref name="bytes"/> is embedded.</returns>
-        public static string FromBytes(byte[]? bytes, in MimeType mediaType)
-        {
-            string data = bytes is null ? string.Empty : Convert.ToBase64String(bytes, Base64FormattingOptions.None);
-            var builder = new StringBuilder(PROTOCOL.Length + MimeType.StringLength + BASE64.Length + 1 + data.Length);
-            return builder.Append(PROTOCOL).AppendMediaType(in mediaType).Append(BASE64).Append(',').Append(data).ToString();
-
-            // $"data:{mediaTypeString};base64,{Convert.ToBase64String(bytes)}"
-        }
-
-
-
-
-        ///// <summary>
-        ///// Erzeugt einen <see cref="Uri"/>, in den der Inhalt einer Datei eingebettet ist.
-        ///// </summary>
-        ///// <param name="path">Absoluter Pfad zu der einzubettenden Datei.</param>
-        ///// <param name="mediaType">Der <see cref="MimeType"/> der einzubettenden Datei oder <c>null</c>. Wenn <c>null</c> angegeben wird,
-        ///// wird versucht, den <see cref="MimeType"/> aus der Dateiendung automatisch zu ermitteln.</param>
-        ///// <returns>Ein <see cref="DataUrlBuilder"/>, in den die Daten der mit <paramref name="path"/> referenzierten Datei
-        ///// eingebettet sind.</returns>
-        ///// <exception cref="ArgumentNullException"><paramref name="path"/> ist <c>null</c>.</exception>
-        ///// <exception cref="ArgumentException"><paramref name="path"/> ist kein gültiger Dateipfad.</exception>
-        ///// <exception cref="UriFormatException">Es kann kein <see cref="Uri"/> initialisiert werden, z.B.
-        ///// weil der URI-String länger als 65519 Zeichen ist.</exception>
-        ///// <exception cref="IOException">E/A-Fehler.</exception>
-        //public static async Task<string> FromFileAsync(string path, MimeType? mediaType = null)
-        //{
-        //    byte[] bytes = await LoadFileAsync(path).ConfigureAwait(false);
-
-        //    if (mediaType is null)
-        //    {
-        //        mediaType = MimeType.FromFileTypeExtension(Path.GetExtension(path));
-        //    }
-
-        //    return FromBytes(bytes, mediaType.Value);
-        //}
-
-
-        /// <summary>
-        /// Embeds the content of a file in a "data" URL (RFC 2397).
-        /// </summary>
-        /// <param name="filePath">Abolute path to the file which content is to embed into the "data" URL.</param>
-        /// <param name="mimeType">The <see cref="MimeType"/> of the file to embed or <c>null</c> to let the method automatically
-        /// retrieve the <see cref="MimeType"/> from the file type extension.</param>
-        /// <returns>A "data" URL, into which the content of the file provided by the parameter <paramref name="filePath"/> is embedded.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="filePath"/> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException"><paramref name="filePath"/> is not a valid file path.</exception>
-        /// <exception cref="IOException">I/O error.</exception>
-        public static string FromFile(string filePath, in MimeType? mimeType = null)
-        {
-            byte[] bytes = LoadFile(filePath);
-
-            MimeType mimeTypeValue = mimeType ?? MimeType.FromFileTypeExtension(Path.GetExtension(filePath));
-            return FromBytes(bytes, in mimeTypeValue);
-        }
-
-        #endregion
-
-        #region Data
-
-        /// <summary>
-        /// Tries to retrieve the text that is embedded in the <see cref="DataUrl"/>.
-        /// </summary>
-        /// <param name="embeddedText">If the method returns <c>true</c> the parameter contains the text, which was embedded in the <see cref="DataUrl"/>.
-        /// The parameter is passed uninitialized.</param>
-        /// <returns><c>true</c> if the data embedded in the data url could be parsed as text, <c>false</c> otherwise.</returns>
-        public bool TryGetEmbeddedText([NotNullWhen(true)] out string? embeddedText)
-        {
-            embeddedText = null;
-            if (!ContainsText)
-            {
-                return false;
-            }
-
-            // als Base64 codierter Text:
-            if (DataEncoding == DataEncoding.Base64)
-            {
-                static bool Predicate(MimeTypeParameter p) => p.IsCharsetParameter();
-
-                MimeTypeParameter charsetParameter = MimeType.Parameters.FirstOrDefault(Predicate);
-
-                Encoding enc = charsetParameter.IsEmpty ? Encoding.ASCII : TextEncodingConverter.GetEncoding(charsetParameter.Value.ToString());
+                if (!ContainsBytes)
+                {
+                    return false;
+                }
 
                 try
                 {
-                    embeddedText = enc.GetString(Convert.FromBase64String(EmbeddedData.ToString()));
+                    embeddedBytes = this.DataEncoding == DataEncoding.Base64
+                        ? Convert.FromBase64String(EmbeddedData.ToString())
+                        : Encoding.UTF8.GetBytes(Uri.UnescapeDataString(EmbeddedData.ToString()));
                 }
                 catch
                 {
                     return false;
                 }
-            }
-            else
-            {
-                // Url-Codierter UTF-8-String:
-                embeddedText = Uri.UnescapeDataString(EmbeddedData.ToString());
+
+                return true;
             }
 
-            return true;
+
+            /// <summary>
+            /// Returns an appropriate file type extension for the data embedded in the <see cref="DataUrl"/>. The file type extension contains the 
+            /// period (".").
+            /// </summary>
+            /// <returns>An appropriate file type extension for the data embedded in the <see cref="DataUrl"/>.</returns>
+            ///// <remarks>The search for a file type extension can be an expensive operation. To make subsequent calls of the method faster, the
+            ///// recent file type extensions are stored in a cache. You can call <see cref="MimeType.ClearCache"/> to clear this cache.</remarks>
+            public string GetFileTypeExtension() => MimeType.GetFileTypeExtension();
+
+            #endregion
+
+            [SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
+            internal static MimeType DefaultMediaType()
+            {
+                ReadOnlyMemory<char> memory = DEFAULT_MEDIA_TYPE.AsMemory();
+                _ = MimeType.TryParse(ref memory, out MimeType mediaType);
+                return mediaType;
+            }
+
+            #region private
+
+            //    private static async Task<byte[]> LoadFileAsync(string path)
+            //    {
+            //        try
+            //        {
+            //#if NETSTANDARD2_0 || NET461
+            //                return await Task.Run(() => File.ReadAllBytes(path)).ConfigureAwait(false);
+            //#else
+            //            return await File.ReadAllBytesAsync(path).ConfigureAwait(false);
+            //#endif
+            //        }
+            //        catch (ArgumentNullException)
+            //        {
+            //            throw new ArgumentNullException(nameof(path));
+            //        }
+            //        catch (ArgumentException e)
+            //        {
+            //            throw new ArgumentException(e.Message, nameof(path), e);
+            //        }
+            //        catch (UnauthorizedAccessException e)
+            //        {
+            //            throw new IOException(e.Message, e);
+            //        }
+            //        catch (NotSupportedException e)
+            //        {
+            //            throw new ArgumentException(e.Message, nameof(path), e);
+            //        }
+            //        catch (System.Security.SecurityException e)
+            //        {
+            //            throw new IOException(e.Message, e);
+            //        }
+            //        catch (PathTooLongException e)
+            //        {
+            //            throw new ArgumentException(e.Message, nameof(path), e);
+            //        }
+            //        catch (Exception e)
+            //        {
+            //            throw new IOException(e.Message, e);
+            //        }
+            //    }
+
+
+            private static byte[] LoadFile(string path)
+            {
+                try
+                {
+                    return File.ReadAllBytes(path);
+                }
+                catch (ArgumentNullException)
+                {
+                    throw new ArgumentNullException(nameof(path));
+                }
+                catch (ArgumentException e)
+                {
+                    throw new ArgumentException(e.Message, nameof(path), e);
+                }
+                catch (UnauthorizedAccessException e)
+                {
+                    throw new IOException(e.Message, e);
+                }
+                catch (NotSupportedException e)
+                {
+                    throw new ArgumentException(e.Message, nameof(path), e);
+                }
+                catch (System.Security.SecurityException e)
+                {
+                    throw new IOException(e.Message, e);
+                }
+                catch (PathTooLongException e)
+                {
+                    throw new ArgumentException(e.Message, nameof(path), e);
+                }
+                catch (Exception e)
+                {
+                    throw new IOException(e.Message, e);
+                }
+            }
+
+
+
+
+            #endregion
+
         }
-
-
-        /// <summary>
-        /// Tries to retrieve the binary data that is embedded in the <see cref="DataUrl"/>.
-        /// </summary>
-        /// <param name="embeddedBytes">If the method returns <c>true</c> the parameter contains the binary data, which was embedded in the <see cref="DataUrl"/>.
-        /// The parameter is passed uninitialized.</param>
-        /// <returns><c>true</c> if the data embedded in the data url could be parsed as binary data, <c>false</c> otherwise.</returns>
-        public bool TryGetEmbeddedBytes([NotNullWhen(true)] out byte[]? embeddedBytes)
-        {
-            embeddedBytes = null;
-
-            if (!ContainsBytes)
-            {
-                return false;
-            }
-
-            try
-            {
-                embeddedBytes = this.DataEncoding == DataEncoding.Base64
-                    ? Convert.FromBase64String(EmbeddedData.ToString())
-                    : Encoding.UTF8.GetBytes(Uri.UnescapeDataString(EmbeddedData.ToString()));
-            }
-            catch
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-
-        /// <summary>
-        /// Returns an appropriate file type extension for the data embedded in the <see cref="DataUrl"/>. The file type extension contains the 
-        /// period (".").
-        /// </summary>
-        /// <returns>An appropriate file type extension for the data embedded in the <see cref="DataUrl"/>.</returns>
-        ///// <remarks>The search for a file type extension can be an expensive operation. To make subsequent calls of the method faster, the
-        ///// recent file type extensions are stored in a cache. You can call <see cref="MimeType.ClearCache"/> to clear this cache.</remarks>
-        public string GetFileTypeExtension() => MimeType.GetFileTypeExtension();
-
-        #endregion
-
-        [SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
-        internal static MimeType DefaultMediaType()
-        {
-            ReadOnlyMemory<char> memory = DEFAULT_MEDIA_TYPE.AsMemory();
-            _ = MimeType.TryParse(in memory, out MimeType mediaType);
-            return mediaType;
-        }
-
-        #region private
-
-        //    private static async Task<byte[]> LoadFileAsync(string path)
-        //    {
-        //        try
-        //        {
-        //#if NETSTANDARD2_0 || NET461
-        //                return await Task.Run(() => File.ReadAllBytes(path)).ConfigureAwait(false);
-        //#else
-        //            return await File.ReadAllBytesAsync(path).ConfigureAwait(false);
-        //#endif
-        //        }
-        //        catch (ArgumentNullException)
-        //        {
-        //            throw new ArgumentNullException(nameof(path));
-        //        }
-        //        catch (ArgumentException e)
-        //        {
-        //            throw new ArgumentException(e.Message, nameof(path), e);
-        //        }
-        //        catch (UnauthorizedAccessException e)
-        //        {
-        //            throw new IOException(e.Message, e);
-        //        }
-        //        catch (NotSupportedException e)
-        //        {
-        //            throw new ArgumentException(e.Message, nameof(path), e);
-        //        }
-        //        catch (System.Security.SecurityException e)
-        //        {
-        //            throw new IOException(e.Message, e);
-        //        }
-        //        catch (PathTooLongException e)
-        //        {
-        //            throw new ArgumentException(e.Message, nameof(path), e);
-        //        }
-        //        catch (Exception e)
-        //        {
-        //            throw new IOException(e.Message, e);
-        //        }
-        //    }
-
-
-        private static byte[] LoadFile(string path)
-        {
-            try
-            {
-                return File.ReadAllBytes(path);
-            }
-            catch (ArgumentNullException)
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-            catch (ArgumentException e)
-            {
-                throw new ArgumentException(e.Message, nameof(path), e);
-            }
-            catch (UnauthorizedAccessException e)
-            {
-                throw new IOException(e.Message, e);
-            }
-            catch (NotSupportedException e)
-            {
-                throw new ArgumentException(e.Message, nameof(path), e);
-            }
-            catch (System.Security.SecurityException e)
-            {
-                throw new IOException(e.Message, e);
-            }
-            catch (PathTooLongException e)
-            {
-                throw new ArgumentException(e.Message, nameof(path), e);
-            }
-            catch (Exception e)
-            {
-                throw new IOException(e.Message, e);
-            }
-        }
-
-
-
-
-        #endregion
-
     }
-}

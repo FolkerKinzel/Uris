@@ -33,23 +33,23 @@ namespace FolkerKinzel.Uris.Intls
         }
 
 
-        internal static StringBuilder AppendMediaType(this StringBuilder builder, in MimeType mediaType)
+        internal static StringBuilder AppendMediaType(this StringBuilder builder, in MimeType mimeType)
         {
-            if (mediaType.IsEmpty)
+            if (mimeType.IsEmpty)
             {
                 return builder;
             }
 
-            if (mediaType.IsTextPlain())
+            if (mimeType.IsTextPlain())
             {
                 MimeType defaultMediaType = DataUrl.DefaultMediaType();
 
-                if (mediaType.Equals(in defaultMediaType))
+                if (mimeType.Equals(in defaultMediaType))
                 {
                     return builder;
                 }
 
-                foreach (MimeTypeParameter parameter in mediaType.Parameters)
+                foreach (MimeTypeParameter parameter in mimeType.Parameters)
                 {
                     parameter.AppendTo(builder);
                 }
@@ -57,7 +57,7 @@ namespace FolkerKinzel.Uris.Intls
                 return builder;
             }
 
-            return mediaType.AppendTo(builder);
+            return mimeType.AppendTo(builder);
         }
 
     }

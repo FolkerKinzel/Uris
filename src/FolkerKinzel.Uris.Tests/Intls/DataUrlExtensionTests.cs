@@ -32,7 +32,7 @@ namespace FolkerKinzel.Uris.Intls.Tests
         [TestMethod]
         public void AppendMediaTypeTest1()
         {
-            Assert.IsTrue(MimeType.TryParse("text/plain".AsMemory(), out MimeType media));
+            Assert.IsTrue(MimeType.TryParse("text/plain", out MimeType media));
 
             var sb = new StringBuilder();
 
@@ -44,7 +44,7 @@ namespace FolkerKinzel.Uris.Intls.Tests
         [TestMethod]
         public void AppendMediaTypeTest2()
         {
-            Assert.IsTrue(MimeType.TryParse("text/plain;charset=iso-8859-1".AsMemory(), out MimeType media));
+            Assert.IsTrue(MimeType.TryParse("text/plain;charset=iso-8859-1", out MimeType media));
 
             var sb = new StringBuilder();
 
@@ -57,7 +57,7 @@ namespace FolkerKinzel.Uris.Intls.Tests
         public void AppendMediaTypeTest3()
         {
             string input = "text/html;charset=iso-8859-1";
-            Assert.IsTrue(MimeType.TryParse(input.AsMemory(), out MimeType media));
+            Assert.IsTrue(MimeType.TryParse(input, out MimeType media));
 
             var sb = new StringBuilder();
 

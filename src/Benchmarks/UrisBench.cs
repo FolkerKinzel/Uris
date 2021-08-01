@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using BenchmarkDotNet.Attributes;
 using FolkerKinzel.Uris;
 
@@ -75,34 +70,34 @@ namespace Benchmarks
         public bool ReadOnlyMemoryByIn()
         {
             var memory = default(ReadOnlyMemory<char>);
-            return DoReadOnlyMemoryByIn(in memory);
+            return DoReadOnlyMemoryByIn(ref memory);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static bool DoReadOnlyMemoryByValue(ReadOnlyMemory<char> largeStruct) => largeStruct.IsEmpty;
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static bool DoReadOnlyMemoryByIn(in ReadOnlyMemory<char> largeStruct) => largeStruct.IsEmpty;
+        private static bool DoReadOnlyMemoryByIn(ref ReadOnlyMemory<char> largeStruct) => largeStruct.IsEmpty;
 
-        [Benchmark]
-        public bool DataUrlByValue()
-        {
-            var dataUrl = default(DataUrl);
-            return DoDataUrlByValue(dataUrl);
-        }
+        //[Benchmark]
+        //public bool DataUrlByValue()
+        //{
+        //    var dataUrl = default(DataUrl);
+        //    return DoDataUrlByValue(dataUrl);
+        //}
 
-        [Benchmark]
-        public bool DataUrlByIn()
-        {
-            var dataUrl = default(DataUrl);
-            return DoDataUrlByIn(in dataUrl);
-        }
+        //[Benchmark]
+        //public bool DataUrlByIn()
+        //{
+        //    var dataUrl = default(DataUrl);
+        //    return DoDataUrlByIn(in dataUrl);
+        //}
 
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private static bool DoDataUrlByValue(DataUrl largeStruct) => largeStruct.IsEmpty;
+        //[MethodImpl(MethodImplOptions.NoInlining)]
+        //private static bool DoDataUrlByValue(DataUrl largeStruct) => largeStruct.IsEmpty;
 
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private static bool DoDataUrlByIn(in DataUrl largeStruct) => largeStruct.IsEmpty;
+        //[MethodImpl(MethodImplOptions.NoInlining)]
+        //private static bool DoDataUrlByIn(in DataUrl largeStruct) => largeStruct.IsEmpty;
 
         //[Benchmark]
         //public bool DataUrlEqualsByValue()

@@ -114,10 +114,7 @@ namespace FolkerKinzel.Uris.Tests
         [DataTestMethod]
         [DataRow("data:abc")]
         //[DataRow("data:,a bc")]
-        public void TryParseTest7(string input)
-        {
-            Assert.IsFalse(DataUrl.TryParse(input, out DataUrl _));
-        }
+        public void TryParseTest7(string input) => Assert.IsFalse(DataUrl.TryParse(input, out DataUrl _));
 
         [TestMethod]
         public void TryParseTest8()
