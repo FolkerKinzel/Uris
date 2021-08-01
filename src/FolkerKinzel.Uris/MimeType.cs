@@ -22,14 +22,14 @@ namespace FolkerKinzel.Uris
 
         // Stores all indexes in one int.
         // | TopLevlMediaTp Length |  SubType Start  |  SubType Length  |  Parameters Start  |
-        // |      Byte 4           |     Byte 3      |     Byte 2       |      Byte 1        |
+        // |       Byte 4          |     Byte 3      |       Byte 2     |     Byte 1         |
         private readonly int _idx;
 
         internal const int StringLength = 80;
 
         private const int SUB_TYPE_LENGTH_SHIFT = 8;
         private const int SUB_TYPE_START_SHIFT = 16;
-        private const int TOP_LEVEL_MEDIA_TYPE_SHIFT = 24;
+        private const int TOP_LEVEL_MEDIA_TYPE_LENGTH_SHIFT = 24;
 
         private MimeType(in ReadOnlyMemory<char> mimeTypeString, int idx)
         {
@@ -44,7 +44,7 @@ namespace FolkerKinzel.Uris
         /// <summary>
         /// Top-Level Media Type. (The left part of a MIME-Type.)
         /// </summary>
-        public ReadOnlySpan<char> TopLevelMediaType => _mimeTypeString.Span.Slice(0, (_idx >> TOP_LEVEL_MEDIA_TYPE_SHIFT) & 0xFF);
+        public ReadOnlySpan<char> TopLevelMediaType => _mimeTypeString.Span.Slice(0, (_idx >> TOP_LEVEL_MEDIA_TYPE_LENGTH_SHIFT) & 0xFF);
 
         /// <summary>
         /// Sub Type (The right part of a MIME-Type.)
@@ -344,30 +344,31 @@ namespace FolkerKinzel.Uris
         public static bool TryParse(in ReadOnlyMemory<char> value, out MimeType mimeType)
         {
             ReadOnlyMemory<char> mimeTypeTrimmed = TrimHelper.TrimStart(in value);
+            ReadOnlySpan<char> span = mimeTypeTrimmed.Span;
 
-            //if(mimeTypeTrimmed.Length == 0)
-            //{
-            //    goto Failed;
-            //}
+            int parameterStartIndex = span.IndexOf(';');
 
-            int parameterStartIndex = value.Span.IndexOf(';');
+            if(parameterStartIndex > byte.MaxValue) // string too long
+            {
+                goto Failed;
+            }
+            else if (parameterStartIndex < 0) // No parameters.
+            {
+                parameterStartIndex = 0;
+            }
 
-            ReadOnlyMemory<char> mediaPart = parameterStartIndex < 0 ? value : value.Slice(0, parameterStartIndex);
-            mediaPart = mediaPart.Trim();
 
-            ReadOnlySpan<char> mediaPartSpan = mediaPart.Span;
-            int mediaTypeSeparatorIndex = mediaPart.Span.IndexOf('/');
+            ReadOnlySpan<char> mediaPartSpan = parameterStartIndex < 1 ? span : span.Slice(0, parameterStartIndex);
+            int mediaTypeSeparatorIndex = mediaPartSpan.IndexOf('/');
 
-            if (mediaTypeSeparatorIndex == -1)
+            if (mediaTypeSeparatorIndex < 1)
             {
                 goto Failed;
             }
 
-            ReadOnlyMemory<char> parameters = parameterStartIndex < 0 ? ReadOnlyMemory<char>.Empty : value.Slice(parameterStartIndex + 1);
-
             int topLevelMediaTypeLength = mediaPartSpan.Slice(0, mediaTypeSeparatorIndex).GetTrimmedLength();
 
-            if (topLevelMediaTypeLength == 0)
+            if (topLevelMediaTypeLength is 0 or > sbyte.MaxValue)
             {
                 goto Failed;
             }
@@ -375,16 +376,21 @@ namespace FolkerKinzel.Uris
             int subTypeStart = mediaTypeSeparatorIndex + 1;
             subTypeStart += mediaPartSpan.Slice(subTypeStart).GetTrimmedStart();
 
-            if (subTypeStart == mediaPartSpan.Length)
+            if (subTypeStart == mediaPartSpan.Length || subTypeStart > byte.MaxValue)
             {
                 goto Failed;
             }
 
+            int subTypeLength = mediaPartSpan.Slice(subTypeStart).GetTrimmedLength();
+
+            int idx = topLevelMediaTypeLength << TOP_LEVEL_MEDIA_TYPE_LENGTH_SHIFT;
+            idx |= subTypeStart << SUB_TYPE_START_SHIFT;
+            idx |= subTypeLength << SUB_TYPE_LENGTH_SHIFT;
+            idx |= parameterStartIndex;
+
             mimeType = new MimeType(
-                in mediaPart,
-                topLevelMediaTypeLength,
-                subTypeStart,
-                in parameters);
+                in mimeTypeTrimmed,
+                idx);
 
             return true;
 
@@ -452,6 +458,12 @@ Failed:
         private IEnumerable<MimeTypeParameter> ParseParameters()
         {
             int parameterStartIndex = _idx & 0xFF;
+
+            if(parameterStartIndex < 1)
+            {
+                yield break;
+            }
+
             do
             {
                 if (TryParseParameter(ref parameterStartIndex, out MimeTypeParameter parameter))
