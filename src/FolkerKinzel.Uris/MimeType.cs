@@ -363,7 +363,8 @@ namespace FolkerKinzel.Uris
                 goto Failed;
             }
 
-            int subTypeStart = mediaPartSpan.Slice(mediaTypeSeparatorIndex + 1).GetTrimmedStart();
+            int subTypeStart = mediaTypeSeparatorIndex + 1;
+            subTypeStart += mediaPartSpan.Slice(subTypeStart).GetTrimmedStart();
 
             if (subTypeStart == mediaPartSpan.Length)
             {
@@ -460,19 +461,16 @@ Failed:
 
             if (nextParameterSeparatorIndex < 0) // last parameter
             {
-                currentParameterString = _parameters.Slice(parameterStartIndex).Trim();
+                currentParameterString = _parameters.Slice(parameterStartIndex);
                 parameterStartIndex = -1;
             }
             else
             {
-                currentParameterString = _parameters.Slice(parameterStartIndex, nextParameterSeparatorIndex).Trim();
+                currentParameterString = _parameters.Slice(parameterStartIndex, nextParameterSeparatorIndex);
                 parameterStartIndex += nextParameterSeparatorIndex + 1;
             }
 
-            if(currentParameterString.Length > 0 && currentParameterString.Span[currentParameterString.Length - 1] == '"')
-            {
-                currentParameterString = currentParameterString.Slice(0, currentParameterString.Length - 1);
-            }
+            
 
             return MimeTypeParameter.TryParse(in currentParameterString, out parameter);
         }

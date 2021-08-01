@@ -1,9 +1,8 @@
 ﻿using System;
-using FolkerKinzel.Uris.Properties;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using FolkerKinzel.Uris.Intls;
-using System.Runtime.CompilerServices;
-using System.Diagnostics;
 
 #if NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
 using FolkerKinzel.Strings.Polyfills;
@@ -16,13 +15,21 @@ namespace FolkerKinzel.Uris
     /// </summary>
     public readonly struct MimeTypeParameter : IEquatable<MimeTypeParameter>
     {
+        internal const int StringLength = 32;
+
         private const string CHARSET_KEY = "charset";
         private const string ASCII_CHARSET_VALUE = "us-ascii";
 
+        private const int KEY_LENGTH_SHIFT = 8;
+        private const int VALUE_START_SHIFT = 16;
+        private const int VALUE_LENGTH_SHIFT = 24;
+
         private readonly ReadOnlyMemory<char> _parameterString;
-        private readonly int _keyLength;
-        private readonly int _valueStart;
-        internal const int StringLength = 32;
+
+        // Stores all indexes in one uint to let the struct not grow too large:
+        // | Value Length | Value Start | Key Length | Key Start |
+        // |    Byte 4    |    Byte 3   |   Byte 2   |   Byte 1  |
+        private readonly uint _idx;
 
         /// <summary>
         /// Initializes a new <see cref="MimeTypeParameter"/> structure.
@@ -30,22 +37,21 @@ namespace FolkerKinzel.Uris
         /// <param name="parameterString">The trimmed Parameter.</param>
         /// <param name="value">The length of the Key part.</param>
         /// <param name="valueStart">The start index of the Value.</param>
-        private MimeTypeParameter(in ReadOnlyMemory<char> parameterString, int keyLength, int valueStart)
+        private MimeTypeParameter(in ReadOnlyMemory<char> parameterString, uint idx)
         {
             this._parameterString = parameterString;
-            this._keyLength = keyLength;
-            this._valueStart = valueStart;
+            this._idx = idx;
         }
 
         /// <summary>
         /// The <see cref="MimeTypeParameter"/>'s key.
         /// </summary>
-        public ReadOnlySpan<char> Key => _parameterString.Span.Slice(0, _keyLength);
+        public ReadOnlySpan<char> Key => _parameterString.Span.Slice((int)(_idx & 0xFF), (int)((_idx >> KEY_LENGTH_SHIFT) & 0xFF));
 
         /// <summary>
         /// The <see cref="MimeTypeParameter"/>'s value.
         /// </summary>
-        public ReadOnlySpan<char> Value => _parameterString.Span.Slice(_valueStart);
+        public ReadOnlySpan<char> Value => _parameterString.Span.Slice((int)((_idx >> VALUE_START_SHIFT) & 0xFF), (int)((_idx >> VALUE_LENGTH_SHIFT) & 0xFF));
 
         /// <summary>
         /// <c>true</c> indicates that the instance contains no data.
@@ -87,39 +93,55 @@ namespace FolkerKinzel.Uris
                 goto Failed;
             }
 
-            Debug.Assert(!char.IsWhiteSpace(parameterString.Span[0]));
-            Debug.Assert(!char.IsWhiteSpace(parameterString.Span[parameterString.Length - 1]));
-            Debug.Assert(parameterString.Span[parameterString.Length - 1] != '"');
-
-            int keyLength = span.Slice(0, keyValueSeparatorIndex).GetTrimmedLength();
+            int keyStart = span.GetTrimmedStart();
+            int keyLength = span.Slice(keyStart, keyValueSeparatorIndex - keyStart).GetTrimmedLength();
 
             if (keyLength == 0)
             {
                 goto Failed;
             }
 
-            int valueStart = span.Slice(keyValueSeparatorIndex + 1).GetTrimmedStart();
+            int valueStart = keyValueSeparatorIndex + 1;
 
             if(valueStart == span.Length)
             {
                 goto Failed;
             }
 
-            if(span[valueStart] == '"')
+            valueStart += span.Slice(valueStart).GetTrimmedStart();
+
+
+            if (span[valueStart] == '"')
             {
                 valueStart++;
             }
 
-            if(valueStart == span.Length)
+            if (valueStart > byte.MaxValue)
             {
                 goto Failed;
             }
 
+            int valueLength = span.Slice(valueStart).GetTrimmedLength();
 
-            parameter = new MimeTypeParameter(in parameterString, keyLength, valueStart);
+            if(span[valueStart + valueLength - 1].Equals('"'))
+            {
+                --valueLength;
+            }
+
+            if(valueLength is 0 or > byte.MaxValue)
+            {
+                goto Failed;
+            }
+
+            uint idx = (uint)valueLength << VALUE_LENGTH_SHIFT;
+            idx |= (uint)valueStart << VALUE_START_SHIFT;
+            idx |= (uint)keyLength << KEY_LENGTH_SHIFT;
+            idx |= (uint)keyStart;
+
+            parameter = new MimeTypeParameter(in parameterString, idx);
 
             return true;
-            ///////////////////////////////
+///////////////////////////////
 Failed:
             parameter = default;
             return false;
