@@ -41,7 +41,6 @@ namespace FolkerKinzel.Uris.Intls
             return builder;
         }
 
-
         internal static bool ContainsAny(this ReadOnlySpan<char> span, ReadOnlySpan<char> chars)
         {
             for (int i = 0; i < chars.Length; i++)
@@ -54,5 +53,38 @@ namespace FolkerKinzel.Uris.Intls
 
             return false;
         }
+
+        internal static int GetTrimmedLength(this ReadOnlySpan<char> span)
+        {
+            int length = span.Length;
+
+            for (int i = length-1; i >= 0; i--)
+            {
+                if (char.IsWhiteSpace(span[i]))
+                {
+                    length--;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            return length;
+        }
+
+
+        internal static int GetTrimmedStart(this ReadOnlySpan<char> span)
+        {
+            for (int i = 0; i < span.Length; i++)
+            {
+                if (!char.IsWhiteSpace(span[i]))
+                {
+                    return i;
+                }
+            }
+
+            return span.Length;
+        }
+
     }
 }

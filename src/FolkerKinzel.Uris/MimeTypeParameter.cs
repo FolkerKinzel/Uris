@@ -91,14 +91,14 @@ namespace FolkerKinzel.Uris
             Debug.Assert(!char.IsWhiteSpace(parameterString.Span[parameterString.Length - 1]));
             Debug.Assert(parameterString.Span[parameterString.Length - 1] != '"');
 
-            int keyLength = span.GetTrimmedLength(keyValueSeparatorIndex);
+            int keyLength = span.Slice(0, keyValueSeparatorIndex).GetTrimmedLength();
 
             if (keyLength == 0)
             {
                 goto Failed;
             }
 
-            int valueStart = span.GetTrimmedStart(keyValueSeparatorIndex + 1);
+            int valueStart = span.Slice(keyValueSeparatorIndex + 1).GetTrimmedStart();
 
             if(valueStart == span.Length)
             {

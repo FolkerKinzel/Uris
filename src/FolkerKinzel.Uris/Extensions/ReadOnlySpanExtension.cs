@@ -28,31 +28,6 @@ namespace FolkerKinzel.Uris
             => span.StartsWith(DataUrl.PROTOCOL.AsSpan(), StringComparison.OrdinalIgnoreCase);
 
 
-        internal static int GetTrimmedLength(this ReadOnlySpan<char> span, int unTrimmedLength)
-            {
-                for (int i = 0; i < unTrimmedLength; i++)
-                {
-                    if (char.IsWhiteSpace(span[i]))
-                    {
-                        return i;
-                    }
-                }
-                return unTrimmedLength;
-            }
-
-            internal static int GetTrimmedStart(this ReadOnlySpan<char> span, int unTrimmedStart)
-            {
-                for (int i = unTrimmedStart; i < span.Length; i++)
-                {
-                    if(!char.IsWhiteSpace(span[i]))
-                    {
-                        return i;
-                    }
-                }
-
-                return span.Length;
-            }
-
 
     }
 }

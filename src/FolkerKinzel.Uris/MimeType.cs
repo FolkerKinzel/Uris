@@ -356,14 +356,14 @@ namespace FolkerKinzel.Uris
 
             ReadOnlyMemory<char> parameters = parameterStartIndex < 0 ? ReadOnlyMemory<char>.Empty : value.Slice(parameterStartIndex + 1);
 
-            int topLevelMediaTypeLength = mediaPartSpan.GetTrimmedLength(mediaTypeSeparatorIndex);
+            int topLevelMediaTypeLength = mediaPartSpan.Slice(0, mediaTypeSeparatorIndex).GetTrimmedLength();
 
             if(topLevelMediaTypeLength == 0)
             {
                 goto Failed;
             }
 
-            int subTypeStart = mediaPartSpan.GetTrimmedStart(mediaTypeSeparatorIndex + 1);
+            int subTypeStart = mediaPartSpan.Slice(mediaTypeSeparatorIndex + 1).GetTrimmedStart();
 
             if (subTypeStart == mediaPartSpan.Length)
             {
