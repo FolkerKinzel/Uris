@@ -51,6 +51,7 @@ namespace FolkerKinzel.Uris.Intls
 
                 foreach (MimeTypeParameter parameter in mimeType.Parameters)
                 {
+                    _ = builder.Append(';');
                     parameter.AppendTo(builder);
                 }
 

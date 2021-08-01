@@ -50,6 +50,16 @@ namespace FolkerKinzel.Uris.Tests
             Assert.AreEqual("text/plain;charset=iso-8859-1", inetMedia.ToString());
         }
 
+        [TestMethod]
+        public void CloneTest1()
+        {
+            Assert.IsTrue(MimeType.TryParse("TEXT/PLAIN ; CHARSET=ISO-8859-1", out MimeType inetMedia));
+            ICloneable cloneable = inetMedia.Parameters.First();
+            object o = cloneable.Clone();
+            Assert.AreEqual(cloneable, o);
+            Assert.AreEqual("charset=iso-8859-1", o.ToString());
+        }
+
         [DataTestMethod]
         [DataRow("text/plain; charset=iso-8859-1", true, 1)]
         [DataRow("text / plain; charset=iso-8859-1;;", true, 1)]

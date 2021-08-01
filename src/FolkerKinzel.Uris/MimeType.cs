@@ -15,7 +15,21 @@ namespace FolkerKinzel.Uris
     /// <summary>
     /// Represents a MIME type ("Internet Media Type") according to RFC 2045 and RFC 2046.
     /// </summary>
-    public readonly struct MimeType : IEquatable<MimeType>
+    /// <remarks>
+    /// <note type="tip">
+    /// <para>
+    /// <see cref="MimeType"/> is a quite large structure. Pass it to other methods by reference (in, ref or out parameters in C#)!
+    /// </para>
+    /// <para>
+    /// If you intend to hold a <see cref="MimeType"/> for a long time in memory and if this <see cref="MimeType"/> is parsed
+    /// from a <see cref="ReadOnlyMemory{T}">ReadOnlyMemory&lt;Char&gt;</see> that comes from a very long <see cref="string"/>, 
+    /// keep in mind, that the <see cref="MimeType"/> holds a reference to that <see cref="string"/>. Consider in this case to make
+    /// a copy of the <see cref="MimeType"/> structure with <see cref="MimeType.Clone"/>: The copy is built on a separate <see cref="string"/>,
+    /// which is only as long as needed.
+    /// </para>
+    /// </note>
+    /// </remarks>
+    public readonly struct MimeType : IEquatable<MimeType>, ICloneable
     {
         private readonly ReadOnlyMemory<char> _mimeTypeString;
 
@@ -63,6 +77,24 @@ namespace FolkerKinzel.Uris
         #endregion
 
         #region Methods
+
+        #region ICloneable
+
+        object ICloneable.Clone() => throw new NotImplementedException();
+
+        public MimeType Clone()
+        {
+            if(this.IsEmpty)
+            {
+                return default;
+            }
+
+            ReadOnlyMemory<char> memory = ToString().AsMemory();
+            _ = TryParse(ref memory, out MimeType mimeType);
+
+            return mimeType;
+        }
+        #endregion
 
         /// <summary>
         /// Determines whether the <see cref="TopLevelMediaType"/> of this instance equals "text".
@@ -136,6 +168,7 @@ namespace FolkerKinzel.Uris
             {
                 foreach (MimeTypeParameter parameter in Parameters)
                 {
+                    _ = builder.Append(';');
                     parameter.AppendTo(builder);
                 }
             }
@@ -524,7 +557,9 @@ Failed:
             return -1;
         }
 
+
         #endregion
 
+        
     }
 }

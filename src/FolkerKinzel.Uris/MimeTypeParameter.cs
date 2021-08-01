@@ -13,7 +13,21 @@ namespace FolkerKinzel.Uris
     /// <summary>
     /// Encapsulates a parameter of a <see cref="MimeType"/>.
     /// </summary>
-    public readonly struct MimeTypeParameter : IEquatable<MimeTypeParameter>
+    /// <remarks>
+    /// <note type="tip">
+    /// <para>
+    /// <see cref="MimeTypeParameter"/> is a quite large structure. Pass it to other methods by reference (in, ref or out parameters in C#)!
+    /// </para>
+    /// <para>
+    /// If you intend to hold a <see cref="MimeTypeParameter"/> for a long time in memory and if this <see cref="MimeTypeParameter"/> is parsed
+    /// from a <see cref="ReadOnlyMemory{T}">ReadOnlyMemory&lt;Char&gt;</see> that comes from a very long <see cref="string"/>, 
+    /// keep in mind, that the <see cref="MimeTypeParameter"/> holds a reference to that <see cref="string"/>. Consider in this case to make
+    /// a copy of the <see cref="MimeType"/> structure with <see cref="MimeTypeParameter.Clone"/>: The copy is built on a separate <see cref="string"/>,
+    /// which is only as long as needed.
+    /// </para>
+    /// </note>
+    /// </remarks>
+    public readonly struct MimeTypeParameter : IEquatable<MimeTypeParameter>, ICloneable
     {
         internal const int StringLength = 32;
 
@@ -78,6 +92,24 @@ namespace FolkerKinzel.Uris
         public bool IsAsciiCharsetParameter()
             => IsCharsetParameter()
                && Value.Equals(ASCII_CHARSET_VALUE.AsSpan(), StringComparison.OrdinalIgnoreCase);
+
+        
+        #region ICloneable
+        object ICloneable.Clone() => Clone();
+
+        public MimeTypeParameter Clone()
+        {
+            if(IsEmpty)
+            {
+                return default;
+            }
+
+            ReadOnlyMemory<char> memory = ToString().AsMemory();
+            _ = TryParse(ref memory, out MimeTypeParameter mimeTypeParameter);
+            return mimeTypeParameter;
+        }
+
+        #endregion
 
 
         internal static bool TryParse(ref ReadOnlyMemory<char> value, out MimeTypeParameter parameter)
@@ -254,16 +286,19 @@ Failed:
                 return;
             }
 
-            _ = builder.EnsureCapacity(builder.Length + StringLength);
-
             // RFC 2045 Section 5.1 "tspecials"
             ReadOnlySpan<char> maskChars = stackalloc char[] { ' ', '(', ')', '<', '>', '@', ',', ';', ':', '\\', '\"', '/', '[', '>', ']', '?', '=' };
 
+            ReadOnlySpan<char> valueSpan = Value;
+            ReadOnlySpan<char> keySpan = Key;
+
+            bool mask = valueSpan.ContainsAny(maskChars);
+
+            int neededCapacity = mask ? 2 + valueSpan.Length + keySpan.Length : valueSpan.Length + keySpan.Length;
+            _ = builder.EnsureCapacity(builder.Length + neededCapacity);
+
             int keyStart = builder.Length;
-            _ = builder.Append(';').Append(Key).ToLowerInvariant(keyStart + 1).Append('=');
-
-
-            bool mask = Value.ContainsAny(maskChars);
+            _ = builder.Append(Key).ToLowerInvariant(keyStart).Append('=');
 
             if (mask)
             {
@@ -280,5 +315,6 @@ Failed:
                 _ = builder.Append('\"');
             }
         }
+
     }
 }
