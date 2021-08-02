@@ -29,7 +29,7 @@ namespace FolkerKinzel.Uris
             // als Base64 codierter Text:
             if (DataEncoding == DataEncoding.Base64)
             {
-                static bool Predicate(MimeTypeParameter p) => p.IsCharsetParameter();
+                static bool Predicate(MimeTypeParameter p) => p.IsCharsetParameter;
 
                 MimeTypeParameter charsetParameter = MimeType.Parameters.FirstOrDefault(Predicate);
 

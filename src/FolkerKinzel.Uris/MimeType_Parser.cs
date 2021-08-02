@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FolkerKinzel.Strings.Polyfills;
 using FolkerKinzel.Uris.Intls;
 using FolkerKinzel.Uris.Properties;
+
+#if NETSTANDARD2_0 || NETSTANDARD2_1 || NET461
+using FolkerKinzel.Strings.Polyfills;
+#endif
 
 namespace FolkerKinzel.Uris
 {
