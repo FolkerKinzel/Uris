@@ -50,7 +50,9 @@
     </DocumentationSources>
     <NamespaceSummaries>
       <NamespaceSummaryItem name="FolkerKinzel.Uris" isDocumented="True">Structures and Classes that support the work with URIs and Internet Media Types ("MIME Types").</NamespaceSummaryItem>
-<NamespaceSummaryItem name="FolkerKinzel.Uris.Extensions" isDocumented="True">Contains static classes, which provide extension methods for String, Uri and ReadOnlySpan&lt;Char&gt;.</NamespaceSummaryItem></NamespaceSummaries>
+      <NamespaceSummaryItem name="FolkerKinzel.Uris.Extensions" isDocumented="True">Contains static classes, which provide extension methods for String, Uri and ReadOnlySpan&lt;Char&gt;.</NamespaceSummaryItem>
+    </NamespaceSummaries>
+    <VisibleItems>Attributes, ExplicitInterfaceImplementations, InheritedMembers, InheritedFrameworkMembers, Protected, ProtectedInternalAsProtected, NonBrowsable</VisibleItems>
   </PropertyGroup>
   <!-- There are no properties for these groups.  AnyCPU needs to appear in order for Visual Studio to perform
 			 the build.  The others are optional common platform types that may appear. -->

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using FolkerKinzel.Uris.Extensions;
 using FolkerKinzel.Uris.Intls;
 using FolkerKinzel.Uris.Properties;
 
@@ -27,16 +28,16 @@ namespace FolkerKinzel.Uris
     /// from a <see cref="ReadOnlyMemory{T}">ReadOnlyMemory&lt;Char&gt;</see> that comes from a very long <see cref="string"/>, 
     /// keep in mind, that the <see cref="DataUrl"/> holds a reference to that <see cref="string"/>. Consider in this case to make
     /// a copy of the <see cref="DataUrl"/> structure with <see cref="DataUrl.Clone"/>: The copy is built on a separate <see cref="string"/>,
-    /// which is only as long as needed.
+    /// which is case-normalized and only as long as needed.
     /// </para>
     /// </note>
     /// </remarks>
     public readonly struct DataUrl : IEquatable<DataUrl>, ICloneable
     {
-        #region private const
+        #region const
+        internal const string PROTOCOL = "data:";
 
         private const string BASE64 = ";base64";
-        internal const string PROTOCOL = "data:";
         private const string DEFAULT_MEDIA_TYPE = "text/plain";
 
         #endregion
@@ -162,6 +163,8 @@ namespace FolkerKinzel.Uris
         /// </summary>
         /// <param name="other">The <see cref="DataUrl"/> instance to compare with.</param>
         /// <returns><c>true</c> if this the value of this instance is equal to that of <paramref name="other"/>; <c>false</c>, otherwise.</returns>
+        /// <remarks>This is the most performant overload of the Equals methods but unfortunately it's not CLS compliant.
+        /// Use it if you can.</remarks>
         [CLSCompliant(false)]
         public bool Equals(in DataUrl other)
             => this.IsEmpty || other.IsEmpty
@@ -209,8 +212,27 @@ namespace FolkerKinzel.Uris
         
         #region ICloneable
 
+        /// <inheritdoc/>
+        /// <remarks>
+        /// If you intend to hold a <see cref="DataUrl"/> for a long time in memory and if this <see cref="DataUrl"/> is parsed
+        /// from a <see cref="ReadOnlyMemory{T}">ReadOnlyMemory&lt;Char&gt;</see> that comes from a very long <see cref="string"/>, 
+        /// keep in mind, that the <see cref="DataUrl"/> holds a reference to that <see cref="string"/>. Consider in this case to make
+        /// a copy of the <see cref="DataUrl"/> structure: The copy is built on a separate <see cref="string"/>,
+        /// which is case-normalized and only as long as needed.
+        /// <note type="tip">
+        /// Use the instance method <see cref="DataUrl.Clone"/> if you can to avoid the costs of boxing.
+        /// </note>
+        /// </remarks>
         object ICloneable.Clone() => Clone();
 
+        /// <summary>
+        /// Creates a new <see cref="DataUrl"/> that is a copy of the current instance.
+        /// </summary>
+        /// <returns>A new <see cref="DataUrl"/>, which is a copy of this instance.</returns>
+        /// <remarks>
+        /// The copy is built on a separate <see cref="string"/>,
+        /// which is case-normalized and only as long as needed.
+        /// </remarks>
         public DataUrl Clone()
         {
             if (IsEmpty)
@@ -256,6 +278,13 @@ namespace FolkerKinzel.Uris
             return TryParse(in memory, out dataUrl);
         }
 
+        /// <summary>
+        /// Tries to parse a <see cref="ReadOnlyMemory{T}">ReadOnlyMemory&lt;Char&gt;</see> as <see cref="DataUrl"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="ReadOnlyMemory{T}">ReadOnlyMemory&lt;Char&gt;</see> to parse.</param>
+        /// <param name="dataUrl">If the method returns <c>true</c> the parameter contains a <see cref="DataUrl"/> structure that provides the contents
+        /// of value. The parameter is passed uninitialized.</param>
+        /// <returns><c>true</c> if <paramref name="value"/> could be parsed as <see cref="DataUrl"/>, <c>false</c> otherwise.</returns>
         public static bool TryParse(in ReadOnlyMemory<char> value, out DataUrl dataUrl)
         {
             ReadOnlySpan<char> span = value.Span;

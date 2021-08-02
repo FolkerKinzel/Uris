@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using FolkerKinzel.Strings.Polyfills;
 #endif
 
-namespace FolkerKinzel.Uris
+namespace FolkerKinzel.Uris.Extensions
 {
     /// <summary>
     /// Extension methods for the <see cref="string"/> class.

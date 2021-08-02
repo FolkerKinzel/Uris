@@ -25,7 +25,7 @@ namespace FolkerKinzel.Uris
     /// from a <see cref="ReadOnlyMemory{T}">ReadOnlyMemory&lt;Char&gt;</see> that comes from a very long <see cref="string"/>, 
     /// keep in mind, that the <see cref="MimeType"/> holds a reference to that <see cref="string"/>. Consider in this case to make
     /// a copy of the <see cref="MimeType"/> structure with <see cref="MimeType.Clone"/>: The copy is built on a separate <see cref="string"/>,
-    /// which is only as long as needed.
+    /// which is case-normalized and only as long as needed.
     /// </para>
     /// </note>
     /// </remarks>
@@ -80,8 +80,27 @@ namespace FolkerKinzel.Uris
 
         #region ICloneable
 
+        /// <inheritdoc/>
+        /// <remarks>
+        /// If you intend to hold a <see cref="MimeType"/> for a long time in memory and if this <see cref="MimeType"/> is parsed
+        /// from a <see cref="ReadOnlyMemory{T}">ReadOnlyMemory&lt;Char&gt;</see> that comes from a very long <see cref="string"/>, 
+        /// keep in mind, that the <see cref="MimeType"/> holds a reference to that <see cref="string"/>. Consider in this case to make
+        /// a copy of the <see cref="MimeType"/> structure: The copy is built on a separate <see cref="string"/>,
+        /// which is case-normalized and only as long as needed.
+        /// <note type="tip">
+        /// Use the instance method <see cref="MimeType.Clone"/> if you can to avoid the costs of boxing.
+        /// </note>
+        /// </remarks>
         object ICloneable.Clone() => throw new NotImplementedException();
 
+        /// <summary>
+        /// Creates a new <see cref="MimeType"/> that is a copy of the current instance.
+        /// </summary>
+        /// <returns>A new <see cref="MimeType"/>, which is a copy of this instance.</returns>
+        /// <remarks>
+        /// The copy is built on a separate <see cref="string"/>,
+        /// which is case-normalized and only as long as needed.
+        /// </remarks>
         public MimeType Clone()
         {
             if(this.IsEmpty)
@@ -130,7 +149,8 @@ namespace FolkerKinzel.Uris
         public override string ToString() => ToString(true);
 
         /// <summary>
-        /// Creates a <see cref="string"/> representation of the instance.
+        /// Creates a <see cref="string"/> representation of the instance and allows to determine, whether or not to include the
+        /// <see cref="Parameters"/>.
         /// </summary>
         /// <param name="includeParameters">Pass <c>true</c> to include the <see cref="Parameters"/>; <c>false</c>, otherwise.</param>
         /// <returns>A <see cref="string"/> representation of the instance.</returns>
@@ -239,6 +259,8 @@ namespace FolkerKinzel.Uris
         /// </summary>
         /// <param name="other">The <see cref="MimeType"/> instance to compare with.</param>
         /// <returns><c>true</c> if this the value of this instance is equal to that of <paramref name="other"/>; <c>false</c>, otherwise.</returns>
+        /// <remarks>This is the most performant overload of the Equals methods but unfortunately it's not CLS compliant.
+        /// Use it if you can.</remarks>
         [CLSCompliant(false)]
         public bool Equals(in MimeType other) => Equals(in other, false);
 
