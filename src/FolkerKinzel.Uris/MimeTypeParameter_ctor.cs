@@ -27,22 +27,8 @@ namespace FolkerKinzel.Uris
     /// </para>
     /// </note>
     /// </remarks>
-    public readonly struct MimeTypeParameter : IEquatable<MimeTypeParameter>, ICloneable
+    public readonly partial struct MimeTypeParameter : IEquatable<MimeTypeParameter>, ICloneable
     {
-        internal const int StringLength = 32;
-
-        private const string CHARSET_KEY = "charset";
-        private const string ASCII_CHARSET_VALUE = "us-ascii";
-
-        private const int KEY_LENGTH_SHIFT = 16;
-
-        private readonly ReadOnlyMemory<char> _parameterString;
-
-        // Stores all indexes in one int to let the struct not grow too large:
-        // |        Key Length          |        Value Start       |
-        // |    Byte 4    |    Byte 3   |    Byte 2   |   Byte 1   |
-        private readonly int _idx;
-
         /// <summary>
         /// Initializes a new <see cref="MimeTypeParameter"/> structure.
         /// </summary>
@@ -53,83 +39,6 @@ namespace FolkerKinzel.Uris
             this._parameterString = parameterString;
             this._idx = idx;
         }
-
-        /// <summary>
-        /// The <see cref="MimeTypeParameter"/>'s key.
-        /// </summary>
-        public ReadOnlySpan<char> Key => _parameterString.Span.Slice(0, (_idx >> KEY_LENGTH_SHIFT) & 0xFFFF);
-
-        /// <summary>
-        /// The <see cref="MimeTypeParameter"/>'s value.
-        /// </summary>
-        public ReadOnlySpan<char> Value => _parameterString.Span.Slice(_idx & 0xFFFF);
-
-        /// <summary>
-        /// <c>true</c> indicates that the instance contains no data.
-        /// </summary>
-        public bool IsEmpty => Key.IsEmpty;
-
-        /// <summary>
-        /// Returns an empty <see cref="MimeTypeParameter"/> structure.
-        /// </summary>
-        public static MimeTypeParameter Empty => default;
-
-
-        /// <summary>
-        /// Determines whether the <see cref="MimeTypeParameter"/> has the <see cref="Key"/> "charset". The comparison is case-insensitive.
-        /// </summary>
-        /// <returns><c>true</c> if <see cref="Key"/> equals "charset"; otherwise, <c>false</c>.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
-        public bool IsCharsetParameter()
-            => Key.Equals(CHARSET_KEY.AsSpan(), StringComparison.OrdinalIgnoreCase);
-
-
-        /// <summary>
-        /// Determines whether this instance equals "charset=us-ascii". The comparison is case-insensitive.
-        /// </summary>
-        /// <returns><c>true</c> if this instance equals "charset=us-ascii"; otherwise, <c>false</c>.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
-        public bool IsAsciiCharsetParameter()
-            => IsCharsetParameter()
-               && Value.Equals(ASCII_CHARSET_VALUE.AsSpan(), StringComparison.OrdinalIgnoreCase);
-
-
-        #region ICloneable
-        /// <inheritdoc/>
-        /// <remarks>
-        /// If you intend to hold a <see cref="MimeTypeParameter"/> for a long time in memory and if this <see cref="MimeTypeParameter"/> is parsed
-        /// from a <see cref="ReadOnlyMemory{T}">ReadOnlyMemory&lt;Char&gt;</see> that comes from a very long <see cref="string"/>, 
-        /// keep in mind, that the <see cref="MimeTypeParameter"/> holds a reference to that <see cref="string"/>. Consider in this case to make
-        /// a copy of the <see cref="MimeTypeParameter"/> structure: The copy is built on a separate <see cref="string"/>,
-        /// which is case-normalized and only as long as needed.
-        /// <note type="tip">
-        /// Use the instance method <see cref="MimeTypeParameter.Clone"/> if you can to avoid the costs of boxing.
-        /// </note>
-        /// </remarks>
-        object ICloneable.Clone() => Clone();
-
-        /// <summary>
-        /// Creates a new <see cref="MimeTypeParameter"/> that is a copy of the current instance.
-        /// </summary>
-        /// <returns>A new <see cref="MimeTypeParameter"/>, which is a copy of this instance.</returns>
-        /// <remarks>
-        /// The copy is built on a separate <see cref="string"/>,
-        /// which is case-normalized and only as long as needed.
-        /// </remarks>
-        public MimeTypeParameter Clone()
-        {
-            if (IsEmpty)
-            {
-                return default;
-            }
-
-            ReadOnlyMemory<char> memory = ToString().AsMemory();
-            _ = TryParse(ref memory, out MimeTypeParameter mimeTypeParameter);
-            return mimeTypeParameter;
-        }
-
-        #endregion
-
 
         internal static bool TryParse(ref ReadOnlyMemory<char> value, out MimeTypeParameter parameter)
         {
@@ -219,7 +128,7 @@ Failed:
         public bool Equals(in MimeTypeParameter other)
             => !Key.Equals(other.Key, StringComparison.OrdinalIgnoreCase)
                 ? false
-                : IsCharsetParameter()
+                : IsCharsetParameter
                     ? Value.Equals(other.Value, StringComparison.OrdinalIgnoreCase)
                     : Value.Equals(other.Value, StringComparison.Ordinal);
 
@@ -249,7 +158,7 @@ Failed:
 
             ReadOnlySpan<char> valueSpan = Value;
 
-            if (IsCharsetParameter())
+            if (IsCharsetParameter)
             {
                 for (int j = 0; j < valueSpan.Length; j++)
                 {
@@ -327,7 +236,7 @@ Failed:
             }
 
             int valueStart = builder.Length;
-            _ = IsCharsetParameter()
+            _ = IsCharsetParameter
                 ? builder.Append(Value).ToLowerInvariant(valueStart)
                 : builder.Append(Value);
 

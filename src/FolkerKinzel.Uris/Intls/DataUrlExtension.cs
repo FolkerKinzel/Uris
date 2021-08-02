@@ -40,7 +40,7 @@ namespace FolkerKinzel.Uris.Intls
                 return builder;
             }
 
-            if (mimeType.IsTextPlain())
+            if (mimeType.IsTextPlain)
             {
                 MimeType defaultMediaType = DataUrl.DefaultMediaType();
 

@@ -30,7 +30,7 @@ namespace FolkerKinzel.Uris
         /// <summary>
         /// <c>true</c> if <see cref="EmbeddedData"/> contains text.
         /// </summary>
-        public bool ContainsText => this.MimeType.IsText();
+        public bool ContainsText => this.MimeType.IsText;
 
         /// <summary>
         /// <c>true</c> if <see cref="EmbeddedData"/> contains binary data.
