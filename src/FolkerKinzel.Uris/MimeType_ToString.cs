@@ -17,17 +17,17 @@ namespace FolkerKinzel.Uris
         #region ToString
 
         /// <summary>
-        /// Creates a complete <see cref="string"/> representation of the instance that includes the <see cref="Parameters"/>.
+        /// Creates a complete <see cref="string"/> representation of the instance (according to RFC 2045 and RFC 2046) that includes the <see cref="Parameters"/>.
         /// </summary>
-        /// <returns>A complete <see cref="string"/> representation of the instance that includes the <see cref="Parameters"/>.</returns>
+        /// <returns>A complete <see cref="string"/> representation of the instance (according to RFC 2045 and RFC 2046) that includes the <see cref="Parameters"/>.</returns>
         public override string ToString() => ToString(true);
 
         /// <summary>
-        /// Creates a <see cref="string"/> representation of the instance and allows to determine, whether or not to include the
+        /// Creates a <see cref="string"/> representation of the instance according to RFC 2045 and RFC 2046, and allows to determine, whether or not to include the
         /// <see cref="Parameters"/>.
         /// </summary>
         /// <param name="includeParameters">Pass <c>true</c> to include the <see cref="Parameters"/>; <c>false</c>, otherwise.</param>
-        /// <returns>A <see cref="string"/> representation of the instance.</returns>
+        /// <returns>A <see cref="string"/> representation of the instance according to RFC 2045 and RFC 2046.</returns>
         public string ToString(bool includeParameters)
         {
             var sb = new StringBuilder(StringLength);
@@ -36,7 +36,7 @@ namespace FolkerKinzel.Uris
         }
 
         /// <summary>
-        /// Appends a <see cref="string"/> representation of this instance to a <see cref="StringBuilder"/>.
+        /// Appends a <see cref="string"/> representation of this instance according to RFC 2045 and RFC 2046 to a <see cref="StringBuilder"/>.
         /// </summary>
         /// <param name="builder">The <see cref="StringBuilder"/>.</param>
         /// <param name="includeParameters">Pass <c>true</c> to include the <see cref="Parameters"/>; <c>false</c>, otherwise.</param>
@@ -63,7 +63,7 @@ namespace FolkerKinzel.Uris
                 foreach (MimeTypeParameter parameter in Parameters)
                 {
                     _ = builder.Append(';');
-                    parameter.AppendTo(builder);
+                    _ = parameter.AppendTo(builder);
                 }
             }
 

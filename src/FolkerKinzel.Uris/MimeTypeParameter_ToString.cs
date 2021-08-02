@@ -20,17 +20,16 @@ namespace FolkerKinzel.Uris
         public override string ToString()
         {
             var sb = new StringBuilder(StringLength);
-            AppendTo(sb);
-            return sb.ToString();
+            return AppendTo(sb).ToString();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
-        internal void AppendTo(StringBuilder builder)
+        internal StringBuilder AppendTo(StringBuilder builder)
         {
             // Standard ctor
             if (IsEmpty)
             {
-                return;
+                return builder;
             }
 
             // RFC 2045 Section 5.1 "tspecials"
@@ -61,6 +60,9 @@ namespace FolkerKinzel.Uris
             {
                 _ = builder.Append('\"');
             }
+
+
+            return builder;
         }
 
     }
