@@ -72,16 +72,16 @@ namespace FolkerKinzel.Uris
             value = value.TrimStart();
             ReadOnlySpan<char> span = value.Span;
 
-            int parameterStartIndex = span.IndexOf(';');
+            int parameterStartIndex = span.IndexOf(';') + 1;
 
             if(parameterStartIndex > byte.MaxValue) // string too long
             {
                 goto Failed;
             }
-            else if (parameterStartIndex < 0) // No parameters.
-            {
-                parameterStartIndex = 0;
-            }
+            //else if (parameterStartIndex < 0) // No parameters.
+            //{
+            //    parameterStartIndex = 0;
+            //}
 
 
             ReadOnlySpan<char> mediaPartSpan = parameterStartIndex < 1 ? span : span.Slice(0, parameterStartIndex);
@@ -109,7 +109,7 @@ namespace FolkerKinzel.Uris
 
             int subTypeLength = mediaPartSpan.Slice(subTypeStart).GetTrimmedLength();
 
-            int idx = topLevelMediaTypeLength << TOP_LEVEL_MEDIA_TYPE_LENGTH_SHIFT;
+            int idx = topLevelMediaTypeLength << MEDIA_TYPE_LENGTH_SHIFT;
             idx |= subTypeStart << SUB_TYPE_START_SHIFT;
             idx |= subTypeLength << SUB_TYPE_LENGTH_SHIFT;
             idx |= parameterStartIndex;

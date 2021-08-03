@@ -22,7 +22,7 @@ namespace FolkerKinzel.Uris
         /// <summary>
         /// Top-Level Media Type. (The left part of a MIME-Type.)
         /// </summary>
-        public ReadOnlySpan<char> MediaType => _mimeTypeString.Span.Slice(0, (_idx >> TOP_LEVEL_MEDIA_TYPE_LENGTH_SHIFT) & 0xFF);
+        public ReadOnlySpan<char> MediaType => _mimeTypeString.Span.Slice(0, (_idx >> MEDIA_TYPE_LENGTH_SHIFT) & 0xFF);
 
         /// <summary>
         /// Sub Type (The right part of a MIME-Type.)

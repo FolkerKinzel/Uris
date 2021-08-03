@@ -33,11 +33,13 @@ namespace FolkerKinzel.Uris
         /// Initializes a new <see cref="MimeTypeParameter"/> structure.
         /// </summary>
         /// <param name="parameterString">The trimmed Parameter.</param>
-        /// <param name="idx">All indexes in one Int32.</param>
-        private MimeTypeParameter(in ReadOnlyMemory<char> parameterString, int idx)
+        /// <param name="idx1">First Int32 that stores indexes.</param>
+        /// <param name="idx2">Second Int32 that stores indexes.</param>
+        private MimeTypeParameter(in ReadOnlyMemory<char> parameterString, int idx1, int idx2)
         {
             this._parameterString = parameterString;
-            this._idx = idx;
+            this._idx1 = idx1;
+            this._idx2 = idx2;
         }
 
 

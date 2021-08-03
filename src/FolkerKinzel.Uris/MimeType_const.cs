@@ -13,7 +13,7 @@ namespace FolkerKinzel.Uris
 
         private const int SUB_TYPE_LENGTH_SHIFT = 8;
         private const int SUB_TYPE_START_SHIFT = 16;
-        private const int TOP_LEVEL_MEDIA_TYPE_LENGTH_SHIFT = 24;
+        private const int MEDIA_TYPE_LENGTH_SHIFT = 24;
 
         #endregion
     }

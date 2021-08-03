@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using FolkerKinzel.Uris.Intls;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -322,5 +323,64 @@ namespace FolkerKinzel.Uris.Tests
             Assert.IsTrue(DataUrl.TryParse(output, out DataUrl dataUrl2));
             Assert.AreEqual(dataUrl, dataUrl2);
         }
+
+
+        [TestMethod]
+        public void EqualsTest1()
+        {
+            const string input = "Märchenbücher";
+            string urlStr1 = DataUrl.FromText(input);
+
+            const string encodingName = "iso-8859-1";
+            Encoding encoding = TextEncodingConverter.GetEncoding(encodingName);
+
+            byte[]? bytes = encoding.GetBytes(input);
+
+            var mime = MimeType.Parse($"text/plain; charset={encodingName}");
+            string urlStr2 = DataUrl.FromBytes(bytes, in mime);
+
+            var dataUrl1 = DataUrl.Parse(urlStr1);
+            var dataUrl2 = DataUrl.Parse(urlStr2);
+
+            Assert.IsTrue(dataUrl1 == dataUrl2);
+            Assert.IsFalse(dataUrl1 != dataUrl2);
+            Assert.AreEqual(dataUrl1.GetHashCode(), dataUrl2.GetHashCode());
+
+            Assert.IsTrue(dataUrl1.Equals(dataUrl2));
+
+            object? o1 = dataUrl1;
+            object? o2 = dataUrl2;
+
+            //Assert.IsTrue(dataUrl1 == o2);
+            //Assert.IsFalse(o1 != o2);
+            Assert.AreEqual(o1.GetHashCode(), o2.GetHashCode());
+
+        }
+
+
+        [TestMethod]
+        public void EqualsTest2()
+        {
+            string input = "xyz";
+            string urlStr1 = $"data:application/octet-stream,{input}";
+            string urlStr2 = $"data:application/octet-stream;base64,{Convert.ToBase64String(Encoding.ASCII.GetBytes(input))}";
+
+            var dataUrl1 = DataUrl.Parse(urlStr1);
+            var dataUrl2 = DataUrl.Parse(urlStr2);
+
+            Assert.IsTrue(dataUrl1 == dataUrl2);
+        }
+
+        [TestMethod]
+        public void CloneTest1()
+        {
+            ICloneable dataUrl1 = DataUrl.Parse("data:,xyz");
+
+            object dataUrl2 = dataUrl1.Clone();
+
+            Assert.IsTrue(((DataUrl)dataUrl1) == (dataUrl2 as DataUrl?));
+
+        }
+
     }
 }

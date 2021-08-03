@@ -38,7 +38,7 @@ namespace FolkerKinzel.Uris
             }
 
             ReadOnlyMemory<char> memory = ToString().AsMemory();
-            _ = TryParse(ref memory, out MimeTypeParameter mimeTypeParameter);
+            _ = TryParse(ref memory, out MimeTypeParameter mimeTypeParameter, out bool _);
             return mimeTypeParameter;
         }
 

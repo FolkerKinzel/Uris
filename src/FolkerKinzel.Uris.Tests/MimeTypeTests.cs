@@ -155,7 +155,24 @@ namespace FolkerKinzel.Uris.Tests
             Assert.AreNotEqual(media1.GetHashCode(), media2.GetHashCode());
         }
 
+        [TestMethod]
+        public void ParseParametersTest1()
+        {
+            string input = "application/x-stuff;" + Environment.NewLine +
+                            "title*1*=us-ascii'en'This%20is%20even%20more%20;" + Environment.NewLine +
+                            "title*2*=%2A%2A%2Afun%2A%2A%2A%20;" + Environment.NewLine +
+                            "title*3=\"isn't it!\"";
 
-        
+            Assert.IsTrue(MimeType.TryParse(input, out MimeType mimeType));
+            Assert.AreEqual(1, mimeType.Parameters.Count());
+            MimeTypeParameter param = mimeType.Parameters.First();
+
+            Assert.AreEqual("title", param.Key.ToString());
+            Assert.AreEqual("us-ascii", param.Charset.ToString());
+            Assert.AreEqual("en", param.Language.ToString());
+
+        }
+
+
     }
 }

@@ -6,7 +6,7 @@ namespace FolkerKinzel.Uris.Intls
     {
         internal static Encoding GetEncoding(string? s)
         {
-            if (s is null)
+            if (string.IsNullOrEmpty(s))
             {
                 return Encoding.UTF8;
             }

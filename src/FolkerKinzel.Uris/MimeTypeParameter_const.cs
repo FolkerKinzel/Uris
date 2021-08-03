@@ -12,6 +12,7 @@ namespace FolkerKinzel.Uris
 
         private const string CHARSET_KEY = "charset";
         private const string ASCII_CHARSET_VALUE = "us-ascii";
-        private const int KEY_LENGTH_SHIFT = 16;
+        
+        
     }
 }
