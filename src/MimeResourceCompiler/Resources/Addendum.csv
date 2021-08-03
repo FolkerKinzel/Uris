@@ -301,7 +301,20 @@ audio/x-scpls pls
 application/vnd.apple.mpegurl m3u
 text/markdown md
 
-
-
-
-
+# https://mimesniff.spec.whatwg.org/
+text/javascript js
+application/javascript js
+application/ecmascript js
+application/x-ecmascript js
+application/x-javascript js
+text/ecmascript js
+text/javascript1.0 js
+text/javascript1.1 js
+text/javascript1.2 js
+text/javascript1.3 js
+text/javascript1.4 js
+text/javascript1.5 js
+text/jscript js
+text/livescript js
+text/x-ecmascript js
+text/x-javascript js

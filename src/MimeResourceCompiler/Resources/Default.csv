@@ -10,5 +10,6 @@
 # Empty lines are allowed.
 
 text/html htm
+text/javascript js
 video/quicktime mov
 image/fits fits

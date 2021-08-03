@@ -50,7 +50,7 @@ namespace FolkerKinzel.Uris
         /// </summary>
         /// <returns><c>true</c> if this instance equals "charset=us-ascii"; otherwise, <c>false</c>.</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
-        public bool IsAsciiCharsetParameter()
+        internal bool IsAsciiCharsetParameter()
             => IsCharsetParameter
                && Value.Equals(ASCII_CHARSET_VALUE.AsSpan(), StringComparison.OrdinalIgnoreCase);
 

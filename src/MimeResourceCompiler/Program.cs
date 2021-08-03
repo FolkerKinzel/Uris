@@ -17,8 +17,8 @@ namespace MimeResourceCompiler
     /// The main part of the data used to find appropriate file type extensions for MIME types or to find an appropriate
     /// MIME type for a file type extension comes from http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types .
     /// The program loads the current version of this file from the internet each time it runs and enriches these data with the
-    /// entries from the resource file Resources\Addendum.csv. The data in this file is collected at https://wiki.selfhtml.org/wiki/MIME-Type/%C3%9Cbersicht
-    /// and from several articles in WIKIPEDIA.
+    /// entries from the resource file Resources\Addendum.csv. The data in this file is collected at https://wiki.selfhtml.org/wiki/MIME-Type/%C3%9Cbersicht ,
+    /// at https://mimesniff.spec.whatwg.org/  and from several articles in WIKIPEDIA.
     /// </para>
     /// <para>
     /// The resource file Resources\Addendum.csv allows to add entries that are missing in the Apache file. Entries in Addendum.csv don't produce

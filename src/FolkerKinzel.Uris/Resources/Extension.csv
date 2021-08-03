@@ -1,4 +1,5 @@
 text/html htm
+text/javascript js
 text/cache-manifest appcache
 text/calendar ics
 text/calendar ifb
@@ -229,7 +230,6 @@ application/ipfix ipfix
 application/java-archive jar
 application/java-serialized-object ser
 application/java-vm class
-application/javascript js
 application/json json
 application/jsonml+json jsonml
 application/lost+xml lostxml
@@ -978,4 +978,4 @@ audio/ogg opus
 audio/s3m s3m
 audio/silk sil
 audio/vnd.dece.audio uva
-audio/vnd.dece.au
+audio/vnd.dece.audio uvv
