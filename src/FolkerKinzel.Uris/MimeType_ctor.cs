@@ -13,7 +13,7 @@ using FolkerKinzel.Strings.Polyfills;
 namespace FolkerKinzel.Uris
 {
     /// <summary>
-    /// Represents a MIME type ("Internet Media Type") according to RFC 2045 and RFC 2046.
+    /// Represents a MIME type ("Internet Media Type") according to RFC 2045, RFC 2046 and RFC 2184.
     /// </summary>
     /// <remarks>
     /// <note type="tip">

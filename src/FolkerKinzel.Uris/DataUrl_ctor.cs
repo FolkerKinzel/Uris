@@ -34,10 +34,10 @@ namespace FolkerKinzel.Uris
     /// </remarks>
     public readonly partial struct DataUrl : IEquatable<DataUrl>, ICloneable
     {
-        internal DataUrl(in MimeType mediaType, DataEncoding dataEncoding, in ReadOnlyMemory<char> embeddedData)
+        internal DataUrl(in MimeType mediaType, ContentEncoding dataEncoding, in ReadOnlyMemory<char> embeddedData)
         {
             _mimeType = mediaType;
-            DataEncoding = dataEncoding;
+            Encoding = dataEncoding;
             _embeddedData = embeddedData;
         }
     }

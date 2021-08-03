@@ -27,7 +27,7 @@ namespace FolkerKinzel.Uris
         {
             var hash = new HashCode();
 
-            ReadOnlySpan<char> mediaTypeSpan = TopLevelMediaType;
+            ReadOnlySpan<char> mediaTypeSpan = MediaType;
             for (int i = 0; i < mediaTypeSpan.Length; i++)
             {
                 hash.Add(char.ToLowerInvariant(mediaTypeSpan[i]));

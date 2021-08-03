@@ -12,7 +12,7 @@ namespace FolkerKinzel.Uris
         private readonly ReadOnlyMemory<char> _mimeTypeString;
 
         // Stores all indexes in one int.
-        // | TopLevlMediaTp Length |  SubType Start  |  SubType Length  |  Parameters Start  |
+        // |     MediaTp Length    |  SubType Start  |  SubType Length  |  Parameters Start  |
         // |       Byte 4          |     Byte 3      |       Byte 2     |     Byte 1         |
         private readonly int _idx;
 
@@ -22,7 +22,7 @@ namespace FolkerKinzel.Uris
         /// <summary>
         /// Top-Level Media Type. (The left part of a MIME-Type.)
         /// </summary>
-        public ReadOnlySpan<char> TopLevelMediaType => _mimeTypeString.Span.Slice(0, (_idx >> TOP_LEVEL_MEDIA_TYPE_LENGTH_SHIFT) & 0xFF);
+        public ReadOnlySpan<char> MediaType => _mimeTypeString.Span.Slice(0, (_idx >> TOP_LEVEL_MEDIA_TYPE_LENGTH_SHIFT) & 0xFF);
 
         /// <summary>
         /// Sub Type (The right part of a MIME-Type.)
@@ -37,7 +37,7 @@ namespace FolkerKinzel.Uris
         /// <summary>
         /// <c>true</c> if the instance contains no data.
         /// </summary>
-        public bool IsEmpty => TopLevelMediaType.IsEmpty;
+        public bool IsEmpty => MediaType.IsEmpty;
 
         /// <summary>
         /// Returns a <see cref="MimeType"/> structure, which contains no data.
@@ -52,13 +52,13 @@ namespace FolkerKinzel.Uris
             => MimeCache.GetFileTypeExtension(ToString(false));
 
         /// <summary>
-        /// Determines whether the <see cref="TopLevelMediaType"/> of this instance equals "text".
+        /// Determines whether the <see cref="MediaType"/> of this instance equals "text".
         /// The comparison is case-insensitive.
         /// </summary>
-        /// <returns><c>true</c> if the <see cref="TopLevelMediaType"/> of this instance equals "text".</returns>
+        /// <returns><c>true</c> if the <see cref="MediaType"/> of this instance equals "text".</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
         internal bool IsText
-            => TopLevelMediaType.Equals("text".AsSpan(), StringComparison.OrdinalIgnoreCase);
+            => MediaType.Equals("text".AsSpan(), StringComparison.OrdinalIgnoreCase);
 
 
         /// <summary>

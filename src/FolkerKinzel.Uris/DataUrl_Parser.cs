@@ -83,13 +83,13 @@ namespace FolkerKinzel.Uris
 
             // dies ändert ggf. auch mimeTypeEndIndex
             ReadOnlySpan<char> mimePart = span.Slice(PROTOCOL.Length, mimeTypeEndIndex - PROTOCOL.Length);
-            DataEncoding dataEncoding = DataEncoding.UrlEncoded;
+            ContentEncoding dataEncoding = ContentEncoding.Url;
 
             if (HasBase64Encoding(mimePart))
             {
                 mimePart = mimePart.Slice(0, mimePart.Length - BASE64.Length);
                 mimeTypeEndIndex -= BASE64.Length;
-                dataEncoding = DataEncoding.Base64;
+                dataEncoding = ContentEncoding.Base64;
             }
 
             MimeType mediaType;

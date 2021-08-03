@@ -25,18 +25,18 @@ namespace FolkerKinzel.Uris
 
             ReadOnlySpan<char> valueSpan = Value;
 
-            if (IsCharsetParameter)
+            if (IsValueCaseSensitive)
             {
                 for (int j = 0; j < valueSpan.Length; j++)
                 {
-                    hash.Add(char.ToLowerInvariant(valueSpan[j]));
+                    hash.Add(valueSpan[j]);
                 }
             }
             else
             {
                 for (int j = 0; j < valueSpan.Length; j++)
                 {
-                    hash.Add(valueSpan[j]);
+                    hash.Add(char.ToLowerInvariant(valueSpan[j]));
                 }
             }
 

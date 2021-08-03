@@ -58,6 +58,12 @@ namespace FolkerKinzel.Uris
             {
                 char current = value[i];
 
+                if(current == '\\') // Mask char: Skip one!
+                {
+                    i++;
+                    continue;
+                }
+
                 if (current == '"')
                 {
                     isInQuotes = !isInQuotes;

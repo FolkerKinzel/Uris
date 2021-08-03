@@ -19,24 +19,24 @@ namespace FolkerKinzel.Uris
         public MimeType MimeType => _mimeType;
 
         /// <summary>
-        /// The encoding of the data in <see cref="EmbeddedData"/>.
+        /// The encoding of the data in <see cref="Data"/>.
         /// </summary>
-        public DataEncoding DataEncoding { get; }
+        public ContentEncoding Encoding { get; }
 
         /// <summary>
         /// The part of the "data" URL, which contains the embedded data.
         /// </summary>
-        public ReadOnlySpan<char> EmbeddedData => _embeddedData.Span;
+        public ReadOnlySpan<char> Data => _embeddedData.Span;
 
         /// <summary>
-        /// <c>true</c> if <see cref="EmbeddedData"/> contains text.
+        /// <c>true</c> if <see cref="Data"/> contains text.
         /// </summary>
         public bool ContainsText => this.MimeType.IsText;
 
         /// <summary>
-        /// <c>true</c> if <see cref="EmbeddedData"/> contains binary data.
+        /// <c>true</c> if <see cref="Data"/> contains binary data.
         /// </summary>
-        public bool ContainsBytes => DataEncoding == DataEncoding.Base64 || !ContainsText;
+        public bool ContainsBytes => Encoding == ContentEncoding.Base64 || !ContainsText;
 
         /// <summary>
         /// <c>true</c> if the <see cref="DataUrl"/> contains nothing.

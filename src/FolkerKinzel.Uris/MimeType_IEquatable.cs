@@ -54,7 +54,7 @@ namespace FolkerKinzel.Uris
         //[CLSCompliant(false)]
         public bool Equals(in MimeType other, bool ignoreParameters)
         {
-            if (!TopLevelMediaType.Equals(other.TopLevelMediaType, StringComparison.OrdinalIgnoreCase) ||
+            if (!MediaType.Equals(other.MediaType, StringComparison.OrdinalIgnoreCase) ||
                !SubType.Equals(other.SubType, StringComparison.OrdinalIgnoreCase))
             {
                 return false;

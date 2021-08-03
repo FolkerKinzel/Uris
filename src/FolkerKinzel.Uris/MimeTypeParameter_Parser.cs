@@ -24,17 +24,24 @@ namespace FolkerKinzel.Uris
 
             ReadOnlySpan<char> span = value.Span;
 
-            if (span[span.Length - 1] == '"')
-            {
-                value = value.Slice(0, value.Length - 1);
-                span = value.Span;
-            }
-
             int keyValueSeparatorIndex = span.IndexOf('=');
 
             if (keyValueSeparatorIndex < 1)
             {
                 goto Failed;
+            }
+
+            // Masked Value:
+            if (span[span.Length - 1] == '"')
+            {
+                var builder = new StringBuilder(value.Length);
+                int startOfValue = keyValueSeparatorIndex + 1;
+                _ = builder.Append(value).Remove(builder.Length - 1, 1);
+
+                UnMask(builder, startOfValue);
+
+                ReadOnlyMemory<char> mem = builder.ToString().AsMemory();
+                return TryParse(ref mem, out parameter);
             }
 
             int keyLength = span.Slice(0, keyValueSeparatorIndex).GetTrimmedLength();
@@ -53,10 +60,14 @@ namespace FolkerKinzel.Uris
 
             valueStart += span.Slice(valueStart).GetTrimmedStart();
 
-            if (span[valueStart] == '"')
-            {
-                valueStart++;
-            }
+            //if (span[valueStart] == '"')
+            //{
+            //    valueStart++;
+            //}
+            //else
+            //{
+            //    goto Failed;
+            //}
 
             if (valueStart > ushort.MaxValue)
             {
@@ -75,6 +86,37 @@ Failed:
             return false;
         }
 
+        private static void UnMask(StringBuilder builder, int startOfValue)
+        {
+            bool quotesRemoved = false;
+            for (int i = startOfValue; i < builder.Length; i++)
+            {
+                char c = builder[i];
 
+                if (!quotesRemoved)
+                {
+                    if (char.IsWhiteSpace(c))
+                    {
+                        _ = builder.Remove(i--, 1);
+                        continue;
+                    }
+                    else if (c == '"')
+                    {
+                        _ = builder.Remove(i--, 1);
+                        quotesRemoved = true;
+                    }
+                    else
+                    {
+                        quotesRemoved = true;
+                    }
+                }
+
+                if (c == '\\')
+                {
+                    // after the mask char one entry can be skipped:
+                    _ = builder.Remove(i, 1);
+                }
+            }
+        }
     }
 }

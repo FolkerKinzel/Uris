@@ -15,7 +15,7 @@ namespace FolkerKinzel.Uris
         /// <summary>
         /// Embeds Text in a "data" URL (RFC 2397).
         /// </summary>
-        /// <param name="text">The text to embed into the "data" URL.</param>
+        /// <param name="text">The text to embed into the "data" URL. <paramref name="text"/> MUST not be URL encoded.</param>
         /// <returns>A "data" URL, into which the text provided by the parameter <paramref name="text"/> is embedded.</returns>
         /// <exception cref="FormatException">The <see cref="Uri"/> class was not able to encode <paramref name="text"/> correctly.</exception>
         public static string FromText(string? text)
@@ -38,7 +38,7 @@ namespace FolkerKinzel.Uris
             else
             {
 
-                string data = Convert.ToBase64String(Encoding.UTF8.GetBytes(text));
+                string data = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(text));
                 var sb = new StringBuilder(PROTOCOL.Length + charset.Length + BASE64.Length + 1 + data.Length);
                 return sb.Append(PROTOCOL).Append(charset).Append(BASE64).Append(',').Append(data).ToString();
             }

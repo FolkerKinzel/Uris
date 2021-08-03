@@ -3,12 +3,12 @@
     /// <summary>
     /// Named constants to specify the encoding of embedded data.
     /// </summary>
-    public enum DataEncoding
+    public enum ContentEncoding
     {
         /// <summary>
         /// URL encoding
         /// </summary>
-        UrlEncoded,
+        Url,
 
         /// <summary>
         /// Base64 encoding

@@ -6,7 +6,7 @@
 
 The library contains:
 * `readonly struct MimeType`: Represents a MIME type ("Internet Media Type") according 
-to RFC 2045 and RFC 2046. The struct can be created automatically from a file type 
+to RFC 2045, RFC 2046 and RFC 2184. The struct can be created automatically from a file type 
 extension or parsed from a `String` or a `ReadOnlyMemory<Char>`. It is 
 able to find an appropriate file type extension for its content. (Have a look at
  [MimeResourceCompiler](https://github.com/FolkerKinzel/Uris/blob/master/src/MimeResourceCompiler/Program.cs) that is part of the repository to

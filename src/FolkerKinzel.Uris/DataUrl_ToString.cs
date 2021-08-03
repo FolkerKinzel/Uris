@@ -36,10 +36,10 @@ namespace FolkerKinzel.Uris
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            if (DataEncoding == DataEncoding.Base64 || IsEmpty)
+            if (Encoding == ContentEncoding.Base64 || IsEmpty)
             {
                 _ = builder.EnsureCapacity(ComputeCapacity());
-                _ = builder.Append(PROTOCOL).AppendMediaType(MimeType).Append(BASE64).Append(',').Append(EmbeddedData);
+                _ = builder.Append(PROTOCOL).AppendMediaType(MimeType).Append(BASE64).Append(',').Append(Data);
             }
             else if(TryGetEmbeddedText(out string? text))
             {
@@ -60,9 +60,9 @@ namespace FolkerKinzel.Uris
 
         private int ComputeCapacity()
         {
-            int capacity = PROTOCOL.Length + MimeType.StringLength + EmbeddedData.Length + 1;
+            int capacity = PROTOCOL.Length + MimeType.StringLength + Data.Length + 1;
 
-            if (DataEncoding == DataEncoding.Base64)
+            if (Encoding == ContentEncoding.Base64)
             {
                 capacity += BASE64.Length;
             }

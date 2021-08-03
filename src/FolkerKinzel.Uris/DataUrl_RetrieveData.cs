@@ -28,17 +28,17 @@ namespace FolkerKinzel.Uris
             }
 
             // als Base64 codierter Text:
-            if (DataEncoding == DataEncoding.Base64)
+            if (Encoding == ContentEncoding.Base64)
             {
                 static bool Predicate(MimeTypeParameter p) => p.IsCharsetParameter;
 
                 MimeTypeParameter charsetParameter = MimeType.Parameters.FirstOrDefault(Predicate);
 
-                Encoding enc = charsetParameter.IsEmpty ? Encoding.ASCII : TextEncodingConverter.GetEncoding(charsetParameter.Value.ToString());
+                Encoding enc = charsetParameter.IsEmpty ? System.Text.Encoding.ASCII : TextEncodingConverter.GetEncoding(charsetParameter.Value.ToString());
 
                 try
                 {
-                    embeddedText = enc.GetString(Convert.FromBase64String(EmbeddedData.ToString()));
+                    embeddedText = enc.GetString(Convert.FromBase64String(Data.ToString()));
                 }
                 catch
                 {
@@ -48,7 +48,7 @@ namespace FolkerKinzel.Uris
             else
             {
                 // Url-Codierter UTF-8-String:
-                embeddedText = Uri.UnescapeDataString(EmbeddedData.ToString());
+                embeddedText = Uri.UnescapeDataString(Data.ToString());
             }
 
             return true;
@@ -72,13 +72,13 @@ namespace FolkerKinzel.Uris
 
             try
             {
-                if(this.DataEncoding == DataEncoding.Base64)
+                if(this.Encoding == ContentEncoding.Base64)
                 {
-                    embeddedBytes = Convert.FromBase64String(EmbeddedData.ToString());
+                    embeddedBytes = Convert.FromBase64String(Data.ToString());
                 }
                 else
                 {
-                    byte[] bytes = Encoding.ASCII.GetBytes(EmbeddedData.ToString());
+                    byte[] bytes = System.Text.Encoding.ASCII.GetBytes(Data.ToString());
                     embeddedBytes = WebUtility.UrlDecodeToBytes(bytes, 0, bytes.Length);
                 }
             }

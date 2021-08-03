@@ -46,6 +46,16 @@ namespace FolkerKinzel.Uris
 
 
         /// <summary>
+        /// Determines whether the <see cref="MimeTypeParameter"/> has the <see cref="Key"/> "access-type". The comparison is case-insensitive.
+        /// </summary>
+        /// <returns><c>true</c> if <see cref="Key"/> equals "access-type"; otherwise, <c>false</c>.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
+        public bool IsAccessTypeParameter
+            => Key.Equals("access-type".AsSpan(), StringComparison.OrdinalIgnoreCase);
+
+        private bool IsValueCaseSensitive => !(IsCharsetParameter || IsAccessTypeParameter);
+
+        /// <summary>
         /// Determines whether this instance equals "charset=us-ascii". The comparison is case-insensitive.
         /// </summary>
         /// <returns><c>true</c> if this instance equals "charset=us-ascii"; otherwise, <c>false</c>.</returns>

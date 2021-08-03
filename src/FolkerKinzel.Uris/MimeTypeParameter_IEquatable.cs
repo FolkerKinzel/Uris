@@ -35,9 +35,9 @@ namespace FolkerKinzel.Uris
         public bool Equals(in MimeTypeParameter other)
             => !Key.Equals(other.Key, StringComparison.OrdinalIgnoreCase)
                 ? false
-                : IsCharsetParameter
-                    ? Value.Equals(other.Value, StringComparison.OrdinalIgnoreCase)
-                    : Value.Equals(other.Value, StringComparison.Ordinal);
+                : IsValueCaseSensitive
+                    ? Value.Equals(other.Value, StringComparison.Ordinal)
+                    : Value.Equals(other.Value, StringComparison.OrdinalIgnoreCase);
 
         /// <summary>
         /// Determines whether <paramref name="obj"/> is a <see cref="MimeTypeParameter"/> structure

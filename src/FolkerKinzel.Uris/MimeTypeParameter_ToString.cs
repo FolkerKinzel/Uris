@@ -32,18 +32,26 @@ namespace FolkerKinzel.Uris
                 return builder;
             }
 
-            // RFC 2045 Section 5.1 "tspecials"
-            ReadOnlySpan<char> maskChars = stackalloc char[] { ' ', '(', ')', '<', '>', '@', ',', ';', ':', '\\', '\"', '/', '[', '>', ']', '?', '=' };
 
             ReadOnlySpan<char> valueSpan = Value;
             ReadOnlySpan<char> keySpan = Key;
 
-            bool mask = valueSpan.ContainsAny(maskChars);
+            // RFC 2045 Section 5.1 "tspecials"
+            bool mask = valueSpan.ContainsAny(stackalloc char[] { ' ', '(', ')', '<', '>', '@', ',', ';', ':', '\\', '\"', '/', '[', '>', ']', '?', '=' });
 
-            if(mask && urlEncodedValues)
+            if (mask)
             {
-                valueSpan = Uri.EscapeDataString(valueSpan.ToString()).AsSpan();
-                mask = false;
+                if (urlEncodedValues)
+                {
+                    valueSpan = Uri.EscapeDataString(valueSpan.ToString()).AsSpan();
+                    mask = false;
+                }
+                else if (valueSpan.ContainsAny(stackalloc char[] { '"', '\\' }))
+                {
+                    var sb = new StringBuilder(valueSpan.Length * 2);
+                    _ = sb.Append(valueSpan);
+                    valueSpan = Mask(sb).ToString().AsSpan();
+                }
             }
 
             int neededCapacity = mask ? 2 + valueSpan.Length + keySpan.Length + 1 : valueSpan.Length + keySpan.Length + 1;
@@ -58,9 +66,10 @@ namespace FolkerKinzel.Uris
             }
 
             int valueStart = builder.Length;
-            _ = IsCharsetParameter
-                ? builder.Append(Value).ToLowerInvariant(valueStart)
-                : builder.Append(Value);
+            _ = IsValueCaseSensitive
+                ? builder.Append(Value)
+                : builder.Append(Value).ToLowerInvariant(valueStart);
+
 
             if (mask)
             {
@@ -71,5 +80,19 @@ namespace FolkerKinzel.Uris
             return builder;
         }
 
+        private static StringBuilder Mask(StringBuilder sb)
+        {
+            for (int i = sb.Length - 1; i >= 0; i--)
+            {
+                char current = sb[i];
+
+                if (current is '"' or '\\')
+                {
+                    _ = sb.Insert(i, '\\');
+                }
+            }
+
+            return sb;
+        }
     }
 }

@@ -57,7 +57,7 @@ namespace FolkerKinzel.Uris
 
             _ = builder.EnsureCapacity(builder.Length + StringLength);
             int insertStartIndex = builder.Length;
-            _ = builder.Append(TopLevelMediaType).Append('/').Append(SubType).ToLowerInvariant(insertStartIndex);
+            _ = builder.Append(MediaType).Append('/').Append(SubType).ToLowerInvariant(insertStartIndex);
 
             if (includeParameters)
             {
