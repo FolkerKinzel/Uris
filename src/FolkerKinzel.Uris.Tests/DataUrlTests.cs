@@ -270,5 +270,22 @@ namespace FolkerKinzel.Uris.Tests
             Assert.IsTrue(dataUrl.TryGetEmbeddedText(out string? output));
             Assert.AreEqual(text, output);
         }
+
+
+        [TestMethod]
+        public void ToStringTest1()
+        {
+            const string input = "data:,This is unescaped ASCII text.";
+
+            Assert.IsTrue(DataUrl.TryParse(input, out DataUrl dataUrl));
+            Assert.IsTrue(dataUrl.ContainsText);
+            Assert.IsFalse(dataUrl.ContainsBytes);
+
+            string output = dataUrl.ToString();
+
+            Assert.AreNotEqual(input, output);
+            Assert.IsTrue(DataUrl.TryParse(output, out DataUrl dataUrl2));
+            Assert.AreEqual(dataUrl, dataUrl2);
+        }
     }
 }

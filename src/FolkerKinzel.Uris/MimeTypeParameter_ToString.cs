@@ -24,7 +24,7 @@ namespace FolkerKinzel.Uris
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
-        internal StringBuilder AppendTo(StringBuilder builder)
+        internal StringBuilder AppendTo(StringBuilder builder, bool urlEncodedValues = false)
         {
             // Standard ctor
             if (IsEmpty)
@@ -40,7 +40,13 @@ namespace FolkerKinzel.Uris
 
             bool mask = valueSpan.ContainsAny(maskChars);
 
-            int neededCapacity = mask ? 2 + valueSpan.Length + keySpan.Length : valueSpan.Length + keySpan.Length;
+            if(mask && urlEncodedValues)
+            {
+                valueSpan = Uri.EscapeDataString(valueSpan.ToString()).AsSpan();
+                mask = false;
+            }
+
+            int neededCapacity = mask ? 2 + valueSpan.Length + keySpan.Length + 1 : valueSpan.Length + keySpan.Length + 1;
             _ = builder.EnsureCapacity(builder.Length + neededCapacity);
 
             int keyStart = builder.Length;

@@ -52,7 +52,7 @@ namespace FolkerKinzel.Uris.Intls
                 foreach (MimeTypeParameter parameter in mimeType.Parameters)
                 {
                     _ = builder.Append(';');
-                    _ = parameter.AppendTo(builder);
+                    _ = parameter.AppendTo(builder, urlEncodedValues: true);
                 }
 
                 return builder;

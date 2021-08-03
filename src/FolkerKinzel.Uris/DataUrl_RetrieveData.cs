@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using FolkerKinzel.Uris.Intls;
@@ -71,9 +72,15 @@ namespace FolkerKinzel.Uris
 
             try
             {
-                embeddedBytes = this.DataEncoding == DataEncoding.Base64
-                    ? Convert.FromBase64String(EmbeddedData.ToString())
-                    : Encoding.UTF8.GetBytes(Uri.UnescapeDataString(EmbeddedData.ToString()));
+                if(this.DataEncoding == DataEncoding.Base64)
+                {
+                    embeddedBytes = Convert.FromBase64String(EmbeddedData.ToString());
+                }
+                else
+                {
+                    byte[] bytes = Encoding.ASCII.GetBytes(EmbeddedData.ToString());
+                    embeddedBytes = WebUtility.UrlDecodeToBytes(bytes, 0, bytes.Length);
+                }
             }
             catch
             {

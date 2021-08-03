@@ -40,9 +40,10 @@ namespace FolkerKinzel.Uris
         /// </summary>
         /// <param name="builder">The <see cref="StringBuilder"/>.</param>
         /// <param name="includeParameters">Pass <c>true</c> to include the <see cref="Parameters"/>; <c>false</c>, otherwise.</param>
+        /// <param name="urlEncodedParameterValues">Pass <c>true</c> to URL encode the parameter values.</param>
         /// <returns>A reference to <paramref name="builder"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="builder"/> is <c>null</c>.</exception>
-        public StringBuilder AppendTo(StringBuilder builder, bool includeParameters = true)
+        public StringBuilder AppendTo(StringBuilder builder, bool includeParameters = true, bool urlEncodedParameterValues = false)
         {
             if (builder is null)
             {
@@ -63,7 +64,7 @@ namespace FolkerKinzel.Uris
                 foreach (MimeTypeParameter parameter in Parameters)
                 {
                     _ = builder.Append(';');
-                    _ = parameter.AppendTo(builder);
+                    _ = parameter.AppendTo(builder, urlEncodedParameterValues);
                 }
             }
 
