@@ -36,7 +36,7 @@ namespace FolkerKinzel.Uris
     {
         internal DataUrl(in MimeType mediaType, DataEncoding dataEncoding, in ReadOnlyMemory<char> embeddedData)
         {
-            MimeType = mediaType;
+            _mimeType = mediaType;
             DataEncoding = dataEncoding;
             _embeddedData = embeddedData;
         }

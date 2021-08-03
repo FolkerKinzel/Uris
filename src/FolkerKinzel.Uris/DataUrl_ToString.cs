@@ -46,10 +46,10 @@ namespace FolkerKinzel.Uris
                 string urlString = DataUrl.FromText(text);
                 _ = builder.Append(urlString);
             }
-            else
+            else // URL encoded bytes
             {
                 _ = TryGetEmbeddedBytes(out byte[]? bytes);
-                string urlString = DataUrl.FromBytes(bytes, MimeType);
+                string urlString = DataUrl.FromBytes(bytes, in _mimeType);
                 _ = builder.Append(urlString);
             }
 

@@ -9,13 +9,14 @@ namespace FolkerKinzel.Uris
     public readonly partial struct DataUrl : IEquatable<DataUrl>, ICloneable
     {
         private readonly ReadOnlyMemory<char> _embeddedData;
+        private readonly MimeType _mimeType;
 
         #region Properties
 
         /// <summary>
         /// The internet media type of the embedded data.
         /// </summary>
-        public MimeType MimeType { get; }
+        public MimeType MimeType => _mimeType;
 
         /// <summary>
         /// The encoding of the data in <see cref="EmbeddedData"/>.
