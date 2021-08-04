@@ -30,46 +30,65 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="alt\**" />
+    <Compile Remove="Resources\**" />
     <EmbeddedResource Remove="alt\**" />
+    <EmbeddedResource Remove="Resources\**" />
     <None Remove="alt\**" />
+    <None Remove="Resources\**" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Intls\Cache.cs" />
+    <Compile Remove="Intls\IndexFactory.cs" />
+    <Compile Remove="Intls\MimeCache.cs" />
+    <Compile Remove="Intls\ResourceParser.cs" />
+    <Compile Remove="Intls\TextEncodingConverter.cs" />
     <Compile Remove="MimeCacheFactory.cs" />
+    <Compile Remove="MimeTypeParameter_const.cs" />
+    <Compile Remove="MimeTypeParameter_ctor.cs" />
+    <Compile Remove="MimeTypeParameter_GetHashCode.cs" />
+    <Compile Remove="MimeTypeParameter_ICloneable.cs" />
+    <Compile Remove="MimeTypeParameter_IEquatable.cs" />
+    <Compile Remove="MimeTypeParameter_Operators.cs" />
+    <Compile Remove="MimeTypeParameter_Parser.cs" />
+    <Compile Remove="MimeTypeParameter_Properties.cs" />
+    <Compile Remove="MimeTypeParameter_ToString.cs" />
+    <Compile Remove="MimeType_const.cs" />
+    <Compile Remove="MimeType_ctor.cs" />
+    <Compile Remove="MimeType_GetHashCode.cs" />
+    <Compile Remove="MimeType_ICloneable.cs" />
+    <Compile Remove="MimeType_IEquatable.cs" />
+    <Compile Remove="MimeType_Operators.cs" />
+    <Compile Remove="MimeType_ParseParameters.cs" />
+    <Compile Remove="MimeType_Parser.cs" />
+    <Compile Remove="MimeType_Properties.cs" />
+    <Compile Remove="MimeType_ToString.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Remove="Resources\Extension.csv" />
-    <None Remove="Resources\Mime.csv" />
-    <None Remove="Resources\MimeIdx.csv" />
     <None Include="..\..\..\..\Nuget-Logo\Logo.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Extension.csv" />
-    <EmbeddedResource Include="Resources\Mime.csv" />
-    <EmbeddedResource Include="Resources\MimeIdx.csv" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Nullable" Version="1.3.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="FolkerKinzel.Strings" Version="3.0.0-beta.2" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
-    <PackageReference Include="FolkerKinzel.Strings" Version="3.0.0-beta" />
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="FolkerKinzel.Strings" Version="3.0.0-beta" />
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
-    <PackageReference Include="FolkerKinzel.Strings" Version="3.0.0-beta" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="5.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\FolkerKinzel.MimeTypes\src\FolkerKinzel.MimeTypes\FolkerKinzel.MimeTypes.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Res.Designer.cs">

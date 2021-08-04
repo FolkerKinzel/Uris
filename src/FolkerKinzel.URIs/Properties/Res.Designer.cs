@@ -68,23 +68,5 @@ namespace FolkerKinzel.Uris.Properties {
                 return ResourceManager.GetString("InvalidDataUrl", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die {0} is not a valid MIME type. ähnelt.
-        /// </summary>
-        internal static string InvalidMimeType {
-            get {
-                return ResourceManager.GetString("InvalidMimeType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die The resource {0} was not found. ähnelt.
-        /// </summary>
-        internal static string ResourceNotFound {
-            get {
-                return ResourceManager.GetString("ResourceNotFound", resourceCulture);
-            }
-        }
     }
 }

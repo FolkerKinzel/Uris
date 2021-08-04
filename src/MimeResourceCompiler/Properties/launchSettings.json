@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "MimeResourceCompiler": {
-      "commandName": "Project",
-      "commandLineArgs": "-c True -l True"
-    }
-  }
-}

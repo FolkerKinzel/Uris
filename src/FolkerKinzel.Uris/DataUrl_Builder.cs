@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FolkerKinzel.MimeTypes;
+using FolkerKinzel.Strings;
 using FolkerKinzel.Uris.Intls;
 
 namespace FolkerKinzel.Uris
@@ -55,7 +57,7 @@ namespace FolkerKinzel.Uris
         public static string FromBytes(byte[]? bytes, in MimeType mimeType)
         {
             string data = bytes is null ? string.Empty : Convert.ToBase64String(bytes, Base64FormattingOptions.None);
-            var builder = new StringBuilder(PROTOCOL.Length + MimeType.StringLength + BASE64.Length + 1 + data.Length);
+            var builder = new StringBuilder(PROTOCOL.Length + FolkerKinzel.MimeTypes.MimeType.StringLength + BASE64.Length + 1 + data.Length);
             return builder.Append(PROTOCOL).AppendMediaType(in mimeType).Append(BASE64).Append(',').Append(data).ToString();
 
             // $"data:{mediaTypeString};base64,{Convert.ToBase64String(bytes)}"
@@ -104,7 +106,7 @@ namespace FolkerKinzel.Uris
         {
             byte[] bytes = LoadFile(filePath);
 
-            MimeType mimeTypeValue = mimeType ?? MimeType.FromFileTypeExtension(Path.GetExtension(filePath));
+            MimeType mimeTypeValue = mimeType ?? MimeTypes.MimeType.FromFileTypeExtension(Path.GetExtension(filePath));
             return FromBytes(bytes, in mimeTypeValue);
         }
         

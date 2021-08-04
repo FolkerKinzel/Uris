@@ -1,4 +1,5 @@
-﻿using FolkerKinzel.Uris.Extensions;
+﻿using FolkerKinzel.MimeTypes;
+using FolkerKinzel.Uris.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Text;
@@ -8,26 +9,26 @@ namespace FolkerKinzel.Uris.Intls.Tests
     [TestClass]
     public class DataUrlExtensionTests
     {
-        private const string DATA_URL_PROTOCOL = "data:";
-        private const string BASE64 = ";base64,";
+        //private const string DATA_URL_PROTOCOL = "data:";
+        //private const string BASE64 = ";base64,";
 
         
 
-        [TestMethod]
-        public void AppendDataUrlProtocolTest()
-        {
-            var sb = new StringBuilder();
-            Assert.AreEqual(sb, sb.Append(DATA_URL_PROTOCOL));
-            Assert.AreEqual(DATA_URL_PROTOCOL, sb.ToString());
-        }
+        //[TestMethod]
+        //public void AppendDataUrlProtocolTest()
+        //{
+        //    var sb = new StringBuilder();
+        //    Assert.AreEqual(sb, sb.Append(DATA_URL_PROTOCOL));
+        //    Assert.AreEqual(DATA_URL_PROTOCOL, sb.ToString());
+        //}
 
-        [TestMethod]
-        public void AppendBase64Test()
-        {
-            var sb = new StringBuilder();
-            Assert.AreEqual(sb, sb.Append(BASE64));
-            Assert.AreEqual(BASE64, sb.ToString());
-        }
+        //[TestMethod]
+        //public void AppendBase64Test()
+        //{
+        //    var sb = new StringBuilder();
+        //    Assert.AreEqual(sb, sb.Append(BASE64));
+        //    Assert.AreEqual(BASE64, sb.ToString());
+        //}
 
         [TestMethod]
         public void AppendMediaTypeTest1()

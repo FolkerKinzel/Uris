@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using FolkerKinzel.MimeTypes;
 
 #if NETSTANDARD2_0 || NET461
 using FolkerKinzel.Strings.Polyfills;
@@ -17,21 +18,22 @@ namespace FolkerKinzel.Uris.Intls
     /// </summary>
     internal static class DataUrlExtension
     {
-        internal static bool IsAscii(this string s)
-        {
-            for (int i = 0; i < s.Length; ++i)
-            {
-                char c = s[i];
+        //internal static bool IsAscii(this string s)
+        //{
+        //    for (int i = 0; i < s.Length; ++i)
+        //    {
+        //        char c = s[i];
 
-                if (((int)c) > 127)
-                {
-                    return false;
-                }
-            }
+        //        if (((int)c) > 127)
+        //        {
+        //            return false;
+        //        }
+        //    }
 
-            return true;
-        }
+        //    return true;
+        //}
 
+        
 
         internal static StringBuilder AppendMediaType(this StringBuilder builder, in MimeType mimeType)
         {

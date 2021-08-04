@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <Compile Remove="Intls\AsciiDataDecoder.cs" />
+    <Compile Remove="MimeTypeTests.cs" />
   </ItemGroup>
 
   <ItemGroup>

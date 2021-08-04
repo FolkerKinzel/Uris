@@ -60,7 +60,7 @@ namespace FolkerKinzel.Uris
 
         private int ComputeCapacity()
         {
-            int capacity = PROTOCOL.Length + MimeType.StringLength + Data.Length + 1;
+            int capacity = PROTOCOL.Length + MimeTypes.MimeType.StringLength + Data.Length + 1;
 
             if (Encoding == ContentEncoding.Base64)
             {

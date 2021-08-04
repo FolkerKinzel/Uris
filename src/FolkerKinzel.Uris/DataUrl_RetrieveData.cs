@@ -5,6 +5,8 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using FolkerKinzel.MimeTypes;
+using FolkerKinzel.Strings;
 using FolkerKinzel.Uris.Intls;
 
 namespace FolkerKinzel.Uris

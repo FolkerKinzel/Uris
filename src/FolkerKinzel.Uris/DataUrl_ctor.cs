@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using FolkerKinzel.MimeTypes;
 using FolkerKinzel.Uris.Extensions;
 using FolkerKinzel.Uris.Intls;
 using FolkerKinzel.Uris.Properties;
