@@ -1,3 +1,3 @@
-# FolkerKinzel.Uris 1.0.0-alpha
+# FolkerKinzel.Uris 1.0.0-alpha.1
 ## Package Release Notes
 - Released on nuget.

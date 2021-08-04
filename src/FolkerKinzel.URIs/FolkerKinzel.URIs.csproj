@@ -9,14 +9,14 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageIcon>Logo.png</PackageIcon>
-    <PackageVersion>1.0.0-alpha1</PackageVersion>
+    <PackageVersion>1.0.0-alpha.1</PackageVersion>
     <FileVersion>1.0.0.69</FileVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <Description>
       .NET library that supports URIs and Internet Media Types ("MIME Types").
     </Description>
     <PackageTags>URI MIME C# .NET</PackageTags>
-    <PackageReleaseNotes>https://github.com/FolkerKinzel/Uris/blob/master/docs/PackageReleaseNotes/1.0.0-alpha1/ReleaseNotes.md</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/FolkerKinzel/Uris/blob/master/docs/PackageReleaseNotes/1.0.0-alpha.1/ReleaseNotes.md</PackageReleaseNotes>
     <PackageIconUrl />
     <PackageProjectUrl>https://github.com/FolkerKinzel/Uris</PackageProjectUrl>
     <RepositoryUrl>https://github.com/FolkerKinzel/Uris.git</RepositoryUrl>
@@ -78,14 +78,9 @@
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="5.0.0" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\FolkerKinzel.MimeTypes\src\FolkerKinzel.MimeTypes\FolkerKinzel.MimeTypes.csproj" />

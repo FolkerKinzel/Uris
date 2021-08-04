@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\.github\ISSUE_TEMPLATE\feature_request.md = ..\.github\ISSUE_TEMPLATE\feature_request.md
 		..\README.md = ..\README.md
 		Reference.md = Reference.md
-		..\docs\PackageReleaseNotes\1.0.0-alpha1\ReleaseNotes.md = ..\docs\PackageReleaseNotes\1.0.0-alpha1\ReleaseNotes.md
+		..\docs\PackageReleaseNotes\1.0.0-alpha.1\ReleaseNotes.md = ..\docs\PackageReleaseNotes\1.0.0-alpha.1\ReleaseNotes.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FolkerKinzel.Uris", "FolkerKinzel.Uris\FolkerKinzel.Uris.csproj", "{AD767983-0336-4630-84F2-CCF3D86C34FF}"
