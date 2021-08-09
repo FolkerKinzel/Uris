@@ -23,8 +23,6 @@ Project("{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}") = "FolkerKinzel.Uris.Reference
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmarks", "Benchmarks\Benchmarks.csproj", "{F39EE66F-955E-4EC0-A3D6-31E91148AEFF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FolkerKinzel.MimeTypes", "..\..\FolkerKinzel.MimeTypes\src\FolkerKinzel.MimeTypes\FolkerKinzel.MimeTypes.csproj", "{8AB430DB-CA5B-45B4-B158-E03F883ACAF3}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,10 +45,6 @@ Global
 		{F39EE66F-955E-4EC0-A3D6-31E91148AEFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F39EE66F-955E-4EC0-A3D6-31E91148AEFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F39EE66F-955E-4EC0-A3D6-31E91148AEFF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8AB430DB-CA5B-45B4-B158-E03F883ACAF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8AB430DB-CA5B-45B4-B158-E03F883ACAF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8AB430DB-CA5B-45B4-B158-E03F883ACAF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8AB430DB-CA5B-45B4-B158-E03F883ACAF3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

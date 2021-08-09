@@ -1,4 +1,6 @@
-﻿using FolkerKinzel.Uris.Intls;
+﻿using FolkerKinzel.MimeTypes;
+using FolkerKinzel.Strings;
+using FolkerKinzel.Uris.Intls;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;

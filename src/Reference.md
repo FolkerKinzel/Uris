@@ -1,5 +1,4 @@
-# FolkerKinzel.Uris
-.NET library that supports the work with URIs. 
+[![GitHub](https://img.shields.io/github/license/FolkerKinzel/Uris)](https://github.com/FolkerKinzel/Uris/blob/master/LICENSE)
 
 The current version of the package is a preview version. Updates of this preview version might contain breaking changes: Therefore it's not recommended to use these preview versions in productivity code.
 

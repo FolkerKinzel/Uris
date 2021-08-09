@@ -54,13 +54,13 @@ namespace FolkerKinzel.Uris.Intls
                 foreach (MimeTypeParameter parameter in mimeType.Parameters)
                 {
                     _ = builder.Append(';');
-                    _ = parameter.AppendTo(builder, urlEncodedValues: true);
+                    _ = parameter.AppendTo(builder, urlEncodedValue: true);
                 }
 
                 return builder;
             }
 
-            return mimeType.AppendTo(builder);
+            return mimeType.AppendTo(builder, MimeTypeFormattingOptions.AlwaysUrlEncoded | MimeTypeFormattingOptions.IncludeParameters);
         }
 
     }
