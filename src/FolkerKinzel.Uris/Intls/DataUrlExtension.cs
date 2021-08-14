@@ -18,23 +18,6 @@ namespace FolkerKinzel.Uris.Intls
     /// </summary>
     internal static class DataUrlExtension
     {
-        //internal static bool IsAscii(this string s)
-        //{
-        //    for (int i = 0; i < s.Length; ++i)
-        //    {
-        //        char c = s[i];
-
-        //        if (((int)c) > 127)
-        //        {
-        //            return false;
-        //        }
-        //    }
-
-        //    return true;
-        //}
-
-        
-
         internal static StringBuilder AppendMediaType(this StringBuilder builder, in MimeType mimeType)
         {
             if (mimeType.IsEmpty)

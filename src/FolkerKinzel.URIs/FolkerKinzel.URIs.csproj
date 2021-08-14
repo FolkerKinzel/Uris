@@ -10,7 +10,7 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageIcon>Logo.png</PackageIcon>
     <PackageVersion>1.0.0-alpha.1</PackageVersion>
-    <FileVersion>1.0.0.73</FileVersion>
+    <FileVersion>1.0.0.77</FileVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <Description>.NET library that supports the work with URIs.</Description>
     <PackageTags>URI MIME C# .NET</PackageTags>
@@ -33,33 +33,6 @@
     <EmbeddedResource Remove="Resources\**" />
     <None Remove="alt\**" />
     <None Remove="Resources\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="Intls\Cache.cs" />
-    <Compile Remove="Intls\IndexFactory.cs" />
-    <Compile Remove="Intls\MimeCache.cs" />
-    <Compile Remove="Intls\ResourceParser.cs" />
-    <Compile Remove="Intls\TextEncodingConverter.cs" />
-    <Compile Remove="MimeCacheFactory.cs" />
-    <Compile Remove="MimeTypeParameter_const.cs" />
-    <Compile Remove="MimeTypeParameter_ctor.cs" />
-    <Compile Remove="MimeTypeParameter_GetHashCode.cs" />
-    <Compile Remove="MimeTypeParameter_ICloneable.cs" />
-    <Compile Remove="MimeTypeParameter_IEquatable.cs" />
-    <Compile Remove="MimeTypeParameter_Operators.cs" />
-    <Compile Remove="MimeTypeParameter_Parser.cs" />
-    <Compile Remove="MimeTypeParameter_Properties.cs" />
-    <Compile Remove="MimeTypeParameter_ToString.cs" />
-    <Compile Remove="MimeType_const.cs" />
-    <Compile Remove="MimeType_ctor.cs" />
-    <Compile Remove="MimeType_GetHashCode.cs" />
-    <Compile Remove="MimeType_ICloneable.cs" />
-    <Compile Remove="MimeType_IEquatable.cs" />
-    <Compile Remove="MimeType_Operators.cs" />
-    <Compile Remove="MimeType_ParseParameters.cs" />
-    <Compile Remove="MimeType_Parser.cs" />
-    <Compile Remove="MimeType_Properties.cs" />
-    <Compile Remove="MimeType_ToString.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\Nuget-Logo\Logo.png">
