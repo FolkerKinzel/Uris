@@ -13,7 +13,6 @@ namespace FolkerKinzel.Uris
 {
     public readonly partial struct DataUrlInfo
     {
-        #region Retrieve Data
 
         /// <summary>
         /// Tries to retrieve the text that is embedded in the <see cref="DataUrlInfo"/>.
@@ -46,9 +45,10 @@ namespace FolkerKinzel.Uris
                     return false;
                 }
 
-                int bomLength = 0;
+                int codePage = TextEncodingConverter.ParseBom(data, out int bomLength);
+
                 Encoding enc = charsetParameter.IsEmpty
-                                ? TextEncodingConverter.GetEncoding(TextEncodingConverter.ParseBom(data, out bomLength))
+                                ? TextEncodingConverter.GetEncoding(codePage)
                                 : charsetParameter.IsAsciiCharsetParameter
                                     ? System.Text.Encoding.UTF8
                                     : TextEncodingConverter.GetEncoding(charsetParameter.Value.ToString());
@@ -118,7 +118,6 @@ namespace FolkerKinzel.Uris
         ///// recent file type extensions are stored in a cache. You can call <see cref="MimeType.ClearCache"/> to clear this cache.</remarks>
         public string GetFileTypeExtension() => MimeType.GetFileTypeExtension();
 
-        #endregion
 
 
     }
