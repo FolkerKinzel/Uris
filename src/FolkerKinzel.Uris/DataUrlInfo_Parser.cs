@@ -15,46 +15,46 @@ using FolkerKinzel.Strings.Polyfills;
 
 namespace FolkerKinzel.Uris
 {
-    public readonly partial struct DataUrl : IEquatable<DataUrl>, ICloneable
+    public readonly partial struct DataUrlInfo : IEquatable<DataUrlInfo>, ICloneable
     {
         #region Parser
 
         /// <summary>
-        /// Parses a <see cref="string"/> as <see cref="DataUrl"/>.
+        /// Parses a <see cref="string"/> as <see cref="DataUrlInfo"/>.
         /// </summary>
         /// <param name="value">The <see cref="string"/> to parse.</param>
-        /// <returns>The <see cref="DataUrl"/> instance, which <paramref name="value"/> represents.</returns>
+        /// <returns>The <see cref="DataUrlInfo"/> instance, which <paramref name="value"/> represents.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException"><paramref name="value"/> value could not be parsed as <see cref="DataUrl"/>.</exception>
-        public static DataUrl Parse(string value)
+        /// <exception cref="ArgumentException"><paramref name="value"/> value could not be parsed as <see cref="DataUrlInfo"/>.</exception>
+        public static DataUrlInfo Parse(string value)
             => value is null
                 ? throw new ArgumentNullException(nameof(value))
-                : TryParse(value, out DataUrl dataUrl)
+                : TryParse(value, out DataUrlInfo dataUrl)
                     ? dataUrl
                     : throw new ArgumentException(string.Format(Res.InvalidDataUrl, nameof(value)), nameof(value));
 
 
         /// <summary>
-        /// Tries to parse a <see cref="string"/> as <see cref="DataUrl"/>.
+        /// Tries to parse a <see cref="string"/> as <see cref="DataUrlInfo"/>.
         /// </summary>
         /// <param name="value">The <see cref="string"/> to parse.</param>
-        /// <param name="dataUrl">If the method returns <c>true</c> the parameter contains a <see cref="DataUrl"/> structure that provides the contents
+        /// <param name="dataUrl">If the method returns <c>true</c> the parameter contains a <see cref="DataUrlInfo"/> structure that provides the contents
         /// of value. The parameter is passed uninitialized.</param>
-        /// <returns><c>true</c> if <paramref name="value"/> could be parsed as <see cref="DataUrl"/>, <c>false</c> otherwise.</returns>
-        public static bool TryParse(string? value, out DataUrl dataUrl)
+        /// <returns><c>true</c> if <paramref name="value"/> could be parsed as <see cref="DataUrlInfo"/>, <c>false</c> otherwise.</returns>
+        public static bool TryParse(string? value, out DataUrlInfo dataUrl)
         {
             ReadOnlyMemory<char> memory = value.AsMemory();
             return TryParse(in memory, out dataUrl);
         }
 
         /// <summary>
-        /// Tries to parse a <see cref="ReadOnlyMemory{T}">ReadOnlyMemory&lt;Char&gt;</see> as <see cref="DataUrl"/>.
+        /// Tries to parse a <see cref="ReadOnlyMemory{T}">ReadOnlyMemory&lt;Char&gt;</see> as <see cref="DataUrlInfo"/>.
         /// </summary>
         /// <param name="value">The <see cref="ReadOnlyMemory{T}">ReadOnlyMemory&lt;Char&gt;</see> to parse.</param>
-        /// <param name="dataUrl">If the method returns <c>true</c> the parameter contains a <see cref="DataUrl"/> structure that provides the contents
+        /// <param name="dataUrl">If the method returns <c>true</c> the parameter contains a <see cref="DataUrlInfo"/> structure that provides the contents
         /// of value. The parameter is passed uninitialized.</param>
-        /// <returns><c>true</c> if <paramref name="value"/> could be parsed as <see cref="DataUrl"/>, <c>false</c> otherwise.</returns>
-        public static bool TryParse(in ReadOnlyMemory<char> value, out DataUrl dataUrl)
+        /// <returns><c>true</c> if <paramref name="value"/> could be parsed as <see cref="DataUrlInfo"/>, <c>false</c> otherwise.</returns>
+        public static bool TryParse(in ReadOnlyMemory<char> value, out DataUrlInfo dataUrl)
         {
             ReadOnlySpan<char> span = value.Span;
 
@@ -66,7 +66,7 @@ namespace FolkerKinzel.Uris
             int mimeTypeEndIndex = -1;
             int startOfData = -1;
 
-            for (int i = PROTOCOL.Length; i < span.Length; i++)
+            for (int i = DataUrl.Protocol.Length; i < span.Length; i++)
             {
                 char c = span[i];
 
@@ -83,13 +83,13 @@ namespace FolkerKinzel.Uris
             }
 
             // dies ändert ggf. auch mimeTypeEndIndex
-            ReadOnlySpan<char> mimePart = span.Slice(PROTOCOL.Length, mimeTypeEndIndex - PROTOCOL.Length);
+            ReadOnlySpan<char> mimePart = span.Slice(DataUrl.Protocol.Length, mimeTypeEndIndex - DataUrl.Protocol.Length);
             ContentEncoding dataEncoding = ContentEncoding.Url;
 
             if (HasBase64Encoding(mimePart))
             {
-                mimePart = mimePart.Slice(0, mimePart.Length - BASE64.Length);
-                mimeTypeEndIndex -= BASE64.Length;
+                mimePart = mimePart.Slice(0, mimePart.Length - DataUrl.Base64.Length);
+                mimeTypeEndIndex -= DataUrl.Base64.Length;
                 dataEncoding = ContentEncoding.Base64;
             }
 
@@ -97,16 +97,16 @@ namespace FolkerKinzel.Uris
 
             if (mimePart.IsEmpty)
             {
-                mediaType = DataUrl.DefaultMediaType();
+                mediaType = DataUrlInfo.DefaultMediaType();
             }
             else
             {
-                ReadOnlyMemory<char> memory = span[PROTOCOL.Length] == ';'
+                ReadOnlyMemory<char> memory = span[DataUrl.Protocol.Length] == ';'
                                                 ? new StringBuilder(DEFAULT_MEDIA_TYPE.Length + mimePart.Length)
                                                     .Append(DEFAULT_MEDIA_TYPE)
                                                     .Append(mimePart).ToString()
                                                     .AsMemory()
-                                                : value.Slice(PROTOCOL.Length, mimeTypeEndIndex - PROTOCOL.Length);
+                                                : value.Slice(DataUrl.Protocol.Length, mimeTypeEndIndex - DataUrl.Protocol.Length);
 
                 if (!MimeType.TryParse(ref memory, out mediaType))
                 {
@@ -114,7 +114,7 @@ namespace FolkerKinzel.Uris
                 }
             }
             ReadOnlyMemory<char> embeddedData = value.Slice(startOfData + 1);
-            dataUrl = new DataUrl(in mediaType, dataEncoding, in embeddedData);
+            dataUrl = new DataUrlInfo(in mediaType, dataEncoding, in embeddedData);
 
             return true;
 
@@ -128,18 +128,18 @@ Failed:
             static bool HasBase64Encoding(ReadOnlySpan<char> val)
             {
                 //Suche ";base64"
-                if (val.Length < BASE64.Length)
+                if (val.Length < DataUrl.Base64.Length)
                 {
                     return false;
                 }
 
-                ReadOnlySpan<char> hayStack = val.Slice(val.Length - BASE64.Length);
+                ReadOnlySpan<char> hayStack = val.Slice(val.Length - DataUrl.Base64.Length);
 
                 for (int i = 0; i < hayStack.Length; i++)
                 {
                     char c = char.ToLowerInvariant(hayStack[i]);
 
-                    if (c != BASE64[i])
+                    if (c != DataUrl.Base64[i])
                     {
                         return false;
                     }

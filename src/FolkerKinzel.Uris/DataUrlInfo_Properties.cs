@@ -7,7 +7,7 @@ using FolkerKinzel.MimeTypes;
 
 namespace FolkerKinzel.Uris
 {
-    public readonly partial struct DataUrl : IEquatable<DataUrl>, ICloneable
+    public readonly partial struct DataUrlInfo : IEquatable<DataUrlInfo>, ICloneable
     {
         private readonly ReadOnlyMemory<char> _embeddedData;
         private readonly MimeType _mimeType;
@@ -40,14 +40,14 @@ namespace FolkerKinzel.Uris
         public bool ContainsBytes => Encoding == ContentEncoding.Base64 || !ContainsText;
 
         /// <summary>
-        /// <c>true</c> if the <see cref="DataUrl"/> contains nothing.
+        /// <c>true</c> if the <see cref="DataUrlInfo"/> contains nothing.
         /// </summary>
         public bool IsEmpty => this.MimeType.IsEmpty;
 
         /// <summary>
-        /// Returns an empty <see cref="DataUrl"/>.
+        /// Returns an empty <see cref="DataUrlInfo"/>.
         /// </summary>
-        public static DataUrl Empty => default;
+        public static DataUrlInfo Empty => default;
 
         #endregion
 

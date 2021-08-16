@@ -14,7 +14,7 @@ using FolkerKinzel.Strings.Polyfills;
 namespace FolkerKinzel.Uris.Intls
 {
     /// <summary>
-    /// Extension methods, which support the <see cref="DataUrl"/> structure.
+    /// Extension methods, which support the <see cref="DataUrlInfo"/> structure.
     /// </summary>
     internal static class DataUrlExtension
     {
@@ -27,7 +27,7 @@ namespace FolkerKinzel.Uris.Intls
 
             if (mimeType.IsTextPlain)
             {
-                MimeType defaultMediaType = DataUrl.DefaultMediaType();
+                MimeType defaultMediaType = DataUrlInfo.DefaultMediaType();
 
                 if (mimeType.Equals(in defaultMediaType))
                 {

@@ -6,14 +6,9 @@ using System.Threading.Tasks;
 
 namespace FolkerKinzel.Uris
 {
-    public readonly partial struct DataUrl : IEquatable<DataUrl>, ICloneable
+    public readonly partial struct DataUrlInfo
     {
-        #region const
-        internal const string PROTOCOL = "data:";
-
-        private const string BASE64 = ";base64";
         private const string DEFAULT_MEDIA_TYPE = "text/plain";
-
-        #endregion
+        
     }
 }

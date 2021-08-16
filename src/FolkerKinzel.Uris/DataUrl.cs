@@ -1,18 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using FolkerKinzel.MimeTypes;
 using FolkerKinzel.Strings;
+using FolkerKinzel.Uris.Extensions;
 using FolkerKinzel.Uris.Intls;
 
 namespace FolkerKinzel.Uris
 {
-    public readonly partial struct DataUrl : IEquatable<DataUrl>, ICloneable
+    public static class DataUrl
     {
-        #region Builder
+        #region const
+        internal const string Protocol = "data:";
+        internal const string Base64 = ";base64";
+        #endregion
+        
 
         /// <summary>
         /// Embeds Text in a "data" URL (RFC 2397).
@@ -20,7 +27,7 @@ namespace FolkerKinzel.Uris
         /// <param name="text">The text to embed into the "data" URL. <paramref name="text"/> MUST not be URL encoded.</param>
         /// <returns>A "data" URL, into which the text provided by the parameter <paramref name="text"/> is embedded.</returns>
         /// <exception cref="FormatException">The <see cref="Uri"/> class was not able to encode <paramref name="text"/> correctly.</exception>
-        public static string FromText(string? text)
+        public static string BuildFromEmbeddedText(string? text)
         {
             const string charset = ";charset=utf-8";
 
@@ -34,15 +41,15 @@ namespace FolkerKinzel.Uris
             if (text.IsAscii())
             {
                 string data = Uri.EscapeDataString(text);
-                var sb = new StringBuilder(PROTOCOL.Length + 1 + data.Length);
-                return sb.Append(PROTOCOL).Append(',').Append(data).ToString();
+                var sb = new StringBuilder(Protocol.Length + 1 + data.Length);
+                return sb.Append(Protocol).Append(',').Append(data).ToString();
             }
             else
             {
 
                 string data = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(text));
-                var sb = new StringBuilder(PROTOCOL.Length + charset.Length + BASE64.Length + 1 + data.Length);
-                return sb.Append(PROTOCOL).Append(charset).Append(BASE64).Append(',').Append(data).ToString();
+                var sb = new StringBuilder(Protocol.Length + charset.Length + Base64.Length + 1 + data.Length);
+                return sb.Append(Protocol).Append(charset).Append(Base64).Append(',').Append(data).ToString();
             }
 
             // $"data:,{Uri.EscapeDataString(text)}"
@@ -54,11 +61,11 @@ namespace FolkerKinzel.Uris
         /// <param name="bytes">The binary data to embed into the "data" URL.</param>
         /// <param name="mimeType">The <see cref="MimeType"/> of the data passed to the parameter <paramref name="bytes"/>.</param>
         /// <returns>A "data" URL, into which the binary data provided by the parameter <paramref name="bytes"/> is embedded.</returns>
-        public static string FromBytes(byte[]? bytes, in MimeType mimeType)
+        public static string BuildFromEmbeddedBytes(byte[]? bytes, in MimeType mimeType)
         {
             string data = bytes is null ? string.Empty : Convert.ToBase64String(bytes, Base64FormattingOptions.None);
-            var builder = new StringBuilder(PROTOCOL.Length + FolkerKinzel.MimeTypes.MimeType.StringLength + BASE64.Length + 1 + data.Length);
-            return builder.Append(PROTOCOL).AppendMediaType(in mimeType).Append(BASE64).Append(',').Append(data).ToString();
+            var builder = new StringBuilder(Protocol.Length + FolkerKinzel.MimeTypes.MimeType.StringLength + Base64.Length + 1 + data.Length);
+            return builder.Append(Protocol).AppendMediaType(in mimeType).Append(Base64).Append(',').Append(data).ToString();
 
             // $"data:{mediaTypeString};base64,{Convert.ToBase64String(bytes)}"
         }
@@ -102,12 +109,12 @@ namespace FolkerKinzel.Uris
         /// <exception cref="ArgumentNullException"><paramref name="filePath"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException"><paramref name="filePath"/> is not a valid file path.</exception>
         /// <exception cref="IOException">I/O error.</exception>
-        public static string FromFile(string filePath, in MimeType? mimeType = null)
+        public static string BuildFromEmbeddedFileContent(string filePath, in MimeType? mimeType = null)
         {
             byte[] bytes = LoadFile(filePath);
 
             MimeType mimeTypeValue = mimeType ?? MimeTypes.MimeType.FromFileTypeExtension(Path.GetExtension(filePath));
-            return FromBytes(bytes, in mimeTypeValue);
+            return BuildFromEmbeddedBytes(bytes, in mimeTypeValue);
         }
         
         #region private
@@ -189,7 +196,6 @@ namespace FolkerKinzel.Uris
             }
         }
         
-        #endregion
         #endregion
 
 

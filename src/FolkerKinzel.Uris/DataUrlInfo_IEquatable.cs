@@ -7,51 +7,50 @@ using System.Threading.Tasks;
 
 namespace FolkerKinzel.Uris
 {
-    public readonly partial struct DataUrl : IEquatable<DataUrl>, ICloneable
+    public readonly partial struct DataUrlInfo : IEquatable<DataUrlInfo>
     {
-        #region IEquatable
         /// <summary>
-        /// Determines whether <paramref name="obj"/> is a <see cref="DataUrl"/> structure whose
+        /// Determines whether <paramref name="obj"/> is a <see cref="DataUrlInfo"/> structure whose
         /// value is equal to that of this instance.
         /// </summary>
         /// <param name="obj">The <see cref="object"/> to compare with.</param>
-        /// <returns><c>true</c> if <paramref name="obj"/> is a <see cref="DataUrl"/> structure whose
+        /// <returns><c>true</c> if <paramref name="obj"/> is a <see cref="DataUrlInfo"/> structure whose
         /// value is equal to that of this instance; <c>false</c>, otherwise.</returns>
-        public override bool Equals(object? obj) => obj is DataUrl other && Equals(in other);
+        public override bool Equals(object? obj) => obj is DataUrlInfo other && Equals(in other);
 
 
 
         /// <summary>
         /// Determines whether the value of this instance is equal to the value of <paramref name="other"/>. 
         /// </summary>
-        /// <param name="other">The <see cref="DataUrl"/> instance to compare with.</param>
+        /// <param name="other">The <see cref="DataUrlInfo"/> instance to compare with.</param>
         /// <returns><c>true</c> if this the value of this instance is equal to that of <paramref name="other"/>; <c>false</c>, otherwise.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(DataUrl other) => Equals(in other);
+        public bool Equals(DataUrlInfo other) => Equals(in other);
 
         /// <summary>
         /// Determines whether the value of this instance is equal to the value of <paramref name="other"/>. 
         /// </summary>
-        /// <param name="other">The <see cref="DataUrl"/> instance to compare with.</param>
+        /// <param name="other">The <see cref="DataUrlInfo"/> instance to compare with.</param>
         /// <returns><c>true</c> if this the value of this instance is equal to that of <paramref name="other"/>; <c>false</c>, otherwise.</returns>
         /// <remarks>This is the most performant overload of the Equals methods but unfortunately it's not CLS compliant.
         /// Use it if you can.</remarks>
         [CLSCompliant(false)]
-        public bool Equals(in DataUrl other)
+        public bool Equals(in DataUrlInfo other)
             => this.IsEmpty || other.IsEmpty
                 ? this.IsEmpty && other.IsEmpty
                 : EqualsData(in other) && StringComparer.Ordinal.Equals(this.GetFileTypeExtension(), other.GetFileTypeExtension());
 
         #region private
 
-        private bool EqualsData(in DataUrl other)
+        private bool EqualsData(in DataUrlInfo other)
             => this.ContainsText
                 ? EqualsText(in other)
                 : this.Encoding == ContentEncoding.Base64 && other.Encoding == ContentEncoding.Base64
                     ? this.Data.Equals(other.Data, StringComparison.Ordinal)
                     : EqualsBytes(in other);
 
-        private bool EqualsText(in DataUrl other)
+        private bool EqualsText(in DataUrlInfo other)
         {
             if (other.TryGetEmbeddedText(out string? otherText))
             {
@@ -64,7 +63,7 @@ namespace FolkerKinzel.Uris
             return false;
         }
 
-        private bool EqualsBytes(in DataUrl other)
+        private bool EqualsBytes(in DataUrlInfo other)
         {
             if (other.TryGetEmbeddedBytes(out byte[]? otherBytes))
             {
@@ -78,8 +77,6 @@ namespace FolkerKinzel.Uris
         }
 
         #endregion
-        #endregion
-        
 
     }
 }

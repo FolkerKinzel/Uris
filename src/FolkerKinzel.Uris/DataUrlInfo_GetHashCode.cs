@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FolkerKinzel.Uris
 {
-    public readonly partial struct DataUrl : IEquatable<DataUrl>, ICloneable
+    public readonly partial struct DataUrlInfo
     {
         /// <summary>
         /// Creates a hash code for this instance.

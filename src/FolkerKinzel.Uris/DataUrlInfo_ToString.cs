@@ -11,7 +11,7 @@ using FolkerKinzel.Strings.Polyfills;
 
 namespace FolkerKinzel.Uris
 {
-    public readonly partial struct DataUrl : IEquatable<DataUrl>, ICloneable
+    public readonly partial struct DataUrlInfo : IEquatable<DataUrlInfo>, ICloneable
     {
         /// <summary>
         /// Creates a "data" URL (RFC 2397) representation of the instance.
@@ -39,17 +39,17 @@ namespace FolkerKinzel.Uris
             if (Encoding == ContentEncoding.Base64 || IsEmpty)
             {
                 _ = builder.EnsureCapacity(ComputeCapacity());
-                _ = builder.Append(PROTOCOL).AppendMediaType(MimeType).Append(BASE64).Append(',').Append(Data);
+                _ = builder.Append(DataUrl.Protocol).AppendMediaType(MimeType).Append(DataUrl.Base64).Append(',').Append(Data);
             }
             else if(TryGetEmbeddedText(out string? text))
             {
-                string urlString = DataUrl.FromText(text);
+                string urlString = DataUrl.BuildFromEmbeddedText(text);
                 _ = builder.Append(urlString);
             }
             else // URL encoded bytes
             {
                 _ = TryGetEmbeddedBytes(out byte[]? bytes);
-                string urlString = DataUrl.FromBytes(bytes, in _mimeType);
+                string urlString = DataUrl.BuildFromEmbeddedBytes(bytes, in _mimeType);
                 _ = builder.Append(urlString);
             }
 
@@ -60,11 +60,11 @@ namespace FolkerKinzel.Uris
 
         private int ComputeCapacity()
         {
-            int capacity = PROTOCOL.Length + MimeTypes.MimeType.StringLength + Data.Length + 1;
+            int capacity = DataUrl.Protocol.Length + MimeTypes.MimeType.StringLength + Data.Length + 1;
 
             if (Encoding == ContentEncoding.Base64)
             {
-                capacity += BASE64.Length;
+                capacity += DataUrl.Base64.Length;
             }
 
             return capacity;
