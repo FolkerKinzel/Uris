@@ -24,7 +24,7 @@ namespace FolkerKinzel.Uris
         public bool TryGetEmbeddedText([NotNullWhen(true)] out string? embeddedText)
         {
             embeddedText = null;
-            if (!ContainsText)
+            if (!ContainsEmbeddedText)
             {
                 return false;
             }
@@ -85,7 +85,7 @@ namespace FolkerKinzel.Uris
         {
             embeddedBytes = null;
 
-            if (!ContainsBytes)
+            if (!ContainsEmbeddedBytes)
             {
                 return false;
             }

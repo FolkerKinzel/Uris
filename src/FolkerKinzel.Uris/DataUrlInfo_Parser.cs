@@ -38,23 +38,23 @@ namespace FolkerKinzel.Uris
         /// Tries to parse a <see cref="string"/> as <see cref="DataUrlInfo"/>.
         /// </summary>
         /// <param name="value">The <see cref="string"/> to parse.</param>
-        /// <param name="dataUrl">If the method returns <c>true</c> the parameter contains a <see cref="DataUrlInfo"/> structure that provides the contents
+        /// <param name="info">If the method returns <c>true</c> the parameter contains a <see cref="DataUrlInfo"/> structure that provides the contents
         /// of value. The parameter is passed uninitialized.</param>
         /// <returns><c>true</c> if <paramref name="value"/> could be parsed as <see cref="DataUrlInfo"/>, <c>false</c> otherwise.</returns>
-        public static bool TryParse(string? value, out DataUrlInfo dataUrl)
+        public static bool TryParse(string? value, out DataUrlInfo info)
         {
             ReadOnlyMemory<char> memory = value.AsMemory();
-            return TryParse(in memory, out dataUrl);
+            return TryParse(in memory, out info);
         }
 
         /// <summary>
         /// Tries to parse a <see cref="ReadOnlyMemory{T}">ReadOnlyMemory&lt;Char&gt;</see> as <see cref="DataUrlInfo"/>.
         /// </summary>
         /// <param name="value">The <see cref="ReadOnlyMemory{T}">ReadOnlyMemory&lt;Char&gt;</see> to parse.</param>
-        /// <param name="dataUrl">If the method returns <c>true</c> the parameter contains a <see cref="DataUrlInfo"/> structure that provides the contents
+        /// <param name="info">If the method returns <c>true</c> the parameter contains a <see cref="DataUrlInfo"/> structure that provides the contents
         /// of value. The parameter is passed uninitialized.</param>
         /// <returns><c>true</c> if <paramref name="value"/> could be parsed as <see cref="DataUrlInfo"/>, <c>false</c> otherwise.</returns>
-        public static bool TryParse(in ReadOnlyMemory<char> value, out DataUrlInfo dataUrl)
+        public static bool TryParse(in ReadOnlyMemory<char> value, out DataUrlInfo info)
         {
             ReadOnlySpan<char> span = value.Span;
 
@@ -114,12 +114,12 @@ namespace FolkerKinzel.Uris
                 }
             }
             ReadOnlyMemory<char> embeddedData = value.Slice(startOfData + 1);
-            dataUrl = new DataUrlInfo(in mediaType, dataEncoding, in embeddedData);
+            info = new DataUrlInfo(in mediaType, dataEncoding, in embeddedData);
 
             return true;
 
 Failed:
-            dataUrl = default;
+            info = default;
             return false;
 
 

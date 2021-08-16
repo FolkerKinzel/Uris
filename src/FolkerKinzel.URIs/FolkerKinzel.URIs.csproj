@@ -10,7 +10,7 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageIcon>Logo.png</PackageIcon>
     <PackageVersion>1.0.0-alpha.3</PackageVersion>
-    <FileVersion>1.0.0.81</FileVersion>
+    <FileVersion>1.0.0.82</FileVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <Description>.NET library that supports the work with URIs.</Description>
     <PackageTags>URI MIME C# .NET</PackageTags>

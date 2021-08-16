@@ -16,7 +16,8 @@ namespace FolkerKinzel.Uris
         /// <param name="obj">The <see cref="object"/> to compare with.</param>
         /// <returns><c>true</c> if <paramref name="obj"/> is a <see cref="DataUrlInfo"/> structure whose
         /// value is equal to that of this instance; <c>false</c>, otherwise.</returns>
-        public override bool Equals(object? obj) => obj is DataUrlInfo other && Equals(in other);
+        public override bool Equals(object? obj)
+            => obj is DataUrlInfo other && Equals(in other);
 
 
 
@@ -44,7 +45,7 @@ namespace FolkerKinzel.Uris
         #region private
 
         private bool EqualsData(in DataUrlInfo other)
-            => this.ContainsText
+            => this.ContainsEmbeddedText
                 ? EqualsText(in other)
                 : this.Encoding == ContentEncoding.Base64 && other.Encoding == ContentEncoding.Base64
                     ? this.Data.Equals(other.Data, StringComparison.Ordinal)
