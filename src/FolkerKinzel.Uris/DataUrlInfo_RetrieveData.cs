@@ -46,11 +46,9 @@ namespace FolkerKinzel.Uris
                     return false;
                 }
 
-                ReadOnlySpan<byte> dataSpan = data.AsSpan();
-
                 int bomLength = 0;
                 Encoding enc = charsetParameter.IsEmpty
-                                ? TextEncodingConverter.GetEncoding(TextEncodingConverter.ParseBom(dataSpan, out bomLength))
+                                ? TextEncodingConverter.GetEncoding(TextEncodingConverter.ParseBom(data, out bomLength))
                                 : charsetParameter.IsAsciiCharsetParameter
                                     ? System.Text.Encoding.UTF8
                                     : TextEncodingConverter.GetEncoding(charsetParameter.Value.ToString());
