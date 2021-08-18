@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FolkerKinzel.Uris
 {
-    public readonly partial struct DataUrlInfo : IEquatable<DataUrlInfo>, ICloneable
+    public readonly partial struct DataUrlInfo
     {
         #region Operators
 

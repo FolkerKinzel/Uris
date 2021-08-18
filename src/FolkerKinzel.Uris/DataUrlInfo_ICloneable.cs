@@ -37,9 +37,9 @@ namespace FolkerKinzel.Uris
             }
 
             ReadOnlyMemory<char> memory = ToString().AsMemory();
-            _ = TryParse(in memory, out DataUrlInfo dataUrl);
+            _ = DataUrl.TryParse(in memory, out DataUrlInfo? dataUrl);
 
-            return dataUrl;
+            return dataUrl!.Value;
         }
 
 

@@ -7,7 +7,7 @@ using FolkerKinzel.MimeTypes;
 
 namespace FolkerKinzel.Uris
 {
-    public readonly partial struct DataUrlInfo : IEquatable<DataUrlInfo>, ICloneable
+    public readonly partial struct DataUrlInfo
     {
         private readonly ReadOnlyMemory<char> _embeddedData;
         private readonly MimeType _mimeType;
@@ -30,22 +30,31 @@ namespace FolkerKinzel.Uris
         public ReadOnlySpan<char> Data => _embeddedData.Span;
 
         /// <summary>
-        /// <c>true</c> if <see cref="Data"/> contains text.
+        /// Indicates whether <see cref="Data"/> contains text.
         /// </summary>
+        /// <value>
+        /// <c>true</c> if <see cref="Data"/> contains text, otherwise <c>false</c>.
+        /// </value>
         public bool ContainsEmbeddedText => this.MimeType.IsText;
 
         /// <summary>
-        /// <c>true</c> if <see cref="Data"/> contains binary data.
+        /// Indicates whether <see cref="Data"/> contains binary data.
         /// </summary>
+        /// <value>
+        /// <c>true</c> if <see cref="Data"/> contains binary data, otherwise <c>false</c>.
+        /// </value>
         public bool ContainsEmbeddedBytes => Encoding == ContentEncoding.Base64 || !ContainsEmbeddedText;
 
         /// <summary>
-        /// <c>true</c> if the <see cref="DataUrlInfo"/> contains nothing.
+        /// Indicates whether the instance contains no data.
         /// </summary>
+        /// <value>
+        /// <c>true</c> if the instance contains no data, otherwise <c>false</c>.
+        /// </value>
         public bool IsEmpty => this.MimeType.IsEmpty;
 
         /// <summary>
-        /// Returns an empty <see cref="DataUrlInfo"/>.
+        /// Returns a <see cref="DataUrlInfo"/> instance, which is <see cref="Empty"/>.
         /// </summary>
         public static DataUrlInfo Empty => default;
 

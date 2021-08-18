@@ -15,7 +15,7 @@ namespace FolkerKinzel.Uris
     {
 
         /// <summary>
-        /// Tries to retrieve the text that is embedded in the <see cref="DataUrlInfo"/>.
+        /// Tries to retrieve the text, which is embedded in the "data" URL.
         /// </summary>
         /// <param name="embeddedText">If the method returns <c>true</c> the parameter contains the text, which was embedded in the <see cref="DataUrlInfo"/>.
         /// The parameter is passed uninitialized.</param>
@@ -45,7 +45,7 @@ namespace FolkerKinzel.Uris
                     return false;
                 }
 
-                int codePage = TextEncodingConverter.ParseBom(data, out int bomLength);
+                int codePage = TextEncodingConverter.GetCodePage(data, out int bomLength);
 
                 Encoding enc = charsetParameter.IsEmpty
                                 ? TextEncodingConverter.GetEncoding(codePage)
@@ -74,7 +74,7 @@ namespace FolkerKinzel.Uris
 
 
         /// <summary>
-        /// Tries to retrieve the binary data that is embedded in the <see cref="DataUrlInfo"/>.
+        /// Tries to retrieve the binary data, which is embedded in the "data" URL.
         /// </summary>
         /// <param name="embeddedBytes">If the method returns <c>true</c> the parameter contains the binary data, which was embedded in the <see cref="DataUrlInfo"/>.
         /// The parameter is passed uninitialized.</param>
@@ -110,7 +110,7 @@ namespace FolkerKinzel.Uris
 
 
         /// <summary>
-        /// Returns an appropriate file type extension for the data embedded in the <see cref="DataUrlInfo"/>. The file type extension contains the 
+        /// Returns an appropriate file type extension for the data embedded in the "data" URL. The file type extension contains the 
         /// period (".").
         /// </summary>
         /// <returns>An appropriate file type extension for the data embedded in the <see cref="DataUrlInfo"/>.</returns>

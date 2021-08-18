@@ -11,7 +11,7 @@ using FolkerKinzel.Strings.Polyfills;
 
 namespace FolkerKinzel.Uris
 {
-    public readonly partial struct DataUrlInfo : IEquatable<DataUrlInfo>, ICloneable
+    public readonly partial struct DataUrlInfo
     {
         /// <summary>
         /// Creates a "data" URL (RFC 2397) representation of the instance.
@@ -24,7 +24,7 @@ namespace FolkerKinzel.Uris
         }
 
         /// <summary>
-        /// Appends a <see cref="string"/> representation of this instance to a <see cref="StringBuilder"/>.
+        /// Appends a "data" URL (RFC 2397) representation of the instance to a <see cref="StringBuilder"/>.
         /// </summary>
         /// <param name="builder">The <see cref="StringBuilder"/>.</param>
         /// <returns>A reference to <paramref name="builder"/>.</returns>

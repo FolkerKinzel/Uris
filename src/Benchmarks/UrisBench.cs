@@ -12,8 +12,8 @@ namespace Benchmarks
         //private readonly StringBuilder _builder = new(16);
         //private const string TEST = "test";
 
-        private readonly DataUrlInfo _dataUrlText1;
-        private readonly DataUrlInfo _dataUrlText2;
+        private readonly DataUrlInfo? _dataUrlText1;
+        private readonly DataUrlInfo? _dataUrlText2;
 
         public UrisBench()
         {
@@ -25,8 +25,8 @@ namespace Benchmarks
 #endif
             string s = $"data:;charset={isoEncoding};base64,{Convert.ToBase64String(Encoding.GetEncoding(isoEncoding).GetBytes(data))}";
 
-            _dataUrlText1 = DataUrlInfo.Parse(s);
-            _dataUrlText2 = DataUrlInfo.Parse(DataUrl.BuildFromEmbeddedText(data));
+            _ = DataUrl.TryParse(s, out _dataUrlText1);
+            _ = DataUrl.TryParse(DataUrl.BuildFromEmbeddedText(data), out _dataUrlText2);
         }
 
 

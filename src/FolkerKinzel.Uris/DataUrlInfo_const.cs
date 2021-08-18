@@ -8,7 +8,6 @@ namespace FolkerKinzel.Uris
 {
     public readonly partial struct DataUrlInfo
     {
-        private const string DEFAULT_MEDIA_TYPE = "text/plain";
         
     }
 }

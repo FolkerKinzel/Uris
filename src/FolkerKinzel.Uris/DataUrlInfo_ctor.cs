@@ -17,7 +17,7 @@ using FolkerKinzel.Strings.Polyfills;
 namespace FolkerKinzel.Uris
 {
     /// <summary>
-    /// Represents a "data" URL (RFC 2397) that embeds data in-line in a URL.
+    /// Provides the information stored in a "data" URL (RFC 2397).
     /// </summary>
     /// <remarks>
     /// <note type="tip">
