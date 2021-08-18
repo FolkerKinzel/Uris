@@ -40,7 +40,7 @@ namespace FolkerKinzel.Uris
         public bool Equals(in DataUrlInfo other)
             => this.IsEmpty || other.IsEmpty
                 ? this.IsEmpty && other.IsEmpty
-                : EqualsData(in other) && StringComparer.Ordinal.Equals(this.GetFileTypeExtension(), other.GetFileTypeExtension());
+                : EqualsData(in other) && StringComparer.Ordinal.Equals(GetFileTypeExtension(), other.GetFileTypeExtension());
 
         #region private
 
@@ -55,7 +55,7 @@ namespace FolkerKinzel.Uris
         {
             if (other.TryGetEmbeddedText(out string? otherText))
             {
-                if (this.TryGetEmbeddedText(out string? thisText))
+                if (TryGetEmbeddedText(out string? thisText))
                 {
                     return StringComparer.Ordinal.Equals(thisText, otherText);
                 }
@@ -68,7 +68,7 @@ namespace FolkerKinzel.Uris
         {
             if (other.TryGetEmbeddedBytes(out byte[]? otherBytes))
             {
-                if (this.TryGetEmbeddedBytes(out byte[]? thisBytes))
+                if (TryGetEmbeddedBytes(out byte[]? thisBytes))
                 {
                     return thisBytes.SequenceEqual(otherBytes);
                 }
