@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using FolkerKinzel.MimeTypes;
@@ -79,6 +80,16 @@ namespace FolkerKinzel.Uris
         /// <param name="embeddedBytes">If the method returns <c>true</c> the parameter contains the binary data, which was embedded in the <see cref="DataUrlInfo"/>.
         /// The parameter is passed uninitialized.</param>
         /// <returns><c>true</c> if the data embedded in the data url could be parsed as binary data, <c>false</c> otherwise.</returns>
+        /// 
+        /// <example>
+        /// <note type="note">
+        /// For the sake of better readability, exception handling is ommitted in the example.
+        /// </note>
+        /// <para>
+        /// Creating and parsing a "data" URL:
+        /// </para>
+        /// <code language="c#" source="./../Examples/DataUrlExample.cs"/>
+        /// </example>
         public bool TryGetEmbeddedBytes([NotNullWhen(true)] out byte[]? embeddedBytes)
         {
             embeddedBytes = null;
@@ -114,8 +125,18 @@ namespace FolkerKinzel.Uris
         /// period (".").
         /// </summary>
         /// <returns>An appropriate file type extension for the data embedded in the <see cref="DataUrlInfo"/>.</returns>
-        ///// <remarks>The search for a file type extension can be an expensive operation. To make subsequent calls of the method faster, the
-        ///// recent file type extensions are stored in a cache. You can call <see cref="MimeType.ClearCache"/> to clear this cache.</remarks>
+        /// <remarks>This method calls <see cref="MimeType.GetFileTypeExtension()"/>.</remarks>
+        /// 
+        ///<example>
+        /// <note type="note">
+        /// For the sake of better readability, exception handling is ommitted in the example.
+        /// </note>
+        /// <para>
+        /// Creating and parsing a "data" URL:
+        /// </para>
+        /// <code language="c#" source="./../Examples/DataUrlExample.cs"/>
+        /// </example>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string GetFileTypeExtension() => MimeType.GetFileTypeExtension();
 
 

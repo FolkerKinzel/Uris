@@ -35,7 +35,7 @@ namespace FolkerKinzel.Uris
         internal const string Base64 = ";base64";
         internal const string DEFAULT_MEDIA_TYPE = "text/plain";
         #endregion
-        
+
 
         /// <summary>
         /// Embeds Text in a "data" URL (RFC 2397).
@@ -125,6 +125,16 @@ namespace FolkerKinzel.Uris
         /// <exception cref="ArgumentNullException"><paramref name="filePath"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException"><paramref name="filePath"/> is not a valid file path.</exception>
         /// <exception cref="IOException">I/O error.</exception>
+        /// 
+        ///<example>
+        /// <note type="note">
+        /// For the sake of better readability, exception handling is ommitted in the example.
+        /// </note>
+        /// <para>
+        /// Creating and parsing a "data" URL:
+        /// </para>
+        /// <code language="c#" source="./../Examples/DataUrlExample.cs"/>
+        /// </example>
         public static string FromFile(string filePath, in MimeType? mimeType = null)
         {
             byte[] bytes = LoadFile(filePath);
@@ -142,7 +152,7 @@ namespace FolkerKinzel.Uris
             return mediaType;
         }
 
-        
+
         #region private
 
         //    private static async Task<byte[]> LoadFileAsync(string path)
@@ -221,7 +231,7 @@ namespace FolkerKinzel.Uris
                 throw new IOException(e.Message, e);
             }
         }
-        
+
         #endregion
 
 

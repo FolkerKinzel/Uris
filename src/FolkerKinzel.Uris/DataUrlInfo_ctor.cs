@@ -33,6 +33,16 @@ namespace FolkerKinzel.Uris
     /// </para>
     /// </note>
     /// </remarks>
+    /// 
+    /// <example>
+    /// <note type="note">
+    /// For the sake of better readability, exception handling is ommitted in the example.
+    /// </note>
+    /// <para>
+    /// Creating and parsing a "data" URL:
+    /// </para>
+    /// <code language="c#" source="./../Examples/DataUrlExample.cs"/>
+    /// </example>
     public readonly partial struct DataUrlInfo
     {
         private DataUrlInfo(in MimeType mediaType, DataEncoding dataEncoding, in ReadOnlyMemory<char> embeddedData)

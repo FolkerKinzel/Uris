@@ -13,7 +13,7 @@ namespace FolkerKinzel.Uris
 {
     public readonly partial struct DataUrlInfo
     {
-        
+
         #region Parser
 
         /// <summary>
@@ -23,6 +23,15 @@ namespace FolkerKinzel.Uris
         /// <returns>A <see cref="DataUrlInfo"/> instance, which represents <paramref name="value"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException"><paramref name="value"/> could not be parsed as <see cref="DataUrlInfo"/>.</exception>
+        /// <example>
+        /// <note type="note">
+        /// For the sake of better readability, exception handling is ommitted in the example.
+        /// </note>
+        /// <para>
+        /// Creating and parsing a "data" URL:
+        /// </para>
+        /// <code language="c#" source="./../Examples/DataUrlExample.cs"/>
+        /// </example>
         public static DataUrlInfo Parse(string value)
             => value is null
                 ? throw new ArgumentNullException(nameof(value))
@@ -160,7 +169,7 @@ Failed:
             }
         }
 
-        
+
 
         #endregion
 

@@ -29,8 +29,8 @@ namespace FolkerKinzel.Uris.Tests
         [TestMethod]
         public void IsEmptyTest2()
         {
-            _ = DataUrl.TryParse("data:,abc", out DataUrlInfo? dataUrl);
-            Assert.IsFalse(dataUrl!.Value.IsEmpty);
+            _ = DataUrlInfo.TryParse("data:,abc", out DataUrlInfo dataUrl);
+            Assert.IsFalse(dataUrl.IsEmpty);
         }
 
         [TestMethod]
@@ -41,9 +41,9 @@ namespace FolkerKinzel.Uris.Tests
 
             string test = DATA_PROTOCOL + "text/plain;charset=utf-8" + ";" + DEFAULT_ENCODING + "," + Uri.EscapeDataString(text);
 
-            Assert.IsTrue(DataUrl.TryParse(test, out DataUrlInfo? dataUri));
+            Assert.IsTrue(DataUrlInfo.TryParse(test, out DataUrlInfo dataUri));
 
-            Assert.IsTrue(dataUri!.Value.TryGetEmbeddedText(out string? outText));
+            Assert.IsTrue(dataUri.TryGetEmbeddedText(out string? outText));
             Assert.AreEqual(text, outText);
 
             outText = DataUrl.FromText(text);
@@ -78,7 +78,7 @@ namespace FolkerKinzel.Uris.Tests
         [DataRow(null)]
         [DataRow("")]
         [DataRow("http://wwww.folker-kinzel.de/index.htm")]
-        public void TryParseTest3(string? value) => Assert.IsFalse(DataUrl.TryParse(value, out _));
+        public void TryParseTest3(string? value) => Assert.IsFalse(DataUrlInfo.TryParse(value, out _));
 
 
         [TestMethod()]
@@ -86,16 +86,16 @@ namespace FolkerKinzel.Uris.Tests
         {
             string test = "data:;charset=UTF-8,Text";
 
-            Assert.IsTrue(DataUrl.TryParse(test, out DataUrlInfo? dataUrl2));
+            Assert.IsTrue(DataUrlInfo.TryParse(test, out DataUrlInfo dataUrl2));
 
-            Assert.AreEqual(dataUrl2!.Value.Data.ToString(), "Text");
-            Assert.AreEqual(dataUrl2.Value.MimeType.MediaType.ToString(), "text");
-            Assert.AreEqual(dataUrl2.Value.MimeType.SubType.ToString(), "plain");
+            Assert.AreEqual(dataUrl2.Data.ToString(), "Text");
+            Assert.AreEqual(dataUrl2.MimeType.MediaType.ToString(), "text");
+            Assert.AreEqual(dataUrl2.MimeType.SubType.ToString(), "plain");
 
-            Assert.AreEqual(dataUrl2.Value.MimeType.Parameters.First().Value.ToString(), "UTF-8");
-            Assert.AreEqual(dataUrl2.Value.DataEncoding, DataEncoding.Url);
+            Assert.AreEqual(dataUrl2.MimeType.Parameters.First().Value.ToString(), "UTF-8");
+            Assert.AreEqual(dataUrl2.DataEncoding, DataEncoding.Url);
 
-            Assert.IsTrue(dataUrl2.Value.TryGetEmbeddedText(out string? outString));
+            Assert.IsTrue(dataUrl2.TryGetEmbeddedText(out string? outString));
             Assert.AreEqual("Text", outString);
         }
 
@@ -105,11 +105,11 @@ namespace FolkerKinzel.Uris.Tests
             const string url = "data:application/x-octet,A%42C";
             byte[] data = new byte[] { 0x41, 0x42, 0x43 };
 
-            Assert.IsTrue(DataUrl.TryParse(url, out DataUrlInfo? dataUrl));
-            Assert.AreEqual(DataEncoding.Url, dataUrl!.Value.DataEncoding);
-            Assert.IsTrue(dataUrl.Value.ContainsEmbeddedBytes);
+            Assert.IsTrue(DataUrlInfo.TryParse(url, out DataUrlInfo dataUrl));
+            Assert.AreEqual(DataEncoding.Url, dataUrl.DataEncoding);
+            Assert.IsTrue(dataUrl.ContainsEmbeddedBytes);
 
-            Assert.IsTrue(dataUrl.Value.TryGetEmbeddedBytes(out byte[]? output));
+            Assert.IsTrue(dataUrl.TryGetEmbeddedBytes(out byte[]? output));
 
             CollectionAssert.AreEqual(data, output);
         }
@@ -117,7 +117,7 @@ namespace FolkerKinzel.Uris.Tests
         [DataTestMethod]
         [DataRow("data:abc")]
         //[DataRow("data:,a bc")]
-        public void TryParseTest7(string input) => Assert.IsFalse(DataUrl.TryParse(input, out _));
+        public void TryParseTest7(string input) => Assert.IsFalse(DataUrlInfo.TryParse(input, out _));
 
         [TestMethod]
         public void TryParseTest8()
@@ -130,7 +130,7 @@ namespace FolkerKinzel.Uris.Tests
 #endif
             string s = $"data:;charset={isoEncoding};base64,{Convert.ToBase64String(Encoding.GetEncoding(isoEncoding).GetBytes(data))}";
 
-            Assert.IsTrue(DataUrl.TryParse(s, out DataUrlInfo? dataUrlText1));
+            Assert.IsTrue(DataUrlInfo.TryParse(s, out DataUrlInfo dataUrlText1));
         }
 
         [TestMethod]
@@ -143,9 +143,9 @@ namespace FolkerKinzel.Uris.Tests
                 _ = sb.Append('%').Append(i.ToString("x2"));
             }
 
-            Assert.IsTrue(DataUrl.TryParse($"data:application/octet-stream,{sb}", out DataUrlInfo? dataUrl));
-            Assert.IsTrue(dataUrl!.Value.ContainsEmbeddedBytes);
-            Assert.IsTrue(dataUrl.Value.TryGetEmbeddedBytes(out byte[]? bytes));
+            Assert.IsTrue(DataUrlInfo.TryParse($"data:application/octet-stream,{sb}", out DataUrlInfo dataUrl));
+            Assert.IsTrue(dataUrl.ContainsEmbeddedBytes);
+            Assert.IsTrue(dataUrl.TryGetEmbeddedBytes(out byte[]? bytes));
             Assert.AreEqual(256, bytes!.Length);
 
             for (int i = 0; i < bytes!.Length; i++)
@@ -160,19 +160,19 @@ namespace FolkerKinzel.Uris.Tests
             string text = "This is long Ascii text.";
             string urlString = DataUrl.FromText(text);
 
-            Assert.IsTrue(DataUrl.TryParse(urlString, out DataUrlInfo? dataUrl));
-            Assert.AreEqual(DataEncoding.Url, dataUrl!.Value.DataEncoding);
-            Assert.IsTrue(dataUrl.Value.ContainsEmbeddedText);
-            Assert.IsFalse(dataUrl.Value.ContainsEmbeddedBytes);
-            Assert.IsTrue(dataUrl.Value.TryGetEmbeddedText(out string? outText));
+            Assert.IsTrue(DataUrlInfo.TryParse(urlString, out DataUrlInfo dataUrl));
+            Assert.AreEqual(DataEncoding.Url, dataUrl.DataEncoding);
+            Assert.IsTrue(dataUrl.ContainsEmbeddedText);
+            Assert.IsFalse(dataUrl.ContainsEmbeddedBytes);
+            Assert.IsTrue(dataUrl.TryGetEmbeddedText(out string? outText));
             Assert.AreEqual(text, outText);
         }
 
         [TestMethod]
         public void GetFileTypeExtensionTest()
         {
-            Assert.IsTrue(DataUrl.TryParse("data:,abc", out DataUrlInfo? dataUrl));
-            Assert.AreEqual(".txt", dataUrl!.Value.GetFileTypeExtension());
+            Assert.IsTrue(DataUrlInfo.TryParse("data:,abc", out DataUrlInfo dataUrl));
+            Assert.AreEqual(".txt", dataUrl.GetFileTypeExtension());
         }
 
 
@@ -344,14 +344,14 @@ namespace FolkerKinzel.Uris.Tests
         {
             const string input = "data:,This is unescaped ASCII text.";
 
-            Assert.IsTrue(DataUrl.TryParse(input, out DataUrlInfo? info));
-            Assert.IsTrue(info!.Value.ContainsEmbeddedText);
-            Assert.IsFalse(info.Value.ContainsEmbeddedBytes);
+            Assert.IsTrue(DataUrlInfo.TryParse(input, out DataUrlInfo info));
+            Assert.IsTrue(info.ContainsEmbeddedText);
+            Assert.IsFalse(info.ContainsEmbeddedBytes);
 
-            string output = info.Value.ToString();
+            string output = info.ToString();
 
             Assert.AreNotEqual(input, output);
-            Assert.IsTrue(DataUrl.TryParse(output, out DataUrlInfo? dataUrl2));
+            Assert.IsTrue(DataUrlInfo.TryParse(output, out DataUrlInfo dataUrl2));
             Assert.AreEqual(info, dataUrl2);
         }
 
@@ -370,8 +370,8 @@ namespace FolkerKinzel.Uris.Tests
             var mime = MimeType.Parse($"text/plain; charset={encodingName}");
             string urlStr2 = DataUrl.FromBytes(bytes, in mime);
 
-            Assert.IsTrue(DataUrl.TryParse(urlStr1, out DataUrlInfo? dataUrl1));
-            Assert.IsTrue(DataUrl.TryParse(urlStr2, out DataUrlInfo? dataUrl2));
+            Assert.IsTrue(DataUrlInfo.TryParse(urlStr1, out DataUrlInfo dataUrl1));
+            Assert.IsTrue(DataUrlInfo.TryParse(urlStr2, out DataUrlInfo dataUrl2));
 
             Assert.IsTrue(dataUrl1 == dataUrl2);
             Assert.IsFalse(dataUrl1 != dataUrl2);
@@ -379,8 +379,8 @@ namespace FolkerKinzel.Uris.Tests
 
             Assert.IsTrue(dataUrl1.Equals(dataUrl2));
 
-            object? o1 = dataUrl1!.Value;
-            object? o2 = dataUrl2!.Value;
+            object? o1 = dataUrl1;
+            object? o2 = dataUrl2;
 
             //Assert.IsTrue(dataUrl1 == o2);
             //Assert.IsFalse(o1 != o2);
@@ -396,8 +396,8 @@ namespace FolkerKinzel.Uris.Tests
             string urlStr1 = $"data:application/octet-stream,{input}";
             string urlStr2 = $"data:application/octet-stream;base64,{Convert.ToBase64String(Encoding.ASCII.GetBytes(input))}";
 
-            Assert.IsTrue(DataUrl.TryParse(urlStr1, out DataUrlInfo? dataUrl1));
-            Assert.IsTrue(DataUrl.TryParse(urlStr2, out DataUrlInfo? dataUrl2));
+            Assert.IsTrue(DataUrlInfo.TryParse(urlStr1, out DataUrlInfo dataUrl1));
+            Assert.IsTrue(DataUrlInfo.TryParse(urlStr2, out DataUrlInfo dataUrl2));
 
             Assert.IsTrue(dataUrl1 == dataUrl2);
         }
@@ -405,8 +405,8 @@ namespace FolkerKinzel.Uris.Tests
         [TestMethod]
         public void CloneTest1()
         {
-            Assert.IsTrue(DataUrl.TryParse("data:,xyz", out DataUrlInfo? dtInfo));
-            ICloneable info = dtInfo!.Value;
+            Assert.IsTrue(DataUrlInfo.TryParse("data:,xyz", out DataUrlInfo dtInfo));
+            ICloneable info = dtInfo;
 
             object dataUrl2 = info.Clone();
 
