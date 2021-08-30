@@ -35,10 +35,10 @@ namespace FolkerKinzel.Uris
     /// </remarks>
     public readonly partial struct DataUrlInfo
     {
-        internal DataUrlInfo(in MimeType mediaType, ContentEncoding dataEncoding, in ReadOnlyMemory<char> embeddedData)
+        private DataUrlInfo(in MimeType mediaType, DataEncoding dataEncoding, in ReadOnlyMemory<char> embeddedData)
         {
             _mimeType = mediaType;
-            Encoding = dataEncoding;
+            DataEncoding = dataEncoding;
             _embeddedData = embeddedData;
         }
     }

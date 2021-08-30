@@ -29,7 +29,7 @@ namespace FolkerKinzel.Uris
             }
 
             // als Base64 codierter Text:
-            if (Encoding == ContentEncoding.Base64)
+            if (DataEncoding == DataEncoding.Base64)
             {
                 static bool Predicate(MimeTypeParameter p) => p.IsCharsetParameter;
 
@@ -90,7 +90,7 @@ namespace FolkerKinzel.Uris
 
             try
             {
-                if (this.Encoding == ContentEncoding.Base64)
+                if (this.DataEncoding == DataEncoding.Base64)
                 {
                     embeddedBytes = Convert.FromBase64String(Data.ToString());
                 }

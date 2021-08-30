@@ -46,13 +46,13 @@ namespace FolkerKinzel.Uris.Tests
             Assert.IsTrue(dataUri!.Value.TryGetEmbeddedText(out string? outText));
             Assert.AreEqual(text, outText);
 
-            outText = DataUrl.BuildFromEmbeddedText(text);
+            outText = DataUrl.FromText(text);
 
             Assert.IsNotNull(outText);
 
             Assert.IsTrue(MimeType.TryParse("application/x-octet", out MimeType mime));
 
-            outText = DataUrl.BuildFromEmbeddedBytes(new byte[] { 1, 2, 3 }, mime);
+            outText = DataUrl.FromBytes(new byte[] { 1, 2, 3 }, mime);
 
             Assert.IsNotNull(outText);
         }
@@ -63,13 +63,13 @@ namespace FolkerKinzel.Uris.Tests
             string text = "http://www.fölkerchen.de";
             //string test = DATA_PROTOCOL + "text/plain;charset=utf-8" + ";" + DEFAULT_ENCODING + "," + Uri.EscapeDataString(text);
 
-            string outText = DataUrl.BuildFromEmbeddedText(text);
+            string outText = DataUrl.FromText(text);
 
             Assert.IsNotNull(outText);
 
             Assert.IsTrue(MimeType.TryParse("application/x-octet", out MimeType mime));
 
-            outText = DataUrl.BuildFromEmbeddedBytes(new byte[] { 1, 2, 3 }, mime);
+            outText = DataUrl.FromBytes(new byte[] { 1, 2, 3 }, mime);
 
             Assert.IsNotNull(outText);
         }
@@ -93,7 +93,7 @@ namespace FolkerKinzel.Uris.Tests
             Assert.AreEqual(dataUrl2.Value.MimeType.SubType.ToString(), "plain");
 
             Assert.AreEqual(dataUrl2.Value.MimeType.Parameters.First().Value.ToString(), "UTF-8");
-            Assert.AreEqual(dataUrl2.Value.Encoding, ContentEncoding.Url);
+            Assert.AreEqual(dataUrl2.Value.DataEncoding, DataEncoding.Url);
 
             Assert.IsTrue(dataUrl2.Value.TryGetEmbeddedText(out string? outString));
             Assert.AreEqual("Text", outString);
@@ -106,7 +106,7 @@ namespace FolkerKinzel.Uris.Tests
             byte[] data = new byte[] { 0x41, 0x42, 0x43 };
 
             Assert.IsTrue(DataUrl.TryParse(url, out DataUrlInfo? dataUrl));
-            Assert.AreEqual(ContentEncoding.Url, dataUrl!.Value.Encoding);
+            Assert.AreEqual(DataEncoding.Url, dataUrl!.Value.DataEncoding);
             Assert.IsTrue(dataUrl.Value.ContainsEmbeddedBytes);
 
             Assert.IsTrue(dataUrl.Value.TryGetEmbeddedBytes(out byte[]? output));
@@ -158,10 +158,10 @@ namespace FolkerKinzel.Uris.Tests
         public void TryParseTest10()
         {
             string text = "This is long Ascii text.";
-            string urlString = DataUrl.BuildFromEmbeddedText(text);
+            string urlString = DataUrl.FromText(text);
 
             Assert.IsTrue(DataUrl.TryParse(urlString, out DataUrlInfo? dataUrl));
-            Assert.AreEqual(ContentEncoding.Url, dataUrl!.Value.Encoding);
+            Assert.AreEqual(DataEncoding.Url, dataUrl!.Value.DataEncoding);
             Assert.IsTrue(dataUrl.Value.ContainsEmbeddedText);
             Assert.IsFalse(dataUrl.Value.ContainsEmbeddedBytes);
             Assert.IsTrue(dataUrl.Value.TryGetEmbeddedText(out string? outText));
@@ -360,7 +360,7 @@ namespace FolkerKinzel.Uris.Tests
         public void EqualsTest1()
         {
             const string input = "Märchenbücher";
-            string urlStr1 = DataUrl.BuildFromEmbeddedText(input);
+            string urlStr1 = DataUrl.FromText(input);
 
             const string encodingName = "iso-8859-1";
             Encoding encoding = TextEncodingConverter.GetEncoding(encodingName);
@@ -368,7 +368,7 @@ namespace FolkerKinzel.Uris.Tests
             byte[]? bytes = encoding.GetBytes(input);
 
             var mime = MimeType.Parse($"text/plain; charset={encodingName}");
-            string urlStr2 = DataUrl.BuildFromEmbeddedBytes(bytes, in mime);
+            string urlStr2 = DataUrl.FromBytes(bytes, in mime);
 
             Assert.IsTrue(DataUrl.TryParse(urlStr1, out DataUrlInfo? dataUrl1));
             Assert.IsTrue(DataUrl.TryParse(urlStr2, out DataUrlInfo? dataUrl2));

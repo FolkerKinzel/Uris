@@ -47,7 +47,7 @@ namespace FolkerKinzel.Uris
         private bool EqualsData(in DataUrlInfo other)
             => this.ContainsEmbeddedText
                 ? EqualsText(in other)
-                : this.Encoding == ContentEncoding.Base64 && other.Encoding == ContentEncoding.Base64
+                : this.DataEncoding == DataEncoding.Base64 && other.DataEncoding == DataEncoding.Base64
                     ? this.Data.Equals(other.Data, StringComparison.Ordinal)
                     : EqualsBytes(in other);
 

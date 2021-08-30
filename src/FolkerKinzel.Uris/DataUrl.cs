@@ -11,6 +11,7 @@ using FolkerKinzel.Strings;
 using FolkerKinzel.Strings.Polyfills;
 using FolkerKinzel.Uris.Extensions;
 using FolkerKinzel.Uris.Intls;
+using FolkerKinzel.Uris.Properties;
 
 namespace FolkerKinzel.Uris
 {
@@ -18,13 +19,21 @@ namespace FolkerKinzel.Uris
     /// Static class, which provides methods to support the work with <see cref="string"/>s and <see cref="Uri"/>s
     /// that represent a "data" URL (RFC 2397) that embeds data in-line in a URL.
     /// </summary>
+    /// <example>
+    /// <note type="note">
+    /// For the sake of better readability, exception handling is ommitted in the example.
+    /// </note>
+    /// <para>
+    /// Creating and parsing a "data" URL:
+    /// </para>
+    /// <code language="c#" source="./../Examples/DataUrlExample.cs"/>
+    /// </example>
     public static class DataUrl
     {
         #region const
         internal const string Protocol = "data:";
         internal const string Base64 = ";base64";
-        private const string DEFAULT_MEDIA_TYPE = "text/plain";
-
+        internal const string DEFAULT_MEDIA_TYPE = "text/plain";
         #endregion
         
 
@@ -34,7 +43,7 @@ namespace FolkerKinzel.Uris
         /// <param name="text">The text to embed into the "data" URL. <paramref name="text"/> MUST not be URL encoded.</param>
         /// <returns>A "data" URL, into which the text provided by the parameter <paramref name="text"/> is embedded.</returns>
         /// <exception cref="FormatException">The <see cref="Uri"/> class was not able to encode <paramref name="text"/> correctly.</exception>
-        public static string BuildFromEmbeddedText(string? text)
+        public static string FromText(string? text)
         {
             const string charset = ";charset=utf-8";
 
@@ -68,7 +77,7 @@ namespace FolkerKinzel.Uris
         /// <param name="bytes">The binary data to embed into the "data" URL.</param>
         /// <param name="mimeType">The <see cref="MimeType"/> of the data passed to the parameter <paramref name="bytes"/>.</param>
         /// <returns>A "data" URL, into which the binary data provided by the parameter <paramref name="bytes"/> is embedded.</returns>
-        public static string BuildFromEmbeddedBytes(byte[]? bytes, in MimeType mimeType)
+        public static string FromBytes(byte[]? bytes, in MimeType mimeType)
         {
             string data = bytes is null ? string.Empty : Convert.ToBase64String(bytes, Base64FormattingOptions.None);
             var builder = new StringBuilder(Protocol.Length + FolkerKinzel.MimeTypes.MimeType.StringLength + Base64.Length + 1 + data.Length);
@@ -116,149 +125,14 @@ namespace FolkerKinzel.Uris
         /// <exception cref="ArgumentNullException"><paramref name="filePath"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException"><paramref name="filePath"/> is not a valid file path.</exception>
         /// <exception cref="IOException">I/O error.</exception>
-        public static string BuildFromEmbeddedFileContent(string filePath, in MimeType? mimeType = null)
+        public static string FromFile(string filePath, in MimeType? mimeType = null)
         {
             byte[] bytes = LoadFile(filePath);
 
             MimeType mimeTypeValue = mimeType ?? MimeTypes.MimeType.FromFileTypeExtension(Path.GetExtension(filePath));
-            return BuildFromEmbeddedBytes(bytes, in mimeTypeValue);
+            return FromBytes(bytes, in mimeTypeValue);
         }
 
-
-        
-        #region Parser
-
-        ///// <summary>
-        ///// Parses a <see cref="string"/> as <see cref="DataUrlInfo"/>.
-        ///// </summary>
-        ///// <param name="value">The <see cref="string"/> to parse.</param>
-        ///// <returns>The <see cref="DataUrlInfo"/> instance, which <paramref name="value"/> represents.</returns>
-        ///// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
-        ///// <exception cref="ArgumentException"><paramref name="value"/> value could not be parsed as <see cref="DataUrlInfo"/>.</exception>
-        //public static DataUrlInfo Parse(string value)
-        //    => value is null
-        //        ? throw new ArgumentNullException(nameof(value))
-        //        : TryParse(value, out DataUrlInfo dataUrl)
-        //            ? dataUrl
-        //            : throw new ArgumentException(string.Format(Res.InvalidDataUrl, nameof(value)), nameof(value));
-
-
-        /// <summary>
-        /// Tries to parse a <see cref="string"/> as <see cref="DataUrlInfo"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="string"/> to parse.</param>
-        /// <param name="info">If the method returns <c>true</c> the parameter contains a <see cref="DataUrlInfo"/> structure 
-        /// that provides the contents
-        /// of <paramref name="value"/>, otherwise <c>null</c>. The parameter is passed uninitialized.</param>
-        /// <returns><c>true</c> if <paramref name="value"/> could be parsed as <see cref="DataUrlInfo"/>, otherwise <c>false</c>.</returns>
-        public static bool TryParse(string? value, [NotNullWhen(true)] out DataUrlInfo? info)
-        {
-            ReadOnlyMemory<char> memory = value.AsMemory();
-            return TryParse(in memory, out info);
-        }
-
-        /// <summary>
-        /// Tries to parse a <see cref="ReadOnlyMemory{T}">ReadOnlyMemory&lt;Char&gt;</see> as <see cref="DataUrlInfo"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="ReadOnlyMemory{T}">ReadOnlyMemory&lt;Char&gt;</see> to parse.</param>
-        /// <param name="info">If the method returns <c>true</c> the parameter contains a <see cref="DataUrlInfo"/> 
-        /// structure that provides the contents
-        /// of <paramref name="value"/>, otherwise <c>null</c>. The parameter is passed uninitialized.</param>
-        /// <returns><c>true</c> if <paramref name="value"/> could be parsed as <see cref="DataUrlInfo"/>, <c>false</c> otherwise.</returns>
-        public static bool TryParse(in ReadOnlyMemory<char> value, [NotNullWhen(true)] out DataUrlInfo? info)
-        {
-            ReadOnlySpan<char> span = value.Span;
-
-            if (!span.IsDataUrl())
-            {
-                goto Failed;
-            }
-
-            int mimeTypeEndIndex = -1;
-            int startOfData = -1;
-
-            for (int i = DataUrl.Protocol.Length; i < span.Length; i++)
-            {
-                char c = span[i];
-
-                if (c == ',')
-                {
-                    startOfData = mimeTypeEndIndex = i;
-                    break;
-                }
-            }
-
-            if (mimeTypeEndIndex == -1) // missing ','
-            {
-                goto Failed;
-            }
-
-            // dies ändert ggf. auch mimeTypeEndIndex
-            ReadOnlySpan<char> mimePart = span.Slice(DataUrl.Protocol.Length, mimeTypeEndIndex - DataUrl.Protocol.Length);
-            ContentEncoding dataEncoding = ContentEncoding.Url;
-
-            if (HasBase64Encoding(mimePart))
-            {
-                mimePart = mimePart.Slice(0, mimePart.Length - DataUrl.Base64.Length);
-                mimeTypeEndIndex -= DataUrl.Base64.Length;
-                dataEncoding = ContentEncoding.Base64;
-            }
-
-            MimeType mediaType;
-
-            if (mimePart.IsEmpty)
-            {
-                mediaType = DataUrl.DefaultMediaType();
-            }
-            else
-            {
-                ReadOnlyMemory<char> memory = span[DataUrl.Protocol.Length] == ';'
-                                                ? new StringBuilder(DEFAULT_MEDIA_TYPE.Length + mimePart.Length)
-                                                    .Append(DEFAULT_MEDIA_TYPE)
-                                                    .Append(mimePart).ToString()
-                                                    .AsMemory()
-                                                : value.Slice(DataUrl.Protocol.Length, mimeTypeEndIndex - DataUrl.Protocol.Length);
-
-                if (!MimeType.TryParse(ref memory, out mediaType))
-                {
-                    goto Failed;
-                }
-            }
-            ReadOnlyMemory<char> embeddedData = value.Slice(startOfData + 1);
-            info = new DataUrlInfo(in mediaType, dataEncoding, in embeddedData);
-
-            return true;
-
-Failed:
-            info = null;
-            return false;
-
-
-            //////////////////////////////////////////////////////////////
-
-            static bool HasBase64Encoding(ReadOnlySpan<char> val)
-            {
-                //Suche ";base64"
-                if (val.Length < DataUrl.Base64.Length)
-                {
-                    return false;
-                }
-
-                ReadOnlySpan<char> hayStack = val.Slice(val.Length - DataUrl.Base64.Length);
-
-                for (int i = 0; i < hayStack.Length; i++)
-                {
-                    char c = char.ToLowerInvariant(hayStack[i]);
-
-                    if (c != DataUrl.Base64[i])
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-        }
 
         [SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
         internal static MimeType DefaultMediaType()
@@ -267,8 +141,6 @@ Failed:
             _ = MimeType.TryParse(ref memory, out MimeType mediaType);
             return mediaType;
         }
-
-        #endregion
 
         
         #region private

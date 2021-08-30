@@ -22,7 +22,7 @@ namespace FolkerKinzel.Uris
         /// <summary>
         /// The encoding of the data in <see cref="Data"/>.
         /// </summary>
-        public ContentEncoding Encoding { get; }
+        public DataEncoding DataEncoding { get; }
 
         /// <summary>
         /// The part of the "data" URL, which contains the embedded data.
@@ -43,7 +43,7 @@ namespace FolkerKinzel.Uris
         /// <value>
         /// <c>true</c> if <see cref="Data"/> contains binary data, otherwise <c>false</c>.
         /// </value>
-        public bool ContainsEmbeddedBytes => Encoding == ContentEncoding.Base64 || !ContainsEmbeddedText;
+        public bool ContainsEmbeddedBytes => DataEncoding == DataEncoding.Base64 || !ContainsEmbeddedText;
 
         /// <summary>
         /// Indicates whether the instance contains no data.
