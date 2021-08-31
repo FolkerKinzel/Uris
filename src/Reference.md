@@ -57,7 +57,8 @@ namespace Examples
 
             var info = DataUrlInfo.Parse(url);
             string path = Path.Combine(Directory.GetCurrentDirectory(),
-                                       Guid.NewGuid().ToString() + info.GetFileTypeExtension());
+                                       Guid.NewGuid().ToString() + 
+                                       info.GetFileTypeExtension());
 
             if (info.TryGetEmbeddedBytes(out byte[]? bytes))
             {
