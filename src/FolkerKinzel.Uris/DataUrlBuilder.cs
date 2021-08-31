@@ -1,23 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
 using FolkerKinzel.MimeTypes;
 using FolkerKinzel.Strings;
-using FolkerKinzel.Strings.Polyfills;
-using FolkerKinzel.Uris.Extensions;
 using FolkerKinzel.Uris.Intls;
-using FolkerKinzel.Uris.Properties;
 
 namespace FolkerKinzel.Uris
 {
     /// <summary>
-    /// Static class, which provides methods to support the work with <see cref="string"/>s and <see cref="Uri"/>s
-    /// that represent a "data" URL (RFC 2397) that embeds data in-line in a URL.
+    /// Provides functionality to build a "data" URL (RFC 2397) that 
+    /// embeds data in-line in a URL. A "data" URL can be created automatically from 
+    /// the data to embed. This can be a file, a byte array or a <see cref="string"/>. 
     /// </summary>
     /// <example>
     /// <note type="note">
@@ -28,7 +22,7 @@ namespace FolkerKinzel.Uris
     /// </para>
     /// <code language="c#" source="./../Examples/DataUrlExample.cs"/>
     /// </example>
-    public static class DataUrl
+    public static class DataUrlBuilder
     {
         #region const
         internal const string Protocol = "data:";

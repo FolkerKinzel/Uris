@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\.github\ISSUE_TEMPLATE\feature_request.md = ..\.github\ISSUE_TEMPLATE\feature_request.md
 		..\README.md = ..\README.md
 		Reference.md = Reference.md
-		..\docs\PackageReleaseNotes\1.0.0-beta.1\ReleaseNotes.md = ..\docs\PackageReleaseNotes\1.0.0-beta.1\ReleaseNotes.md
+		..\docs\PackageReleaseNotes\1.0.0-beta.2\ReleaseNotes.md = ..\docs\PackageReleaseNotes\1.0.0-beta.2\ReleaseNotes.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FolkerKinzel.Uris", "FolkerKinzel.Uris\FolkerKinzel.Uris.csproj", "{AD767983-0336-4630-84F2-CCF3D86C34FF}"
@@ -23,7 +23,7 @@ Project("{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}") = "FolkerKinzel.Uris.Reference
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmarks", "Benchmarks\Benchmarks.csproj", "{F39EE66F-955E-4EC0-A3D6-31E91148AEFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Examples", "Examples\Examples.csproj", "{82FC19F4-3B73-41C3-933A-6399C6A78C5B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Examples", "Examples\Examples.csproj", "{82FC19F4-3B73-41C3-933A-6399C6A78C5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

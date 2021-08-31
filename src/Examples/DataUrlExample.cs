@@ -10,7 +10,7 @@ namespace Examples
         public static void Example()
         {
             string fotoFilePath = CreatePhotoFile();
-            string dataUrl = DataUrl.FromFile(fotoFilePath);
+            string dataUrl = DataUrlBuilder.FromFile(fotoFilePath);
             File.Delete(fotoFilePath);
 
             // Uncomment this, to show the content of the

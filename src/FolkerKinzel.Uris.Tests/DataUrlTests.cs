@@ -182,7 +182,7 @@ namespace FolkerKinzel.Uris.Tests
             Assert.IsTrue(MimeType.TryParse("application/x-octet", out MimeType mime));
 
             byte[] bytes = new byte[] { 1, 2, 3 };
-            string outText = DataUrl.FromBytes(bytes, mime);
+            string outText = DataUrlBuilder.FromBytes(bytes, mime);
 
             Assert.IsNotNull(outText);
 
@@ -196,7 +196,7 @@ namespace FolkerKinzel.Uris.Tests
         [TestMethod]
         public void FromBytesTest3()
         {
-            string outText = DataUrl.FromBytes(null, MimeType.Empty);
+            string outText = DataUrlBuilder.FromBytes(null, MimeType.Empty);
 
             Assert.IsNotNull(outText);
 
@@ -212,7 +212,7 @@ namespace FolkerKinzel.Uris.Tests
         public void FromFileTest1()
         {
             string path = TestFiles.FolkerPng;
-            string url = DataUrl.FromFile(path);
+            string url = DataUrlBuilder.FromFile(path);
             Assert.IsNotNull(url);
 
             Assert.IsTrue(DataUrlInfo.TryParse(url, out DataUrlInfo dataUrl));
@@ -226,7 +226,7 @@ namespace FolkerKinzel.Uris.Tests
         public void FromFileTest2()
         {
             string path = TestFiles.EmptyTextFile;
-            string url = DataUrl.FromFile(path);
+            string url = DataUrlBuilder.FromFile(path);
             Assert.IsNotNull(url);
             Assert.IsTrue(DataUrlInfo.TryParse(url, out DataUrlInfo dataUrl));
             Assert.IsTrue(dataUrl.TryGetEmbeddedBytes(out byte[]? outBytes));
@@ -235,11 +235,11 @@ namespace FolkerKinzel.Uris.Tests
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void FromFileTest3() => _ = DataUrl.FromFile(null!);
+        public void FromFileTest3() => _ = DataUrlBuilder.FromFile(null!);
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void FromFileTest4() => _ = DataUrl.FromFile("   ");
+        public void FromFileTest4() => _ = DataUrlBuilder.FromFile("   ");
 
         [TestMethod]
         public void FromFileTest5()
@@ -247,7 +247,7 @@ namespace FolkerKinzel.Uris.Tests
             string path = TestFiles.Utf8;
             string fileContent = File.ReadAllText(path);
 
-            string url = DataUrl.FromFile(path);
+            string url = DataUrlBuilder.FromFile(path);
 
             Assert.IsTrue(DataUrlInfo.TryParse(url, out DataUrlInfo dataUrl));
             Assert.IsTrue(dataUrl.TryGetEmbeddedText(out string? dataUrlText));
@@ -261,7 +261,7 @@ namespace FolkerKinzel.Uris.Tests
             string path = TestFiles.Utf16LE;
             string fileContent = File.ReadAllText(path);
 
-            string url = DataUrl.FromFile(path);
+            string url = DataUrlBuilder.FromFile(path);
 
             Assert.IsTrue(DataUrlInfo.TryParse(url, out DataUrlInfo dataUrl));
             Assert.IsTrue(dataUrl.TryGetEmbeddedText(out string? dataUrlText));
@@ -273,7 +273,7 @@ namespace FolkerKinzel.Uris.Tests
         [TestMethod]
         public void FromTextOnNull()
         {
-            string urlString = DataUrl.FromText(null);
+            string urlString = DataUrlBuilder.FromText(null);
             Assert.IsNotNull(urlString);
             Assert.IsTrue(DataUrlInfo.TryParse(urlString, out DataUrlInfo dataUrl));
             Assert.IsTrue(dataUrl.TryGetEmbeddedText(out string? output));
@@ -283,7 +283,7 @@ namespace FolkerKinzel.Uris.Tests
         [TestMethod]
         public void FromTextOnStringEmpty()
         {
-            string urlString = DataUrl.FromText("");
+            string urlString = DataUrlBuilder.FromText("");
             Assert.IsTrue(DataUrlInfo.TryParse(urlString, out DataUrlInfo dataUrl));
             Assert.IsTrue(dataUrl.TryGetEmbeddedText(out string? output));
             Assert.AreEqual(string.Empty, output);
@@ -294,7 +294,7 @@ namespace FolkerKinzel.Uris.Tests
         {
             const string TEXT = "In Märchenbüchern herumstöbern.";
 
-            string dataUrl1 = DataUrl.FromText(TEXT);
+            string dataUrl1 = DataUrlBuilder.FromText(TEXT);
 
             Assert.IsTrue(DataUrlInfo.TryParse(dataUrl1, out DataUrlInfo dataUrl2));
 
@@ -330,7 +330,7 @@ namespace FolkerKinzel.Uris.Tests
             string text = "http://www.fölkerchen.de";
             //string test = DATA_PROTOCOL + "text/plain;charset=utf-8" + ";" + DEFAULT_ENCODING + "," + Uri.EscapeDataString(text);
 
-            string outText = DataUrl.FromText(text);
+            string outText = DataUrlBuilder.FromText(text);
 
             Assert.IsNotNull(outText);
             Assert.IsTrue(DataUrlInfo.TryParse(outText, out DataUrlInfo dataUrl));

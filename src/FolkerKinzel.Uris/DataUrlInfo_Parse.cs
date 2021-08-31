@@ -86,7 +86,7 @@ namespace FolkerKinzel.Uris
             int mimeTypeEndIndex = -1;
             int startOfData = -1;
 
-            for (int i = DataUrl.Protocol.Length; i < span.Length; i++)
+            for (int i = DataUrlBuilder.Protocol.Length; i < span.Length; i++)
             {
                 char c = span[i];
 
@@ -103,13 +103,13 @@ namespace FolkerKinzel.Uris
             }
 
             // dies ändert ggf. auch mimeTypeEndIndex
-            ReadOnlySpan<char> mimePart = span.Slice(DataUrl.Protocol.Length, mimeTypeEndIndex - DataUrl.Protocol.Length);
+            ReadOnlySpan<char> mimePart = span.Slice(DataUrlBuilder.Protocol.Length, mimeTypeEndIndex - DataUrlBuilder.Protocol.Length);
             DataEncoding dataEncoding = DataEncoding.Url;
 
             if (HasBase64Encoding(mimePart))
             {
-                mimePart = mimePart.Slice(0, mimePart.Length - DataUrl.Base64.Length);
-                mimeTypeEndIndex -= DataUrl.Base64.Length;
+                mimePart = mimePart.Slice(0, mimePart.Length - DataUrlBuilder.Base64.Length);
+                mimeTypeEndIndex -= DataUrlBuilder.Base64.Length;
                 dataEncoding = DataEncoding.Base64;
             }
 
@@ -117,16 +117,16 @@ namespace FolkerKinzel.Uris
 
             if (mimePart.IsEmpty)
             {
-                mediaType = DataUrl.DefaultMediaType();
+                mediaType = DataUrlBuilder.DefaultMediaType();
             }
             else
             {
-                ReadOnlyMemory<char> memory = span[DataUrl.Protocol.Length] == ';'
-                                                ? new StringBuilder(DataUrl.DEFAULT_MEDIA_TYPE.Length + mimePart.Length)
-                                                    .Append(DataUrl.DEFAULT_MEDIA_TYPE)
+                ReadOnlyMemory<char> memory = span[DataUrlBuilder.Protocol.Length] == ';'
+                                                ? new StringBuilder(DataUrlBuilder.DEFAULT_MEDIA_TYPE.Length + mimePart.Length)
+                                                    .Append(DataUrlBuilder.DEFAULT_MEDIA_TYPE)
                                                     .Append(mimePart).ToString()
                                                     .AsMemory()
-                                                : value.Slice(DataUrl.Protocol.Length, mimeTypeEndIndex - DataUrl.Protocol.Length);
+                                                : value.Slice(DataUrlBuilder.Protocol.Length, mimeTypeEndIndex - DataUrlBuilder.Protocol.Length);
 
                 if (!MimeType.TryParse(ref memory, out mediaType))
                 {
@@ -148,18 +148,18 @@ Failed:
             static bool HasBase64Encoding(ReadOnlySpan<char> val)
             {
                 //Suche ";base64"
-                if (val.Length < DataUrl.Base64.Length)
+                if (val.Length < DataUrlBuilder.Base64.Length)
                 {
                     return false;
                 }
 
-                ReadOnlySpan<char> hayStack = val.Slice(val.Length - DataUrl.Base64.Length);
+                ReadOnlySpan<char> hayStack = val.Slice(val.Length - DataUrlBuilder.Base64.Length);
 
                 for (int i = 0; i < hayStack.Length; i++)
                 {
                     char c = char.ToLowerInvariant(hayStack[i]);
 
-                    if (c != DataUrl.Base64[i])
+                    if (c != DataUrlBuilder.Base64[i])
                     {
                         return false;
                     }

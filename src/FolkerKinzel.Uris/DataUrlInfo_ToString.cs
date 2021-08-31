@@ -39,17 +39,17 @@ namespace FolkerKinzel.Uris
             if (DataEncoding == DataEncoding.Base64 || IsEmpty)
             {
                 _ = builder.EnsureCapacity(ComputeCapacity());
-                _ = builder.Append(DataUrl.Protocol).AppendMediaType(MimeType).Append(DataUrl.Base64).Append(',').Append(Data);
+                _ = builder.Append(DataUrlBuilder.Protocol).AppendMediaType(MimeType).Append(DataUrlBuilder.Base64).Append(',').Append(Data);
             }
             else if(TryGetEmbeddedText(out string? text))
             {
-                string urlString = DataUrl.FromText(text);
+                string urlString = DataUrlBuilder.FromText(text);
                 _ = builder.Append(urlString);
             }
             else // URL encoded bytes
             {
                 _ = TryGetEmbeddedBytes(out byte[]? bytes);
-                string urlString = DataUrl.FromBytes(bytes, in _mimeType);
+                string urlString = DataUrlBuilder.FromBytes(bytes, in _mimeType);
                 _ = builder.Append(urlString);
             }
 
@@ -60,11 +60,11 @@ namespace FolkerKinzel.Uris
 
         private int ComputeCapacity()
         {
-            int capacity = DataUrl.Protocol.Length + MimeTypes.MimeType.StringLength + Data.Length + 1;
+            int capacity = DataUrlBuilder.Protocol.Length + MimeTypes.MimeType.StringLength + Data.Length + 1;
 
             if (DataEncoding == DataEncoding.Base64)
             {
-                capacity += DataUrl.Base64.Length;
+                capacity += DataUrlBuilder.Base64.Length;
             }
 
             return capacity;

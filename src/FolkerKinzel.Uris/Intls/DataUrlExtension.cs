@@ -27,7 +27,7 @@ namespace FolkerKinzel.Uris.Intls
 
             if (mimeType.IsTextPlain)
             {
-                MimeType defaultMediaType = DataUrl.DefaultMediaType();
+                MimeType defaultMediaType = DataUrlBuilder.DefaultMediaType();
 
                 if (mimeType.Equals(in defaultMediaType))
                 {
