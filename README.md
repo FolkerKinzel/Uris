@@ -15,7 +15,7 @@ automatically an appropriate file type extension for it.
 The library makes use of ReadOnlySpan&lt;Char&gt; and ReadOnlyMemory&lt;Char&gt; in order to build and examine the 
 content of such URIs without having to allocate a lot of temporary Strings.
 
-Read the [Project Reference](https://github.com/FolkerKinzel/Uris/blob/master/ProjectReference/1.0.0-beta.2/FolkerKinzel.Uris.Reference.en.chm) for details.
+Read the [Project Reference](https://github.com/FolkerKinzel/Uris/blob/master/ProjectReference/1.0.0-beta.3/FolkerKinzel.Uris.Reference.en.chm) for details.
 
 > IMPORTANT: On some systems the content of the .CHM file is blocked. Before opening the file right click on the file icon, select Properties, and check the "Allow" checkbox (if it is present) in the lower right corner of the General tab in the Properties dialog.
 
