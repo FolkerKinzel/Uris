@@ -35,8 +35,13 @@ namespace FolkerKinzel.Uris
         /// Embeds Text in a "data" URL (RFC 2397).
         /// </summary>
         /// <param name="text">The text to embed into the "data" URL. <paramref name="text"/> MUST not be URL encoded.</param>
+        /// 
         /// <returns>A "data" URL, into which the text provided by the parameter <paramref name="text"/> is embedded.</returns>
-        /// <exception cref="FormatException">The <see cref="Uri"/> class was not able to encode <paramref name="text"/> correctly.</exception>
+        /// <exception cref="FormatException"><paramref name="text"/> consists only of ASCII characters and the <see cref="Uri"/> class 
+        /// was not able to encode <paramref name="text"/> correctly.</exception>
+        /// <remarks>If <paramref name="text"/>
+        /// consists only of ASCII characters the method serializes it Url encoded, otherwise <paramref name="text"/> is serialized
+        /// as Base64.</remarks>
         public static string FromText(string? text)
         {
             const string charset = ";charset=utf-8";
@@ -57,7 +62,7 @@ namespace FolkerKinzel.Uris
             else
             {
 
-                string data = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(text));
+                string data = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(text), Base64FormattingOptions.None);
                 var sb = new StringBuilder(Protocol.Length + charset.Length + Base64.Length + 1 + data.Length);
                 return sb.Append(Protocol).Append(charset).Append(Base64).Append(',').Append(data).ToString();
             }
@@ -71,7 +76,7 @@ namespace FolkerKinzel.Uris
         /// <param name="bytes">The binary data to embed into the "data" URL.</param>
         /// <param name="mimeType">The <see cref="MimeType"/> of the data passed to the parameter <paramref name="bytes"/>.</param>
         /// <returns>A "data" URL, into which the binary data provided by the parameter <paramref name="bytes"/> is embedded.</returns>
-        public static string FromBytes(byte[]? bytes, in MimeType mimeType)
+        public static string FromBytes(byte[]? bytes, in MimeType mimeType, bool useBase64UrlFormat = false)
         {
             string data = bytes is null ? string.Empty : Convert.ToBase64String(bytes, Base64FormattingOptions.None);
             var builder = new StringBuilder(Protocol.Length + FolkerKinzel.MimeTypes.MimeType.StringLength + Base64.Length + 1 + data.Length);

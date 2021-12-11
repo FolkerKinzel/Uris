@@ -39,7 +39,7 @@ namespace FolkerKinzel.Uris
                 byte[] data;
                 try
                 {
-                    data = Convert.FromBase64String(Data.ToString());
+                    data = Base64Parser.ParseBase64(Data.ToString());
                 }
                 catch
                 {
@@ -103,7 +103,7 @@ namespace FolkerKinzel.Uris
             {
                 if (this.DataEncoding == DataEncoding.Base64)
                 {
-                    embeddedBytes = Convert.FromBase64String(Data.ToString());
+                    embeddedBytes = Base64Parser.ParseBase64(Data.ToString());
                 }
                 else
                 {
