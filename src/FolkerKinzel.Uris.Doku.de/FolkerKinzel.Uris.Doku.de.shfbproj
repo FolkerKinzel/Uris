@@ -28,7 +28,9 @@
     </TransformComponentArguments>
     <DocumentationSources>
       <DocumentationSource sourceFile="..\FolkerKinzel.Uris\FolkerKinzel.Uris.csproj" />
-      <DocumentationSource sourceFile="..\FolkerKinzel.Uris\bin\Release\net5.0\de\FolkerKinzel.Uris.xml" />
+      <DocumentationSource sourceFile="..\FolkerKinzel.Uris\bin\Release\net6.0\de\FolkerKinzel.Uris.xml" />
+      <DocumentationSource sourceFile="..\..\..\FolkerKinzel.MimeTypes\src\FolkerKinzel.MimeTypes\FolkerKinzel.MimeTypes.csproj" />
+      <DocumentationSource sourceFile="..\..\..\FolkerKinzel.MimeTypes\src\FolkerKinzel.MimeTypes\bin\Release\net6.0\de\FolkerKinzel.MimeTypes.xml" />
     </DocumentationSources>
     <HelpFileFormat>HtmlHelp1</HelpFileFormat>
     <SyntaxFilters>Standard</SyntaxFilters>
