@@ -3,14 +3,15 @@
     <TargetFrameworks>net6.0;net5.0;netstandard2.1;netstandard2.0;net461</TargetFrameworks>
     <NeutralLanguage>en</NeutralLanguage>
     <Nullable>enable</Nullable>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
     <Authors>Folker Kinzel</Authors>
     <Copyright>Copyright © 2021 Folker Kinzel</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageIcon>Logo.png</PackageIcon>
     <PackageVersion>1.0.0-beta.4</PackageVersion>
-    <FileVersion>1.0.0.115</FileVersion>
+    <FileVersion>1.0.0.118</FileVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <Description>.NET library that supports the work with URIs.</Description>
     <PackageTags>URI URL C# .NET</PackageTags>
@@ -26,6 +27,12 @@
   <PropertyGroup Condition="'$(TargetFramework)' == 'net461' OR '$(TargetFramework)' == 'netstandard2_0'">
     <NoWarn>$(NoWarn);8600;8601;8602;8603;8604</NoWarn>
   </PropertyGroup>
+  <ItemGroup>
+    <Using Remove="System.Net.Http" />
+    <Using Include="System.Diagnostics.CodeAnalysis" />
+    <Using Include="System.Diagnostics" />
+    <Using Include="System.Runtime.CompilerServices" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Remove="alt\**" />
     <Compile Remove="Resources\**" />

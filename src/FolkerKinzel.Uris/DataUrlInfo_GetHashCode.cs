@@ -1,34 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace FolkerKinzel.Uris;
 
-namespace FolkerKinzel.Uris
+public readonly partial struct DataUrlInfo
 {
-    public readonly partial struct DataUrlInfo
+    /// <summary>
+    /// Creates a hash code for this instance.
+    /// </summary>
+    /// <returns>The hash code.</returns>
+    public override int GetHashCode()
     {
-        /// <summary>
-        /// Creates a hash code for this instance.
-        /// </summary>
-        /// <returns>The hash code.</returns>
-        public override int GetHashCode()
-        {
-            var hash = new HashCode();
-            hash.Add(GetFileTypeExtension());
+        var hash = new HashCode();
+        hash.Add(GetFileTypeExtension());
 
-            if (TryGetEmbeddedText(out string? text))
-            {
-                hash.Add(text);
-            }
-            else if (TryGetEmbeddedBytes(out byte[]? bytes))
-            {
-                for (int i = 0; i < bytes.Length; i++)
-                {
-                    hash.Add(bytes[i]);
-                }
-            }
-            return hash.ToHashCode();
+        if (TryGetEmbeddedText(out string? text))
+        {
+            hash.Add(text);
         }
+        else if (TryGetEmbeddedBytes(out byte[]? bytes))
+        {
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                hash.Add(bytes[i]);
+            }
+        }
+        return hash.ToHashCode();
     }
 }

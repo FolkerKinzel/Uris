@@ -1,48 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace FolkerKinzel.Uris;
 
-namespace FolkerKinzel.Uris
+public readonly partial struct DataUrlInfo : ICloneable
 {
-    public readonly partial struct DataUrlInfo : ICloneable
+    /// <inheritdoc/>
+    /// <remarks>
+    /// If you intend to hold a <see cref="DataUrlInfo"/> for a long time in memory and if this <see cref="DataUrlInfo"/> is parsed
+    /// from a <see cref="ReadOnlyMemory{T}">ReadOnlyMemory&lt;Char&gt;</see> that comes from a very long <see cref="string"/>, 
+    /// keep in mind, that the <see cref="DataUrlInfo"/> holds a reference to that <see cref="string"/>. Consider in this case to make
+    /// a copy of the <see cref="DataUrlInfo"/> structure: The copy is built on a separate <see cref="string"/>,
+    /// which is case-normalized and only as long as needed.
+    /// <note type="tip">
+    /// Use the instance method <see cref="DataUrlInfo.Clone"/> if you can to avoid the costs of boxing.
+    /// </note>
+    /// </remarks>
+    object ICloneable.Clone() => Clone();
+
+    /// <summary>
+    /// Creates a new <see cref="DataUrlInfo"/> that is a copy of the current instance.
+    /// </summary>
+    /// <returns>A new <see cref="DataUrlInfo"/>, which is a copy of this instance.</returns>
+    /// <remarks>
+    /// The copy is built on a separate <see cref="string"/>,
+    /// which is case-normalized and only as long as needed.
+    /// </remarks>
+    public DataUrlInfo Clone()
     {
-        /// <inheritdoc/>
-        /// <remarks>
-        /// If you intend to hold a <see cref="DataUrlInfo"/> for a long time in memory and if this <see cref="DataUrlInfo"/> is parsed
-        /// from a <see cref="ReadOnlyMemory{T}">ReadOnlyMemory&lt;Char&gt;</see> that comes from a very long <see cref="string"/>, 
-        /// keep in mind, that the <see cref="DataUrlInfo"/> holds a reference to that <see cref="string"/>. Consider in this case to make
-        /// a copy of the <see cref="DataUrlInfo"/> structure: The copy is built on a separate <see cref="string"/>,
-        /// which is case-normalized and only as long as needed.
-        /// <note type="tip">
-        /// Use the instance method <see cref="DataUrlInfo.Clone"/> if you can to avoid the costs of boxing.
-        /// </note>
-        /// </remarks>
-        object ICloneable.Clone() => Clone();
-
-        /// <summary>
-        /// Creates a new <see cref="DataUrlInfo"/> that is a copy of the current instance.
-        /// </summary>
-        /// <returns>A new <see cref="DataUrlInfo"/>, which is a copy of this instance.</returns>
-        /// <remarks>
-        /// The copy is built on a separate <see cref="string"/>,
-        /// which is case-normalized and only as long as needed.
-        /// </remarks>
-        public DataUrlInfo Clone()
+        if (IsEmpty)
         {
-            if (IsEmpty)
-            {
-                return default;
-            }
-
-            ReadOnlyMemory<char> memory = ToString().AsMemory();
-            _ = DataUrlInfo.TryParse(in memory, out DataUrlInfo dataUrl);
-
-            return dataUrl;
+            return default;
         }
 
+        ReadOnlyMemory<char> memory = ToString().AsMemory();
+        _ = DataUrlInfo.TryParse(in memory, out DataUrlInfo dataUrl);
 
-
+        return dataUrl;
     }
+
+
+
 }
