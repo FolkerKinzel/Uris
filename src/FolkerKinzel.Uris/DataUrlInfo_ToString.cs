@@ -16,6 +16,7 @@ public readonly partial struct DataUrlInfo
         return AppendTo(builder).ToString();
     }
 
+
     /// <summary>
     /// Appends a "data" URL (RFC 2397) representation of the instance to a <see cref="StringBuilder"/>.
     /// </summary>
