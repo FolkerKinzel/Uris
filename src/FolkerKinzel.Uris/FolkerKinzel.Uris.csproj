@@ -1,0 +1,80 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net5.0;netstandard2.1;netstandard2.0;net461</TargetFrameworks>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Nullable>enable</Nullable>
+    <LangVersion>10.0</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Authors>Folker Kinzel</Authors>
+    <Copyright>Copyright © 2021 Folker Kinzel</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageIcon>Logo.png</PackageIcon>
+    <PackageVersion>1.0.0-beta.4</PackageVersion>
+    <FileVersion>1.0.0.122</FileVersion>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <Description>.NET library that supports the work with URIs.</Description>
+    <PackageTags>URI URL C# .NET</PackageTags>
+    <PackageReleaseNotes>https://github.com/FolkerKinzel/Uris/blob/master/docs/PackageReleaseNotes/1.0.0-beta.4/ReleaseNotes.md</PackageReleaseNotes>
+    <PackageIconUrl />
+    <PackageProjectUrl>https://github.com/FolkerKinzel/Uris</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/FolkerKinzel/Uris.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+	<PropertyGroup>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	</PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net461' OR '$(TargetFramework)' == 'netstandard2_0'">
+    <NoWarn>$(NoWarn);8600;8601;8602;8603;8604</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Using Remove="System.Net.Http" />
+    <Using Include="System.Diagnostics.CodeAnalysis" />
+    <Using Include="System.Diagnostics" />
+    <Using Include="System.Runtime.CompilerServices" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="alt\**" />
+    <Compile Remove="Resources\**" />
+    <EmbeddedResource Remove="alt\**" />
+    <EmbeddedResource Remove="Resources\**" />
+    <None Remove="alt\**" />
+    <None Remove="Resources\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="DataUrlInfo_Parser.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\Nuget-Logo\Logo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FolkerKinzel.MimeTypes" Version="1.0.0-beta.3" />
+    <PackageReference Include="Nullable" Version="1.3.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Res.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Res.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Res.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Res.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if $(ConfigurationName) == Release copy /v /b /y &quot;$(OutDir)$(ProjectName).xml&quot; &quot;$(OutDir)de/$(ProjectName).xml&quot;&#xD;&#xA;if $(ConfigurationName) == Release if '$(TargetFramework)' == 'netstandard2.1' dotnet $(SolutionDir)IncVersion\IncVersion.dll $(ProjectDir)$(ProjectFileName) --revision" />
+  </Target>
+</Project>
