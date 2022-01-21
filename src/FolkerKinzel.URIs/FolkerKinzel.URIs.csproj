@@ -10,16 +10,25 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageIcon>Logo.png</PackageIcon>
-    <PackageVersion>1.0.0-beta.4</PackageVersion>
-    <FileVersion>1.0.0.122</FileVersion>
+    <PackageVersion>1.0.0-beta.5</PackageVersion>
+    <FileVersion>1.0.0.124</FileVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     <Description>.NET library that supports the work with URIs.</Description>
     <PackageTags>URI URL C# .NET</PackageTags>
-    <PackageReleaseNotes>https://github.com/FolkerKinzel/Uris/blob/master/docs/PackageReleaseNotes/1.0.0-beta.4/ReleaseNotes.md</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/FolkerKinzel/Uris/blob/master/docs/PackageReleaseNotes/1.0.0-beta.5/ReleaseNotes.md</PackageReleaseNotes>
     <PackageIconUrl />
     <PackageProjectUrl>https://github.com/FolkerKinzel/Uris</PackageProjectUrl>
     <RepositoryUrl>https://github.com/FolkerKinzel/Uris.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+  <PropertyGroup>
+    <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <!-- Optional: Embed source files that are not tracked by the source control manager in the PDB -->
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -51,7 +60,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FolkerKinzel.MimeTypes" Version="1.0.0-beta.3" />
+    <PackageReference Include="FolkerKinzel.MimeTypes" Version="1.0.0-beta.4" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Nullable" Version="1.3.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -71,6 +84,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if $(ConfigurationName) == Release copy /v /b /y &quot;$(OutDir)$(ProjectName).xml&quot; &quot;$(OutDir)de/$(ProjectName).xml&quot;&#xD;&#xA;if $(ConfigurationName) == Release if '$(TargetFramework)' == 'netstandard2.1' dotnet $(SolutionDir)IncVersion\IncVersion.dll $(ProjectDir)$(ProjectFileName) --revision" />
+    <Exec Command="if $(ConfigurationName) == Release if '$(TargetFramework)' == 'net6.0' dotnet $(SolutionDir)IncVersion\IncVersion.dll $(ProjectDir)$(ProjectFileName) --revision" />
   </Target>
 </Project>
