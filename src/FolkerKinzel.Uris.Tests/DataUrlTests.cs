@@ -330,7 +330,7 @@ namespace FolkerKinzel.Uris.Tests
             Assert.AreEqual(dataUrl2.MimeType.MediaType.ToString(), "text");
             Assert.AreEqual(dataUrl2.MimeType.SubType.ToString(), "plain");
 
-            Assert.AreEqual(1, dataUrl2.MimeType.Parameters.Count());
+            Assert.AreEqual(1, dataUrl2.MimeType.Parameters().Count());
 
             Assert.IsTrue(dataUrl2.TryGetEmbeddedText(out string? outText));
             Assert.AreEqual(TEXT, outText);

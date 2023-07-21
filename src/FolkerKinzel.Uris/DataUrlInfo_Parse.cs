@@ -120,7 +120,7 @@ public readonly partial struct DataUrlInfo
                                                 .AsMemory()
                                             : value.Slice(DataUrlBuilder.Protocol.Length, mimeTypeEndIndex - DataUrlBuilder.Protocol.Length);
 
-            if (!MimeType.TryParse(ref memory, out mediaType))
+            if (!MimeType.TryParse(memory, out mediaType))
             {
                 goto Failed;
             }

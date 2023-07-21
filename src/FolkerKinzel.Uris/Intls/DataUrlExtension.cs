@@ -24,16 +24,17 @@ internal static class DataUrlExtension
                 return builder;
             }
 
-            foreach (MimeTypeParameter parameter in mimeType.Parameters)
+            foreach (MimeTypeParameter parameter in mimeType.Parameters())
             {
                 _ = builder.Append(';');
-                _ = parameter.AppendTo(builder, urlEncodedValue: true);
+                parameter.AppendTo(builder, alwaysUrlEncoded: true);
             }
 
             return builder;
         }
 
-        return mimeType.AppendTo(builder, MimeTypeFormattingOptions.AlwaysUrlEncoded | MimeTypeFormattingOptions.IncludeParameters);
+        mimeType.AppendTo(builder, FormattingOptions.AlwaysUrlEncoded | FormattingOptions.IncludeParameters);
+        return builder;
     }
 
 }

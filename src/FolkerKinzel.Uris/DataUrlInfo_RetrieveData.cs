@@ -25,9 +25,9 @@ public readonly partial struct DataUrlInfo
         // als Base64 codierter Text:
         if (DataEncoding == DataEncoding.Base64)
         {
-            static bool Predicate(MimeTypeParameter p) => p.IsCharsetParameter;
+            static bool Predicate(MimeTypeParameter p) => p.IsCharSetParameter;
 
-            MimeTypeParameter charsetParameter = MimeType.Parameters.FirstOrDefault(Predicate);
+            MimeTypeParameter charsetParameter = MimeType.Parameters().FirstOrDefault(Predicate);
 
             byte[] data;
             try
@@ -43,7 +43,7 @@ public readonly partial struct DataUrlInfo
 
             Encoding enc = charsetParameter.IsEmpty
                             ? TextEncodingConverter.GetEncoding(codePage)
-                            : charsetParameter.IsAsciiCharsetParameter
+                            : charsetParameter.IsAsciiCharSetParameter
                                 ? System.Text.Encoding.UTF8
                                 : TextEncodingConverter.GetEncoding(charsetParameter.Value.ToString());
 

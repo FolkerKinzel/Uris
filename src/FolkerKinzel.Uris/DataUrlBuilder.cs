@@ -140,11 +140,18 @@ public static class DataUrlBuilder
     }
 
 
+    //[SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
+    //internal static MimeType DefaultMediaType()
+    //{
+    //    ReadOnlyMemory<char> memory = DEFAULT_MEDIA_TYPE.AsMemory();
+    //    _ = MimeType.TryParse(ref memory, out MimeType mediaType);
+    //    return mediaType;
+    //}
+
     [SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
     internal static MimeType DefaultMediaType()
     {
-        ReadOnlyMemory<char> memory = DEFAULT_MEDIA_TYPE.AsMemory();
-        _ = MimeType.TryParse(ref memory, out MimeType mediaType);
+        _ = MimeType.TryParse(DEFAULT_MEDIA_TYPE.AsMemory(), out MimeType mediaType);
         return mediaType;
     }
 
