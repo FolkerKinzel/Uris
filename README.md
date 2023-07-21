@@ -2,7 +2,7 @@
 [![NuGet](https://img.shields.io/nuget/v/FolkerKinzel.Uris)](https://www.nuget.org/packages/FolkerKinzel.Uris/)
 [![GitHub](https://img.shields.io/github/license/FolkerKinzel/Uris)](https://github.com/FolkerKinzel/Uris/blob/master/LICENSE)
 
-#### .NET library that supports working with URIs
+### .NET library that supports working with URIs
 [Project Reference and Release Notes](https://github.com/FolkerKinzel/Uris/releases/tag/v1.0.0-beta.5)
 
 The library supports:
