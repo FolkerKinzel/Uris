@@ -83,34 +83,6 @@ public static class DataUrlBuilder
     }
 
 
-
-
-    ///// <summary>
-    ///// Erzeugt einen <see cref="Uri"/>, in den der Inhalt einer Datei eingebettet ist.
-    ///// </summary>
-    ///// <param name="path">Absoluter Pfad zu der einzubettenden Datei.</param>
-    ///// <param name="mediaType">Der <see cref="MimeType"/> der einzubettenden Datei oder <c>null</c>. Wenn <c>null</c> angegeben wird,
-    ///// wird versucht, den <see cref="MimeType"/> aus der Dateiendung automatisch zu ermitteln.</param>
-    ///// <returns>Ein <see cref="DataUrlBuilder"/>, in den die Daten der mit <paramref name="path"/> referenzierten Datei
-    ///// eingebettet sind.</returns>
-    ///// <exception cref="ArgumentNullException"><paramref name="path"/> ist <c>null</c>.</exception>
-    ///// <exception cref="ArgumentException"><paramref name="path"/> ist kein gültiger Dateipfad.</exception>
-    ///// <exception cref="UriFormatException">Es kann kein <see cref="Uri"/> initialisiert werden, z.B.
-    ///// weil der URI-String länger als 65519 Zeichen ist.</exception>
-    ///// <exception cref="IOException">E/A-Fehler.</exception>
-    //public static async Task<string> FromFileAsync(string path, MimeType? mediaType = null)
-    //{
-    //    byte[] bytes = await LoadFileAsync(path).ConfigureAwait(false);
-
-    //    if (mediaType is null)
-    //    {
-    //        mediaType = MimeType.FromFileTypeExtension(Path.GetExtension(path));
-    //    }
-
-    //    return FromBytes(bytes, mediaType.Value);
-    //}
-
-
     /// <summary>
     /// Embeds the content of a file in a "data" URL (RFC 2397).
     /// </summary>
@@ -140,14 +112,6 @@ public static class DataUrlBuilder
     }
 
 
-    //[SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
-    //internal static MimeType DefaultMediaType()
-    //{
-    //    ReadOnlyMemory<char> memory = DEFAULT_MEDIA_TYPE.AsMemory();
-    //    _ = MimeType.TryParse(ref memory, out MimeType mediaType);
-    //    return mediaType;
-    //}
-
     [SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
     internal static MimeType DefaultMediaType()
     {
@@ -157,47 +121,6 @@ public static class DataUrlBuilder
 
 
     #region private
-
-    //    private static async Task<byte[]> LoadFileAsync(string path)
-    //    {
-    //        try
-    //        {
-    //#if NETSTANDARD2_0 || NET461
-    //                return await Task.Run(() => File.ReadAllBytes(path)).ConfigureAwait(false);
-    //#else
-    //            return await File.ReadAllBytesAsync(path).ConfigureAwait(false);
-    //#endif
-    //        }
-    //        catch (ArgumentNullException)
-    //        {
-    //            throw new ArgumentNullException(nameof(path));
-    //        }
-    //        catch (ArgumentException e)
-    //        {
-    //            throw new ArgumentException(e.Message, nameof(path), e);
-    //        }
-    //        catch (UnauthorizedAccessException e)
-    //        {
-    //            throw new IOException(e.Message, e);
-    //        }
-    //        catch (NotSupportedException e)
-    //        {
-    //            throw new ArgumentException(e.Message, nameof(path), e);
-    //        }
-    //        catch (System.Security.SecurityException e)
-    //        {
-    //            throw new IOException(e.Message, e);
-    //        }
-    //        catch (PathTooLongException e)
-    //        {
-    //            throw new ArgumentException(e.Message, nameof(path), e);
-    //        }
-    //        catch (Exception e)
-    //        {
-    //            throw new IOException(e.Message, e);
-    //        }
-    //    }
-
 
     private static byte[] LoadFile(string path)
     {

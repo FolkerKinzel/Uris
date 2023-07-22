@@ -2,28 +2,6 @@
 
 internal static class Base64Parser
 {
-    ///// <summary>
-    ///// Converts <paramref name="data"/> to a Base64 <see cref="string"/> and uses optionally the
-    ///// Base64Url format (RFC 4648 § 5).
-    ///// </summary>
-    ///// <param name="data">The data to convert.</param>
-    ///// <param name="useBase64UrlFormat"><c>true</c> to use the Base64Url format.</param>
-    ///// <returns><paramref name="data"/> converted to Base64 or - optionally - Base64Url.</returns>
-    ///// <exception cref="ArgumentNullException"><paramref name="data"/> is <c>null</c>.</exception>
-    //internal static string ToBase64String(byte[] data, bool useBase64UrlFormat)
-    //{
-    //    string base64 = Convert.ToBase64String(data, Base64FormattingOptions.None);
-
-    //    if(useBase64UrlFormat)
-    //    {
-    //        return ConvertToBase64Url(base64);
-    //    }
-
-    //    return base64;
-    //}
-
-
-
     /// <summary>
     /// Parses a Base64 <see cref="string"/> as byte array - even
     /// if it is in the Base64Url format (RFC 4648 § 5).
@@ -50,13 +28,6 @@ internal static class Base64Parser
         base64 = base64.Replace('-', '+');
         return base64.Replace('_', '/');
     }
-
-    //private static string ConvertToBase64Url(string base64)
-    //{
-    //    base64 = base64.Replace('+', '-');
-    //    base64 = base64.Replace('/', '_');
-    //    return base64.TrimEnd('=');
-    //}
 
     private static string HandleBase64WithoutPadding(string base64)
     {
