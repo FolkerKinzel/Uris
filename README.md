@@ -6,7 +6,7 @@
 [Project Reference and Release Notes](https://github.com/FolkerKinzel/Uris/releases/tag/v1.0.0-beta.5)
 
 The library supports:
-* The "data" URL scheme (RFC 2397):
+* The "data" URL scheme ([RFC 2397](https://datatracker.ietf.org/doc/html/rfc2397)):
   * The static `DataUrlBuilder` class: Provides functionality to build a "data" URL that 
 embeds data in-line in a URL. A "data" URL can be created automatically from 
 the data to embed. This can be a file, a byte array or a string. 

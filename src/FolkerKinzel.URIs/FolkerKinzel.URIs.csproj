@@ -15,7 +15,7 @@
 		<AssemblyVersion>2.0.0.0</AssemblyVersion>
 		<Description>.NET library that supports working with URIs</Description>
 		<PackageTags>URI URL C# .NET</PackageTags>
-		<PackageReleaseNotes>https://github.com/FolkerKinzel/Uris/releases/tag/v1.0.0-beta.5</PackageReleaseNotes>
+		<PackageReleaseNotes>https://github.com/FolkerKinzel/Uris/releases/tag/v2.0.0-beta.1</PackageReleaseNotes>
 		<PackageIconUrl />
 		<PackageProjectUrl>https://github.com/FolkerKinzel/Uris</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/FolkerKinzel/Uris.git</RepositoryUrl>
