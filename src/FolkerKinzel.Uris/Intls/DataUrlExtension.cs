@@ -27,13 +27,13 @@ internal static class DataUrlExtension
             foreach (MimeTypeParameter parameter in mimeType.Parameters())
             {
                 _ = builder.Append(';');
-                parameter.AppendTo(builder, alwaysUrlEncoded: true);
+                parameter.AppendTo(builder, urlFormat: true);
             }
 
             return builder;
         }
 
-        mimeType.AppendTo(builder, FormattingOptions.AlwaysUrlEncoded);
+        mimeType.AppendTo(builder, MimeFormats.Url);
         return builder;
     }
 
