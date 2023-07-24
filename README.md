@@ -3,7 +3,7 @@
 [![GitHub](https://img.shields.io/github/license/FolkerKinzel/Uris)](https://github.com/FolkerKinzel/Uris/blob/master/LICENSE)
 
 ### .NET library that supports working with URIs
-[Project Reference and Release Notes](https://github.com/FolkerKinzel/Uris/releases/tag/v1.0.0-beta.5)
+[Project Reference and Release Notes](https://github.com/FolkerKinzel/Uris/releases/tag/v2.0.0-beta.1)
 
 The library supports:
 - The "data" URL scheme ([RFC 2397](https://datatracker.ietf.org/doc/html/rfc2397)):
@@ -18,7 +18,7 @@ The library is designed to support performance and small heap allocation.
 [Version History](https://github.com/FolkerKinzel/Uris/releases)
 
 .
-## Example:
+### Example:
 Creating and parsing a "data" URL:
 ```csharp
 using System.Diagnostics;

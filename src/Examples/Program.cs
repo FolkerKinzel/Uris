@@ -2,11 +2,8 @@
 
 namespace Examples
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
-        {
-            DataUrlExample.Example();
-        }
+        private static void Main() => DataUrlExample.Example();
     }
 }

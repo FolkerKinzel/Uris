@@ -2,7 +2,7 @@
 
 
 ### .NET library that supports working with URIs
-[Project Reference and Release Notes](https://github.com/FolkerKinzel/Uris/releases/tag/v1.0.0-beta.5)
+[Project Reference and Release Notes](https://github.com/FolkerKinzel/Uris/releases/tag/v2.0.0-beta.1)
 
 The library supports:
 - The "data" URL scheme ([RFC 2397](https://datatracker.ietf.org/doc/html/rfc2397)):

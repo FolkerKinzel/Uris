@@ -11,6 +11,7 @@ public static class ReadOnlySpanExtension
     /// <param name="span">The <see cref="ReadOnlySpan{T}">ReadOnlySpan&lt;Char&gt;</see> to examine.</param>
     /// <returns><c>true</c> if <paramref name="span"/> contains a "data" URL.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
     public static bool IsDataUrl(this ReadOnlySpan<char> span)
         => span.StartsWith(DataUrlBuilder.Protocol.AsSpan(), StringComparison.OrdinalIgnoreCase);
 
