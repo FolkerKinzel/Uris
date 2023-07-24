@@ -1,5 +1,9 @@
 ﻿# FolkerKinzel.Uris
 ## Roadmap
+
+### 2.0.0-beta.2
+- [ ] Use `Convert.TryFromBase64Chars(ReadOnlySpan<char>, Span<byte>, int)`
+
 ### 2.0.0-beta.1
 - [x] Dependency update
 - [x] .NET 7 support

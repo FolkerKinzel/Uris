@@ -390,5 +390,49 @@ namespace FolkerKinzel.Uris.Tests
             Assert.AreNotEqual(new DataUrlInfo().GetHashCode(), info2.GetHashCode());
         }
 
+
+        [TestMethod]
+        public void LargeFileTest1()
+        {
+            byte[] buf = new byte[1024*1024];
+            new Random().NextBytes(buf);
+            
+            string url = DataUrlBuilder.FromBytes(buf, MimeType.Parse("application/octet-stream"));
+            Assert.IsTrue(DataUrlInfo.TryParse(url, out DataUrlInfo info));
+            Assert.IsTrue(info.TryGetEmbeddedBytes(out _));
+        }
+
+        [TestMethod]
+        public void LargeFileTest2()
+        {
+            const string chunk = "%01%02%03";
+            StringBuilder sb = new StringBuilder(chunk.Length * 20100);
+
+            for (int i = 0; i < 20000; i++)
+            {
+                sb.Append(chunk);
+            }
+
+            string url = "data:application/octet-stream," + sb.ToString();
+            Assert.IsTrue(DataUrlInfo.TryParse(url, out DataUrlInfo info));
+            Assert.IsTrue(info.TryGetEmbeddedBytes(out _));
+        }
+
+        [TestMethod]
+        public void LargeFileTest3()
+        {
+            const string chunk = "%01%02%03";
+            StringBuilder sb = new StringBuilder(chunk.Length * 20100);
+
+            for (int i = 0; i < 20000; i++)
+            {
+                sb.Append(chunk);
+            }
+
+            string url = "data:," + sb.ToString();
+            Assert.IsTrue(DataUrlInfo.TryParse(url, out DataUrlInfo info));
+            Assert.IsTrue(info.TryGetEmbeddedText(out _));
+        }
+
     }
 }
