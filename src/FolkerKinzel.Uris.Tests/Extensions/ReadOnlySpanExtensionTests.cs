@@ -1,7 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-
-namespace FolkerKinzel.Uris.Extensions.Tests
+﻿namespace FolkerKinzel.Uris.Extensions.Tests
 {
     [TestClass]
     public class ReadOnlySpanExtensionTests

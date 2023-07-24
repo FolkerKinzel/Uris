@@ -1,17 +1,4 @@
-﻿using FolkerKinzel.MimeTypes;
-using FolkerKinzel.Strings;
-using FolkerKinzel.Uris.Intls;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
-
-namespace FolkerKinzel.Uris.Tests;
+﻿namespace FolkerKinzel.Uris.Tests;
 
 [TestClass]
 public class DataUrlTests

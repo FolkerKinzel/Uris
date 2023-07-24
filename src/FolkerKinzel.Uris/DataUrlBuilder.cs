@@ -1,7 +1,4 @@
-﻿using System.Text;
-using FolkerKinzel.MimeTypes;
-using FolkerKinzel.Strings;
-using FolkerKinzel.Uris.Intls;
+﻿using FolkerKinzel.Uris.Intls;
 
 namespace FolkerKinzel.Uris;
 

@@ -14,6 +14,14 @@
 		<SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
+	<ItemGroup>
+		<Using Include="FolkerKinzel.Uris" />
+		<Using Include="FolkerKinzel.MimeTypes"/>
+		<Using Include="Microsoft.VisualStudio.TestTools.UnitTesting"/>
+		<Using Include="FolkerKinzel.Strings"/>
+		<Using Include="System.Text"/>
+		<Using Remove="System.Net.Http"/>
+	</ItemGroup>
 
 	<ItemGroup>
 		<Compile Remove="reports\html\**" />
@@ -61,10 +69,7 @@
 		</EmbeddedResource>
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Using Include="FolkerKinzel.Uris" />
-		<Using Remove="System.Net.Http"/>
-	</ItemGroup>
+
 
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(TargetFramework)' == 'net5.0'">

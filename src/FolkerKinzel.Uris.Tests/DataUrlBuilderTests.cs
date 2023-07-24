@@ -1,8 +1,4 @@
-﻿using FolkerKinzel.MimeTypes;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Diagnostics.CodeAnalysis;
-
-namespace FolkerKinzel.Uris.Tests;
+﻿namespace FolkerKinzel.Uris.Tests;
 
 [TestClass]
 public class DataUrlBuilderTests

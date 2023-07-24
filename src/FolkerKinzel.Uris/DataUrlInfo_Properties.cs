@@ -1,6 +1,4 @@
-﻿using FolkerKinzel.MimeTypes;
-
-namespace FolkerKinzel.Uris;
+﻿namespace FolkerKinzel.Uris;
 
 public readonly partial struct DataUrlInfo
 {
@@ -28,7 +26,7 @@ public readonly partial struct DataUrlInfo
     /// <value>
     /// <c>true</c> if <see cref="Data"/> contains text, otherwise <c>false</c>.
     /// </value>
-    public bool ContainsEmbeddedText => this.MimeType.IsText;
+    public bool ContainsEmbeddedText => this.MimeType.IsText || this.MimeType.IsEmpty;
 
     /// <summary>
     /// Indicates whether <see cref="Data"/> contains binary data.

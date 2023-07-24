@@ -1,6 +1,4 @@
-﻿using System.Text;
-using FolkerKinzel.Strings.Polyfills;
-using FolkerKinzel.Uris.Intls;
+﻿using FolkerKinzel.Uris.Intls;
 
 namespace FolkerKinzel.Uris;
 

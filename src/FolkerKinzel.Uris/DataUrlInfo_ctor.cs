@@ -1,5 +1,4 @@
 ﻿using System.Runtime.InteropServices;
-using FolkerKinzel.MimeTypes;
 
 namespace FolkerKinzel.Uris;
 

@@ -1,7 +1,4 @@
-﻿using System.IO;
-
-
-namespace FolkerKinzel.Uris.Tests
+﻿namespace FolkerKinzel.Uris.Tests
 {
     internal static class TestFiles
     {

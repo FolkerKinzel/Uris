@@ -1,10 +1,4 @@
-﻿using FolkerKinzel.MimeTypes;
-using FolkerKinzel.Uris.Extensions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Text;
-
-namespace FolkerKinzel.Uris.Intls.Tests
+﻿namespace FolkerKinzel.Uris.Intls.Tests
 {
     [TestClass]
     public class DataUrlExtensionTests

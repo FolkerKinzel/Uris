@@ -1,7 +1,4 @@
-﻿using System.Text;
-using FolkerKinzel.MimeTypes;
-
-namespace FolkerKinzel.Uris.Intls;
+﻿namespace FolkerKinzel.Uris.Intls;
 
 /// <summary>
 /// Extension methods, which support the <see cref="DataUrlInfo"/> structure.

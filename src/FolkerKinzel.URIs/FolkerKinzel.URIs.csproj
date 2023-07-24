@@ -40,7 +40,11 @@
 		<Using Remove="System.Net.Http" />
 		<Using Include="System.Diagnostics.CodeAnalysis" />
 		<Using Include="System.Diagnostics" />
+		<Using Include="System.Text" />
 		<Using Include="System.Runtime.CompilerServices" />
+		<Using Include="FolkerKinzel.Strings" />
+		<Using Include="FolkerKinzel.Strings.Polyfills" />
+		<Using Include="FolkerKinzel.MimeTypes" />
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Remove="alt\**" />

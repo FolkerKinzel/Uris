@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace FolkerKinzel.Uris.Intls.Tests
+﻿namespace FolkerKinzel.Uris.Intls.Tests
 {
     [TestClass]
     public class Base64ParserTests

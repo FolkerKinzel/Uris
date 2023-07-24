@@ -1,13 +1,12 @@
 ﻿using System.Net;
-using System.Text;
-using FolkerKinzel.MimeTypes;
-using FolkerKinzel.Strings;
 using FolkerKinzel.Uris.Intls;
 
 namespace FolkerKinzel.Uris;
 
 public readonly partial struct DataUrlInfo
 {
+    private const int ASCII_CODEPAGE = 20127;
+
     /// <summary>
     /// Tries to retrieve the text, which is embedded in the "data" URL.
     /// </summary>
@@ -17,6 +16,7 @@ public readonly partial struct DataUrlInfo
     public bool TryGetEmbeddedText([NotNullWhen(true)] out string? embeddedText)
     {
         embeddedText = null;
+
         if (!ContainsEmbeddedText)
         {
             return false;
@@ -25,10 +25,6 @@ public readonly partial struct DataUrlInfo
         // als Base64 codierter Text:
         if (DataEncoding == DataEncoding.Base64)
         {
-            static bool Predicate(MimeTypeParameter p) => p.IsCharSetParameter;
-
-            MimeTypeParameter charsetParameter = MimeType.Parameters().FirstOrDefault(Predicate);
-
             byte[] data;
             try
             {
@@ -39,13 +35,7 @@ public readonly partial struct DataUrlInfo
                 return false;
             }
 
-            int codePage = TextEncodingConverter.GetCodePage(data, out int bomLength);
-
-            Encoding enc = charsetParameter.IsEmpty
-                            ? TextEncodingConverter.GetEncoding(codePage)
-                            : charsetParameter.IsAsciiCharSetParameter
-                                ? System.Text.Encoding.UTF8
-                                : TextEncodingConverter.GetEncoding(charsetParameter.Value.ToString());
+            int bomLength = GetEncoding(data, out Encoding enc);
 
             try
             {
@@ -64,6 +54,9 @@ public readonly partial struct DataUrlInfo
 
         return true;
     }
+
+
+    
 
 
     /// <summary>
@@ -99,7 +92,7 @@ public readonly partial struct DataUrlInfo
             }
             else
             {
-                byte[] bytes = System.Text.Encoding.ASCII.GetBytes(Data.ToString());
+                byte[] bytes = InitEncoding(ASCII_CODEPAGE).GetBytes(Data.ToString());
                 embeddedBytes = WebUtility.UrlDecodeToBytes(bytes, 0, bytes.Length);
             }
         }
@@ -131,4 +124,29 @@ public readonly partial struct DataUrlInfo
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string GetFileTypeExtension() => MimeType.GetFileTypeExtension();
 
+
+    private int GetEncoding(byte[] data, out Encoding enc)
+    {
+        int codePage = TextEncodingConverter.GetCodePage(data, out int bomLength);
+
+        MimeTypeParameter charsetParameter = MimeType.Parameters().FirstOrDefault(Predicate);
+
+        enc = charsetParameter.IsEmpty
+                        ? InitEncoding(codePage)
+                        : charsetParameter.IsAsciiCharSetParameter
+                            ? InitEncoding(ASCII_CODEPAGE)
+                            : InitEncoding(charsetParameter.Value.ToString());
+        return bomLength;
+
+        ////////////////////////////////////
+
+        static bool Predicate(MimeTypeParameter p) => p.IsCharSetParameter;
+    }
+
+
+    private Encoding InitEncoding(int codePage) =>
+        TextEncodingConverter.GetEncoding(codePage, EncoderFallback.ExceptionFallback, DecoderFallback.ExceptionFallback, true);
+
+    private Encoding InitEncoding(string encodingName) =>
+        TextEncodingConverter.GetEncoding(encodingName, EncoderFallback.ExceptionFallback, DecoderFallback.ExceptionFallback, true);
 }

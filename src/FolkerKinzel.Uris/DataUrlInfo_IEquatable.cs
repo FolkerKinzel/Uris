@@ -57,6 +57,7 @@ public readonly partial struct DataUrlInfo : IEquatable<DataUrlInfo>
         return false;
     }
 
+
     private bool EqualsBytes(in DataUrlInfo other)
     {
         if (other.TryGetEmbeddedBytes(out byte[]? otherBytes))
