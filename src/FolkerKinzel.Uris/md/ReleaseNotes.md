@@ -1,5 +1,5 @@
 ﻿- .NET 7 support
-- The dependency `FolkerKinzel.MimeTypes` has been updated to version 3.0.0-beta.1.
+- The dependency `FolkerKinzel.MimeTypes` that is part of the API has been updated to version 3.0.0-beta.1.
 
 >**Notes to users who build .NET Core 2.x/3.0 applications based on the .NET Standard 2.0 part of the package:**  
 >You might get a compiler error. This is caused by a Microsoft dependency. You can get rid of this error, if you copy `<SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>` to a `<PropertyGroup>` of your project file (at own risk).
