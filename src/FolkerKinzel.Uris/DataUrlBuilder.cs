@@ -122,6 +122,7 @@ public static class DataUrlBuilder
 
     #region private
 
+    [ExcludeFromCodeCoverage]
     private static byte[] LoadFile(string path)
     {
         try

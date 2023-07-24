@@ -10,7 +10,7 @@ internal static class Base64Parser
     /// <returns>A byte array containing the data that was encoded in <paramref name="base64"/>.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="base64"/> is <c>null</c>.</exception>
     /// <exception cref="FormatException"><paramref name="base64"/> has an invalid format.</exception>
-    internal static byte[] ParseBase64(string base64)
+    internal static byte[] Parse(string base64)
     {
         if (base64 == null)
         {

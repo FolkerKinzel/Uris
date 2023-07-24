@@ -355,6 +355,17 @@ namespace FolkerKinzel.Uris.Tests
             Assert.AreEqual(info, dataUrl2);
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void AppendToTest1() => _ = new DataUrlInfo().AppendTo(null!);
+
+        [TestMethod]
+        public void AppendToTest2()
+        {
+            var stringBuilder = new StringBuilder();
+            _ = new DataUrlInfo().AppendTo(stringBuilder);
+            Assert.AreNotEqual(0, stringBuilder.Length);
+        }
 
         [TestMethod]
         public void EqualsTest1()

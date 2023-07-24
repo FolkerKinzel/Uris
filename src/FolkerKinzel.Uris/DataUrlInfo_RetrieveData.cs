@@ -32,7 +32,7 @@ public readonly partial struct DataUrlInfo
             byte[] data;
             try
             {
-                data = Base64Parser.ParseBase64(Data.ToString());
+                data = Base64Parser.Parse(Data.ToString());
             }
             catch
             {
@@ -95,7 +95,7 @@ public readonly partial struct DataUrlInfo
         {
             if (this.DataEncoding == DataEncoding.Base64)
             {
-                embeddedBytes = Base64Parser.ParseBase64(Data.ToString());
+                embeddedBytes = Base64Parser.Parse(Data.ToString());
             }
             else
             {
