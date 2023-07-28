@@ -32,7 +32,7 @@ namespace FolkerKinzel.Uris;
 [StructLayout(LayoutKind.Auto)]
 public readonly partial struct DataUrlInfo
 {
-    private DataUrlInfo(in MimeType mediaType, DataEncoding dataEncoding, in ReadOnlyMemory<char> embeddedData)
+    private DataUrlInfo(in MimeTypeInfo mediaType, DataEncoding dataEncoding, in ReadOnlyMemory<char> embeddedData)
     {
         _mimeType = mediaType;
         DataEncoding = dataEncoding;

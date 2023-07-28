@@ -31,7 +31,7 @@ public readonly partial struct DataUrlInfo
         if (DataEncoding == DataEncoding.Base64 || IsEmpty)
         {
             _ = builder.EnsureCapacity(ComputeCapacity());
-            _ = builder.Append(DataUrlBuilder.Protocol).AppendMediaType(MimeType).Append(DataUrlBuilder.Base64).Append(',').Append(Data);
+            _ = builder.Append(DataUrlBuilder.Protocol).AppendMediaType(MimeTypes.MimeType.Create(in _mimeType)).Append(DataUrlBuilder.Base64).Append(',').Append(Data);
         }
         else if (TryGetEmbeddedText(out string? text))
         {
@@ -41,7 +41,7 @@ public readonly partial struct DataUrlInfo
         else // URL encoded bytes
         {
             _ = TryGetEmbeddedBytes(out byte[]? bytes);
-            string urlString = DataUrlBuilder.FromBytes(bytes, in _mimeType);
+            string urlString = DataUrlBuilder.FromBytes(bytes, MimeTypes.MimeType.Create(in _mimeType));
             _ = builder.Append(urlString);
         }
 
@@ -50,7 +50,7 @@ public readonly partial struct DataUrlInfo
 
     private int ComputeCapacity()
     {
-        int capacity = DataUrlBuilder.Protocol.Length + MimeTypes.MimeType.StringLength + Data.Length + 1;
+        int capacity = DataUrlBuilder.Protocol.Length + DataUrlBuilder.ESTIMATED_MIME_TYPE_LENGTH;
 
         if (DataEncoding == DataEncoding.Base64)
         {

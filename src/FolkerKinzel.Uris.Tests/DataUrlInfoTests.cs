@@ -75,10 +75,10 @@ namespace FolkerKinzel.Uris.Tests
             Assert.IsTrue(DataUrlInfo.TryParse(test, out DataUrlInfo dataUrl2));
 
             Assert.AreEqual(dataUrl2.Data.ToString(), "Text");
-            Assert.AreEqual(dataUrl2.MimeType.MediaType.ToString(), "text");
-            Assert.AreEqual(dataUrl2.MimeType.SubType.ToString(), "plain");
+            Assert.AreEqual(dataUrl2.MimeTypeInfo.MediaType.ToString(), "text");
+            Assert.AreEqual(dataUrl2.MimeTypeInfo.SubType.ToString(), "plain");
 
-            Assert.AreEqual(dataUrl2.MimeType.Parameters().First().Value.ToString(), "UTF-8");
+            Assert.AreEqual(dataUrl2.MimeTypeInfo.Parameters().First().Value.ToString(), "UTF-8");
             Assert.AreEqual(dataUrl2.DataEncoding, DataEncoding.Url);
 
             Assert.IsTrue(dataUrl2.TryGetEmbeddedText(out string? outString));

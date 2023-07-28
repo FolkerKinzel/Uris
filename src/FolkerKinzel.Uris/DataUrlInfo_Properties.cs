@@ -6,9 +6,9 @@ public readonly partial struct DataUrlInfo
     private readonly MimeTypeInfo _mimeType;
 
     /// <summary>
-    /// The internet media type of the embedded data.
+    /// Information about the internet media type of the embedded data.
     /// </summary>
-    public MimeTypeInfo MimeType => _mimeType;
+    public MimeTypeInfo MimeTypeInfo => _mimeType;
 
     /// <summary>
     /// The encoding of the data in <see cref="Data"/>.
@@ -26,7 +26,7 @@ public readonly partial struct DataUrlInfo
     /// <value>
     /// <c>true</c> if <see cref="Data"/> contains text, otherwise <c>false</c>.
     /// </value>
-    public bool ContainsEmbeddedText => this.MimeType.IsText || this.MimeType.IsEmpty;
+    public bool ContainsEmbeddedText => this.MimeTypeInfo.IsText || this.MimeTypeInfo.IsEmpty;
 
     /// <summary>
     /// Indicates whether <see cref="Data"/> contains binary data.
@@ -42,7 +42,7 @@ public readonly partial struct DataUrlInfo
     /// <value>
     /// <c>true</c> if the instance contains no data, otherwise <c>false</c>.
     /// </value>
-    public bool IsEmpty => this.MimeType.IsEmpty;
+    public bool IsEmpty => this.MimeTypeInfo.IsEmpty;
 
     /// <summary>
     /// Returns a <see cref="DataUrlInfo"/> instance, which is <see cref="Empty"/>.

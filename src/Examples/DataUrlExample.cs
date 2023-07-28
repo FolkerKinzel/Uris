@@ -24,7 +24,7 @@ public static class DataUrlExample
 
         Console.WriteLine($"Contains Bytes: {info.ContainsEmbeddedBytes}");
         Console.WriteLine($"Contains Text:  {info.ContainsEmbeddedText}");
-        Console.WriteLine($"MIME Type:      {info.MimeType}");
+        Console.WriteLine($"MIME Type:      {info.MimeTypeInfo}");
         Console.WriteLine($"File Type Ext.: {info.GetFileTypeExtension()}");
         Console.WriteLine($"Data Encoding:  {info.DataEncoding}");
 

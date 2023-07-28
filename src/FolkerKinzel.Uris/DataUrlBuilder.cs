@@ -22,14 +22,14 @@ public static class DataUrlBuilder
     internal const string Protocol = "data:";
     internal const string Base64 = ";base64";
     internal const string DEFAULT_MEDIA_TYPE = "text/plain";
-    private const int ESTIMATED_MIME_TYPE_LENGTH = 80;
+    internal const int ESTIMATED_MIME_TYPE_LENGTH = 80;
     #endregion
 
     /// <summary>
     /// Embeds text in a "data" URL (RFC 2397).
     /// </summary>
     /// <param name="text">The text to embed into the "data" URL. <paramref name="text"/> MUST not be URL encoded.</param>
-    /// <param name="mimeTypeString">The Internet Media Type of the <paramref name="text"/> or <c>null</c> for <see cref="MimeType.Default"/>.</param>
+    /// <param name="mimeTypeString">The Internet Media Type of the <paramref name="text"/> or <c>null</c> for <see cref="MimeString.OctetStream"/>.</param>
     /// 
     /// <returns>A "data" URL, into which <paramref name="text"/> is embedded.</returns>
     /// <exception cref="FormatException"><paramref name="text"/> consists only of ASCII characters and the <see cref="Uri"/> class 
@@ -38,9 +38,9 @@ public static class DataUrlBuilder
     /// consists only of ASCII characters the method serializes it Url encoded, otherwise <paramref name="text"/> is serialized
     /// as Base64 using <see cref="UTF8Encoding"/>.</remarks>
     public static string FromText(string? text, string? mimeTypeString = DEFAULT_MEDIA_TYPE) =>
-        MimeType.TryParse(string.IsNullOrWhiteSpace(mimeTypeString) ? MimeType.Default : mimeTypeString, out MimeType mimeType)
+        MimeType.TryParse(string.IsNullOrWhiteSpace(mimeTypeString) ? MimeString.OctetStream : mimeTypeString, out MimeType? mimeType)
                 ? FromText(text, mimeType)
-                : FromText(text, MimeType.Default);
+                : FromText(text, MimeString.OctetStream);
 
 
     /// <summary>
@@ -68,7 +68,7 @@ public static class DataUrlBuilder
 
         if (text.IsAscii())
         {
-            string data = Uri.EscapeDataString(text);
+            UrlEncoding.TryEncode(text, out string? data);
             var sb = new StringBuilder(Protocol.Length + ESTIMATED_MIME_TYPE_LENGTH + data.Length);
             return sb.Append(Protocol).AppendMediaType(mimeType).Append(',').Append(data).ToString();
         }
@@ -87,13 +87,13 @@ public static class DataUrlBuilder
     /// Embeds binary data in a "data" URL (RFC 2397).
     /// </summary>
     /// <param name="bytes">The binary data to embed into the "data" URL.</param>
-    /// <param name="mimeTypeString">The Internet Media Type of the <paramref name="bytes"/> or <c>null</c> for <see cref="MimeType.Default"/>.</param>
+    /// <param name="mimeTypeString">The Internet Media Type of the <paramref name="bytes"/> or <c>null</c> for <see cref="MimeString.OctetStream"/>.</param>
     /// <returns>A "data" URL, into which the binary data provided by the parameter <paramref name="bytes"/> is embedded.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="mimeTypeString"/> is <c>null</c>.</exception>
-    public static string FromBytes(byte[]? bytes, string? mimeTypeString = MimeType.Default) =>
-        MimeType.TryParse(string.IsNullOrWhiteSpace(mimeTypeString) ? MimeType.Default : mimeTypeString, out MimeType mimeType)
+    public static string FromBytes(byte[]? bytes, string? mimeTypeString = MimeString.OctetStream) =>
+        MimeType.TryParse(string.IsNullOrWhiteSpace(mimeTypeString) ? MimeString.OctetStream : mimeTypeString, out MimeType? mimeType)
                 ? FromBytes(bytes, mimeType)
-                : FromBytes(bytes, MimeType.Default);
+                : FromBytes(bytes, MimeString.OctetStream);
 
 
     /// <summary>
@@ -139,10 +139,12 @@ public static class DataUrlBuilder
     /// </para>
     /// <code language="c#" source="./../Examples/DataUrlExample.cs"/>
     /// </example>
-    public static string FromFile(string filePath, string? mimeTypeString = null) =>
-        MimeType.TryParse(string.IsNullOrWhiteSpace(mimeTypeString) ? MimeType.Default : mimeTypeString, out MimeType mimeType)
-                ? FromFile(filePath, mimeType)
-                : FromFile(filePath, MimeType.Default);
+    public static string FromFile(string filePath, string? mimeTypeString = null) => 
+        string.IsNullOrWhiteSpace(mimeTypeString)
+              ? FromFile(filePath, MimeType.FromFileName(filePath))
+              : MimeType.TryParse(string.IsNullOrWhiteSpace(mimeTypeString) ? MimeString.OctetStream : mimeTypeString, out MimeType? mimeType)
+                  ? FromFile(filePath, mimeType)
+                  : FromFile(filePath, (string?)null);
 
     /// <summary>
     /// Embeds the content of a file in a "data" URL (RFC 2397).

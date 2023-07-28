@@ -110,7 +110,6 @@ public readonly partial struct DataUrlInfo
     /// period (".").
     /// </summary>
     /// <returns>An appropriate file type extension for the data embedded in the <see cref="DataUrlInfo"/>.</returns>
-    /// <remarks>This method calls <see cref="MimeType.GetFileTypeExtension()"/>.</remarks>
     /// 
     ///<example>
     /// <note type="note">
@@ -122,14 +121,14 @@ public readonly partial struct DataUrlInfo
     /// <code language="c#" source="./../Examples/DataUrlExample.cs"/>
     /// </example>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public string GetFileTypeExtension() => MimeType.GetFileTypeExtension();
+    public string GetFileTypeExtension() => MimeTypeInfo.GetFileTypeExtension();
 
 
     private int GetEncoding(byte[] data, out Encoding enc)
     {
         int codePage = TextEncodingConverter.GetCodePage(data, out int bomLength);
 
-        MimeTypeParameter charsetParameter = MimeType.Parameters().FirstOrDefault(Predicate);
+        MimeTypeParameterInfo charsetParameter = MimeTypeInfo.Parameters().FirstOrDefault(Predicate);
 
         enc = charsetParameter.IsEmpty
                         ? InitEncoding(codePage)

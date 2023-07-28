@@ -7,11 +7,9 @@ internal static class DataUrlExtension
 {
     internal static StringBuilder AppendMediaType(this StringBuilder builder, MimeType mimeType)
     {
-        string mimeString = mimeType.ToString(MimeFormats.Url);
-
-        if (mimeString.StartsWith(DataUrlBuilder.DEFAULT_MEDIA_TYPE, StringComparison.Ordinal))
+        if (mimeType.IsTextPlain)
         {
-            if (MimeTypeInfo.Parse(DataUrlBuilder.DEFAULT_MEDIA_TYPE).Equals(MimeTypeInfo.Parse(mimeString)))
+            if (MimeType.Create("text", "plain").Equals(mimeType))
             {
                 return builder;
             }
@@ -25,7 +23,7 @@ internal static class DataUrlExtension
             return builder;
         }
 
-        builder.Append(mimeString);
+        builder.Append(mimeType.ToString(MimeFormats.Url));
         return builder;
     }
 
