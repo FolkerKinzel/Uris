@@ -5,23 +5,18 @@
 /// </summary>
 internal static class DataUrlExtension
 {
-    internal static StringBuilder AppendMediaType(this StringBuilder builder, in MimeType mimeType)
+    internal static StringBuilder AppendMediaType(this StringBuilder builder, MimeType mimeType)
     {
-        if (mimeType.IsEmpty)
-        {
-            return builder;
-        }
+        string mimeString = mimeType.ToString(MimeFormats.Url);
 
-        if (mimeType.IsTextPlain)
+        if (mimeString.StartsWith(DataUrlBuilder.DEFAULT_MEDIA_TYPE, StringComparison.Ordinal))
         {
-            MimeType defaultMediaType = DataUrlBuilder.DefaultMediaType();
-
-            if (mimeType.Equals(in defaultMediaType))
+            if (MimeTypeInfo.Parse(DataUrlBuilder.DEFAULT_MEDIA_TYPE).Equals(MimeTypeInfo.Parse(mimeString)))
             {
                 return builder;
             }
 
-            foreach (MimeTypeParameter parameter in mimeType.Parameters())
+            foreach (MimeTypeParameter parameter in mimeType.Parameters)
             {
                 _ = builder.Append(';');
                 parameter.AppendTo(builder, urlFormat: true);
@@ -30,7 +25,7 @@ internal static class DataUrlExtension
             return builder;
         }
 
-        mimeType.AppendTo(builder, MimeFormats.Url);
+        builder.Append(mimeString);
         return builder;
     }
 
