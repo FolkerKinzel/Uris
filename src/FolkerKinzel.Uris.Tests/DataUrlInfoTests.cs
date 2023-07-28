@@ -36,7 +36,7 @@ namespace FolkerKinzel.Uris.Tests
 
             Assert.IsNotNull(outText);
 
-            Assert.IsTrue(MimeType.TryParse("application/x-octet", out MimeType mime));
+            Assert.IsTrue(MimeType.TryParse("application/x-octet", out MimeType? mime));
 
             outText = DataUrlBuilder.FromBytes(new byte[] { 1, 2, 3 }, mime);
 
@@ -53,7 +53,7 @@ namespace FolkerKinzel.Uris.Tests
 
             Assert.IsNotNull(outText);
 
-            Assert.IsTrue(MimeType.TryParse("application/x-octet", out MimeType mime));
+            Assert.IsTrue(MimeType.TryParse("application/x-octet", out MimeType? mime));
 
             outText = DataUrlBuilder.FromBytes(new byte[] { 1, 2, 3 }, mime);
 
@@ -89,7 +89,7 @@ namespace FolkerKinzel.Uris.Tests
         public void TryParseTest5()
         {
             const string url = "data:application/x-octet,A%42C";
-            byte[] data = new byte[] { 0x41, 0x42, 0x43 };
+            byte[] data = "ABC"u8.ToArray();
 
             Assert.IsTrue(DataUrlInfo.TryParse(url, out DataUrlInfo dataUrl));
             Assert.AreEqual(DataEncoding.Url, dataUrl.DataEncoding);
@@ -113,7 +113,7 @@ namespace FolkerKinzel.Uris.Tests
 
             string s = $"data:;charset={isoEncoding};base64,{Convert.ToBase64String(TextEncodingConverter.GetEncoding(isoEncoding).GetBytes(data))}";
 
-            Assert.IsTrue(DataUrlInfo.TryParse(s, out DataUrlInfo dataUrlText1));
+            Assert.IsTrue(DataUrlInfo.TryParse(s, out DataUrlInfo _));
         }
 
         [TestMethod]
@@ -161,7 +161,7 @@ namespace FolkerKinzel.Uris.Tests
         [TestMethod]
         public void TryParseTest12()
         {
-            var data = new byte[] { 1, 2, 3 };
+            byte[] data = new byte[] { 1, 2, 3 };
             string url = DataUrlBuilder.FromBytes(data, MimeType.Parse("application/x-stuff; key=\";bla,blabla\""));
             Assert.IsTrue(DataUrlInfo.TryParse(url, out DataUrlInfo dataUrl));
             Assert.IsTrue(dataUrl.TryGetEmbeddedBytes(out byte[]? parsed));
@@ -172,7 +172,7 @@ namespace FolkerKinzel.Uris.Tests
         public void ParseTest1()
         {
             ReadOnlyMemory<char> mem = "data:application/octet-stream;base64,ABCD".AsMemory();
-            var info = DataUrlInfo.Parse(in mem);
+            var info = DataUrlInfo.Parse(mem);
             Assert.IsFalse(info.IsEmpty);
         }
 
@@ -181,7 +181,7 @@ namespace FolkerKinzel.Uris.Tests
         public void ParseTest2()
         {
             ReadOnlyMemory<char> mem = "blabla".AsMemory();
-            _ = DataUrlInfo.Parse(in mem);
+            _ = DataUrlInfo.Parse(mem);
         }
 
         [TestMethod]
@@ -215,17 +215,11 @@ namespace FolkerKinzel.Uris.Tests
         }
 
         [TestMethod]
-        public void TryGetEmbedddedTextTest3()
-        {
-            Assert.IsTrue(new DataUrlInfo().TryGetEmbeddedText(out _));
-        }
+        public void TryGetEmbedddedTextTest3() => Assert.IsTrue(new DataUrlInfo().TryGetEmbeddedText(out _));
 
 
         [TestMethod]
-        public void TryGetEmbedddedBytesTest1()
-        {
-            Assert.IsFalse(new DataUrlInfo().TryGetEmbeddedBytes(out _));
-        }
+        public void TryGetEmbedddedBytesTest1() => Assert.IsFalse(new DataUrlInfo().TryGetEmbeddedBytes(out _));
 
         [TestMethod]
         public void TryGetEmbeddedBytesTest2()
@@ -296,7 +290,7 @@ namespace FolkerKinzel.Uris.Tests
             byte[]? bytes = encoding.GetBytes(input);
 
             var mime = MimeType.Parse($"text/plain; charset={encodingName}");
-            string urlStr2 = DataUrlBuilder.FromBytes(bytes, in mime);
+            string urlStr2 = DataUrlBuilder.FromBytes(bytes, mime);
 
             Assert.IsTrue(DataUrlInfo.TryParse(urlStr1, out DataUrlInfo dataUrl1));
             Assert.IsTrue(DataUrlInfo.TryParse(urlStr2, out DataUrlInfo dataUrl2));

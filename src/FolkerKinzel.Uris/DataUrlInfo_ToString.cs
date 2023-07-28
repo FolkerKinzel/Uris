@@ -31,7 +31,7 @@ public readonly partial struct DataUrlInfo
         if (DataEncoding == DataEncoding.Base64 || IsEmpty)
         {
             _ = builder.EnsureCapacity(ComputeCapacity());
-            _ = builder.Append(DataUrlBuilder.Protocol).AppendMediaType(MimeTypes.MimeType.Create(in _mimeType)).Append(DataUrlBuilder.Base64).Append(',').Append(Data);
+            _ = builder.Append(DataUrlBuilder.Protocol).AppendMediaType(_mimeType.IsEmpty ? MimeType.Create("text", "plain") : MimeType.Create(in _mimeType)).Append(DataUrlBuilder.Base64).Append(',').Append(Data);
         }
         else if (TryGetEmbeddedText(out string? text))
         {

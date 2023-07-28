@@ -27,7 +27,7 @@
         [TestMethod]
         public void AppendMediaTypeTest1()
         {
-            Assert.IsTrue(MimeType.TryParse("text/plain", out MimeType media));
+            Assert.IsTrue(MimeType.TryParse("text/plain", out MimeType? media));
 
             var sb = new StringBuilder();
 
@@ -39,7 +39,7 @@
         [TestMethod]
         public void AppendMediaTypeTest2()
         {
-            Assert.IsTrue(MimeType.TryParse("text/plain;charset=iso-8859-1", out MimeType media));
+            Assert.IsTrue(MimeType.TryParse("text/plain;charset=iso-8859-1", out MimeType? media));
 
             var sb = new StringBuilder();
 
@@ -52,7 +52,7 @@
         public void AppendMediaTypeTest3()
         {
             string input = "text/html;charset=iso-8859-1";
-            Assert.IsTrue(MimeType.TryParse(input, out MimeType media));
+            Assert.IsTrue(MimeType.TryParse(input, out MimeType? media));
 
             var sb = new StringBuilder();
 

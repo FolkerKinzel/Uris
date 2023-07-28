@@ -30,8 +30,7 @@ public readonly partial struct DataUrlInfo : ICloneable
             return default;
         }
 
-        ReadOnlyMemory<char> memory = ToString().AsMemory();
-        _ = DataUrlInfo.TryParse(in memory, out DataUrlInfo dataUrl);
+        _ = DataUrlInfo.TryParse(ToString(), out DataUrlInfo dataUrl);
 
         return dataUrl;
     }

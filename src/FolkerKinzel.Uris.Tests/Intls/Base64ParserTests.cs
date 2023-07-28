@@ -13,9 +13,6 @@
         [DataRow("AB")]
         //[DataRow("A")]
         [DataRow("")]
-        public void ParseTest2(string input)
-        {
-            Assert.IsNotNull(Base64Parser.Parse(input));
-        }
+        public void ParseTest2(string input) => Assert.IsNotNull(Base64Parser.Parse(input));
     }
 }

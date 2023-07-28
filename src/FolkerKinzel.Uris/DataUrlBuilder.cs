@@ -68,7 +68,11 @@ public static class DataUrlBuilder
 
         if (text.IsAscii())
         {
-            UrlEncoding.TryEncode(text, out string? data);
+            if(!UrlEncoding.TryEncode(text, out string? data))
+            {
+                data = string.Empty;
+            }
+
             var sb = new StringBuilder(Protocol.Length + ESTIMATED_MIME_TYPE_LENGTH + data.Length);
             return sb.Append(Protocol).AppendMediaType(mimeType).Append(',').Append(data).ToString();
         }

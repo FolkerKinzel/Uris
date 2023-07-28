@@ -92,7 +92,7 @@ public readonly partial struct DataUrlInfo
             }
             else
             {
-                byte[] bytes = InitEncoding(ASCII_CODEPAGE).GetBytes(Data.ToString());
+                byte[] bytes = DataUrlInfo.InitEncoding(ASCII_CODEPAGE).GetBytes(Data.ToString());
                 embeddedBytes = WebUtility.UrlDecodeToBytes(bytes, 0, bytes.Length);
             }
         }
@@ -131,21 +131,21 @@ public readonly partial struct DataUrlInfo
         MimeTypeParameterInfo charsetParameter = MimeTypeInfo.Parameters().FirstOrDefault(Predicate);
 
         enc = charsetParameter.IsEmpty
-                        ? InitEncoding(codePage)
+                        ? DataUrlInfo.InitEncoding(codePage)
                         : charsetParameter.IsAsciiCharSetParameter
-                            ? InitEncoding(ASCII_CODEPAGE)
-                            : InitEncoding(charsetParameter.Value.ToString());
+                            ? DataUrlInfo.InitEncoding(ASCII_CODEPAGE)
+                            : DataUrlInfo.InitEncoding(charsetParameter.Value.ToString());
         return bomLength;
 
         ////////////////////////////////////
 
-        static bool Predicate(MimeTypeParameter p) => p.IsCharSetParameter;
+        static bool Predicate(MimeTypeParameterInfo p) => p.IsCharSetParameter;
     }
 
 
-    private Encoding InitEncoding(int codePage) =>
+    private static Encoding InitEncoding(int codePage) =>
         TextEncodingConverter.GetEncoding(codePage, EncoderFallback.ExceptionFallback, DecoderFallback.ExceptionFallback, true);
 
-    private Encoding InitEncoding(string encodingName) =>
+    private static Encoding InitEncoding(string encodingName) =>
         TextEncodingConverter.GetEncoding(encodingName, EncoderFallback.ExceptionFallback, DecoderFallback.ExceptionFallback, true);
 }

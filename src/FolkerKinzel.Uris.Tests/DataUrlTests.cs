@@ -181,7 +181,7 @@ public class DataUrlTests
     [TestMethod]
     public void FromBytesTest2()
     {
-        Assert.IsTrue(MimeType.TryParse("application/x-octet", out MimeType mime));
+        Assert.IsTrue(MimeType.TryParse("application/x-octet", out MimeType? mime));
 
         byte[] bytes = new byte[] { 1, 2, 3 };
         string outText = DataUrlBuilder.FromBytes(bytes, mime);
@@ -198,7 +198,7 @@ public class DataUrlTests
     [TestMethod]
     public void FromBytesTest3()
     {
-        string outText = DataUrlBuilder.FromBytes(null, MimeType.Empty);
+        string outText = DataUrlBuilder.FromBytes(null, MimeType.Parse("text/plain"));
 
         Assert.IsNotNull(outText);
 
