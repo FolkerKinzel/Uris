@@ -3,12 +3,12 @@
 public readonly partial struct DataUrlInfo
 {
     private readonly ReadOnlyMemory<char> _embeddedData;
-    private readonly MimeType _mimeType;
+    private readonly MimeTypeInfo _mimeType;
 
     /// <summary>
     /// The internet media type of the embedded data.
     /// </summary>
-    public MimeType MimeType => _mimeType;
+    public MimeTypeInfo MimeType => _mimeType;
 
     /// <summary>
     /// The encoding of the data in <see cref="Data"/>.
