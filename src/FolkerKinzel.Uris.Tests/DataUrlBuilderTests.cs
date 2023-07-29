@@ -19,7 +19,7 @@ public class DataUrlBuilderTests
         string path = Path.Combine(TestContext.TestRunDirectory, fileName);
         File.WriteAllBytes(path, testData);
 
-        string url1 = DataUrlBuilder.FromFile(path);
+        string url1 = DataUrl.FromFile(path);
         StringAssert.Contains(url1, "image/jpeg");
     }
 

@@ -190,7 +190,7 @@ public class DataUrlTests
 
         Assert.IsNotNull(outText);
 
-        Assert.IsTrue(DataUrlInfo.TryParse(outText, out DataUrlInfo dataUrl));
+        Assert.IsTrue(DataUrl.TryParse(outText, out DataUrlInfo dataUrl));
 
         Assert.IsTrue(dataUrl.TryGetEmbeddedBytes(out byte[]? outBytes));
 
@@ -204,7 +204,7 @@ public class DataUrlTests
 
         Assert.IsNotNull(outText);
 
-        Assert.IsTrue(DataUrlInfo.TryParse(outText, out DataUrlInfo dataUrl));
+        Assert.IsTrue(DataUrl.TryParse(outText, out DataUrlInfo dataUrl));
 
         Assert.IsTrue(dataUrl.TryGetEmbeddedBytes(out byte[]? outBytes));
 
@@ -216,10 +216,10 @@ public class DataUrlTests
     public void FromFileTest1()
     {
         string path = TestFiles.FolkerPng;
-        string url = DataUrlBuilder.FromFile(path);
+        string url = DataUrl.FromFile(path);
         Assert.IsNotNull(url);
 
-        Assert.IsTrue(DataUrlInfo.TryParse(url, out DataUrlInfo dataUrl));
+        Assert.IsTrue(DataUrl.TryParse(url, out DataUrlInfo dataUrl));
 
         Assert.IsTrue(dataUrl.TryGetEmbeddedBytes(out byte[]? outBytes));
 
@@ -230,20 +230,20 @@ public class DataUrlTests
     public void FromFileTest2()
     {
         string path = TestFiles.EmptyTextFile;
-        string url = DataUrlBuilder.FromFile(path);
+        string url = DataUrl.FromFile(path);
         Assert.IsNotNull(url);
-        Assert.IsTrue(DataUrlInfo.TryParse(url, out DataUrlInfo dataUrl));
+        Assert.IsTrue(DataUrl.TryParse(url, out DataUrlInfo dataUrl));
         Assert.IsTrue(dataUrl.TryGetEmbeddedBytes(out byte[]? outBytes));
         CollectionAssert.AreEqual(outBytes, File.ReadAllBytes(path));
     }
 
     [TestMethod]
     [ExpectedException(typeof(ArgumentNullException))]
-    public void FromFileTest3() => _ = DataUrlBuilder.FromFile(null!);
+    public void FromFileTest3() => _ = DataUrl.FromFile(null!);
 
     [TestMethod]
     [ExpectedException(typeof(ArgumentException))]
-    public void FromFileTest4() => _ = DataUrlBuilder.FromFile("   ");
+    public void FromFileTest4() => _ = DataUrl.FromFile("   ");
 
     [TestMethod]
     public void FromFileTest5()
@@ -251,9 +251,9 @@ public class DataUrlTests
         string path = TestFiles.Utf8;
         string fileContent = File.ReadAllText(path);
 
-        string url = DataUrlBuilder.FromFile(path);
+        string url = DataUrl.FromFile(path);
 
-        Assert.IsTrue(DataUrlInfo.TryParse(url, out DataUrlInfo dataUrl));
+        Assert.IsTrue(DataUrl.TryParse(url, out DataUrlInfo dataUrl));
         Assert.IsTrue(dataUrl.TryGetEmbeddedText(out string? dataUrlText));
 
         Assert.AreEqual(fileContent, dataUrlText);
@@ -265,9 +265,9 @@ public class DataUrlTests
         string path = TestFiles.Utf16LE;
         string fileContent = File.ReadAllText(path);
 
-        string url = DataUrlBuilder.FromFile(path);
+        string url = DataUrl.FromFile(path);
 
-        Assert.IsTrue(DataUrlInfo.TryParse(url, out DataUrlInfo dataUrl));
+        Assert.IsTrue(DataUrl.TryParse(url, out DataUrlInfo dataUrl));
         Assert.IsTrue(dataUrl.TryGetEmbeddedText(out string? dataUrlText));
 
         Assert.AreEqual(fileContent, dataUrlText);
@@ -291,9 +291,9 @@ public class DataUrlTests
     [TestMethod]
     public void FromTextOnNull()
     {
-        string urlString = DataUrlBuilder.FromText(null, ReadOnlyMemory<char>.Empty);
+        string urlString = DataUrl.FromText(null);
         Assert.IsNotNull(urlString);
-        Assert.IsTrue(DataUrlInfo.TryParse(urlString, out DataUrlInfo dataUrl));
+        Assert.IsTrue(DataUrl.TryParse(urlString, out DataUrlInfo dataUrl));
         Assert.IsTrue(dataUrl.TryGetEmbeddedText(out string? output));
         Assert.AreEqual(string.Empty, output);
     }
@@ -301,8 +301,8 @@ public class DataUrlTests
     [TestMethod]
     public void FromTextOnStringEmpty()
     {
-        string urlString = DataUrlBuilder.FromText("", ReadOnlyMemory<char>.Empty);
-        Assert.IsTrue(DataUrlInfo.TryParse(urlString, out DataUrlInfo dataUrl));
+        string urlString = DataUrl.FromText("");
+        Assert.IsTrue(DataUrl.TryParse(urlString, out DataUrlInfo dataUrl));
         Assert.IsTrue(dataUrl.TryGetEmbeddedText(out string? output));
         Assert.AreEqual(string.Empty, output);
     }
@@ -312,9 +312,9 @@ public class DataUrlTests
     {
         const string TEXT = "In Märchenbüchern herumstöbern.";
 
-        string dataUrl1 = DataUrlBuilder.FromText(TEXT, ReadOnlyMemory<char>.Empty);
+        string dataUrl1 = DataUrl.FromText(TEXT);
 
-        Assert.IsTrue(DataUrlInfo.TryParse(dataUrl1, out DataUrlInfo dataUrl2));
+        Assert.IsTrue(DataUrl.TryParse(dataUrl1, out DataUrlInfo dataUrl2));
 
         Assert.AreEqual(dataUrl2.MimeType.ToString(), "text/plain");
 
@@ -347,10 +347,10 @@ public class DataUrlTests
         string text = "http://www.fölkerchen.de";
         //string test = DATA_PROTOCOL + "text/plain;charset=utf-8" + ";" + DEFAULT_ENCODING + "," + Uri.EscapeDataString(text);
 
-        string outText = DataUrlBuilder.FromText(text, ReadOnlyMemory<char>.Empty);
+        string outText = DataUrl.FromText(text);
 
         Assert.IsNotNull(outText);
-        Assert.IsTrue(DataUrlInfo.TryParse(outText, out DataUrlInfo dataUrl));
+        Assert.IsTrue(DataUrl.TryParse(outText, out DataUrlInfo dataUrl));
         Assert.IsTrue(dataUrl.TryGetEmbeddedText(out string? output));
         Assert.AreEqual(text, output);
     }
