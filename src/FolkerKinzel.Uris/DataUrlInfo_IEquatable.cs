@@ -12,8 +12,6 @@ public readonly partial struct DataUrlInfo : IEquatable<DataUrlInfo>
     public override bool Equals(object? obj)
         => obj is DataUrlInfo other && Equals(in other);
 
-
-
     /// <summary>
     /// Determines whether the value of this instance is equal to the value of <paramref name="other"/>. 
     /// </summary>

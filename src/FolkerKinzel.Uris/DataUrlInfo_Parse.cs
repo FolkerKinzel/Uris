@@ -76,72 +76,112 @@ public readonly partial struct DataUrlInfo
     /// <seealso cref="TryParse(string?, out DataUrlInfo)"/>
     public static bool TryParse(ReadOnlyMemory<char> value, out DataUrlInfo info) => TryParseInternal(ref value, out info);
 
+
+    [SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
     private static bool TryParseInternal(ref ReadOnlyMemory<char> value, out DataUrlInfo info)
     {
         value = value.Trim();
-        ReadOnlySpan<char> span = value.Span;
         info = default;
 
-        if (!span.IsDataUrl())
+        if (!value.Span.IsDataUrl())
         {
             return false;
         }
 
-        int mimeTypeEndIndex = -1;
-        int startOfData = -1;
-
-        for (int i = DataUrlBuilder.Protocol.Length; i < span.Length; i++)
-        {
-            char c = span[i];
-
-            if (c == ',')
-            {
-                startOfData = mimeTypeEndIndex = i;
-                break;
-            }
-        }
-
-        if (mimeTypeEndIndex == -1) // missing ','
+        value = value.Slice(DataUrl.Protocol.Length);
+        ReadOnlySpan<char> span = value.Span;
+        int mimeTypeLength = span.IndexOf(',');
+               
+        if (mimeTypeLength == -1) // missing ','
         {
             return false;
         }
 
-        // dies ändert ggf. auch mimeTypeEndIndex
-        ReadOnlySpan<char> mimePart = span.Slice(DataUrlBuilder.Protocol.Length, mimeTypeEndIndex - DataUrlBuilder.Protocol.Length);
-        DataEncoding dataEncoding = DataEncoding.Url;
+        DataEncoding dataEncoding = 
+            span.Slice(0, mimeTypeLength)
+                .EndsWith(DataUrl.Base64.AsSpan(), StringComparison.OrdinalIgnoreCase) 
+                      ? DataEncoding.Base64 
+                      : DataEncoding.Url;
 
-        if (mimePart.EndsWith(DataUrlBuilder.Base64, StringComparison.OrdinalIgnoreCase))
+        if (dataEncoding == DataEncoding.Base64)
         {
-            mimePart = mimePart.Slice(0, mimePart.Length - DataUrlBuilder.Base64.Length);
-            mimeTypeEndIndex -= DataUrlBuilder.Base64.Length;
-            dataEncoding = DataEncoding.Base64;
+            mimeTypeLength -= DataUrl.Base64.Length;
         }
 
-        MimeTypeInfo mediaType;
-
-        if (mimePart.IsEmpty)
+        // if text/plain is omitted and only the parameters are provided:
+        if (mimeTypeLength > 0 && span.StartsWith(';')) 
         {
-            mediaType = MimeTypeInfo.Parse(DataUrlBuilder.DEFAULT_MEDIA_TYPE);
+            value = $"{DataUrl.DefaultMediaType}{span.ToString()}".AsMemory();
+            mimeTypeLength += DataUrl.DefaultMediaType.Length;
         }
-        else
-        {
-            // if text/plain is omitted and only the parameters are provided:
-            ReadOnlyMemory<char> memory = span[DataUrlBuilder.Protocol.Length] == ';'
-                                            ? new StringBuilder(DataUrlBuilder.DEFAULT_MEDIA_TYPE.Length + mimePart.Length)
-                                                .Append(DataUrlBuilder.DEFAULT_MEDIA_TYPE)
-                                                .Append(mimePart).ToString()
-                                                .AsMemory()
-                                            : value.Slice(DataUrlBuilder.Protocol.Length, mimeTypeEndIndex - DataUrlBuilder.Protocol.Length);
 
-            if (!MimeTypeInfo.TryParse(memory, out mediaType))
-            {
-                return false;
-            }
+        if(mimeTypeLength > MIME_TYPE_LENGTH_MAX_VALUE)
+        {
+            return false;
         }
-        ReadOnlyMemory<char> embeddedData = value.Slice(startOfData + 1);
-        info = new DataUrlInfo(in mediaType, dataEncoding, in embeddedData);
+
+        ushort idx = (ushort)(mimeTypeLength << MIME_TYPE_LENGTH_SHIFT);
+        idx |= (ushort)dataEncoding;
+
+        info = new DataUrlInfo(idx, in value);
 
         return true;
+
+        //// dies ändert ggf. auch mimeTypeEndIndex
+        //ReadOnlySpan<char> mimePart = span.Slice(DataUrlBuilder.Protocol.Length, mimeTypeLength - DataUrlBuilder.Protocol.Length);
+
+        //if (mimePart.EndsWith(DataUrlBuilder.Base64, StringComparison.OrdinalIgnoreCase))
+        //{
+        //    mimePart = mimePart.Slice(0, mimePart.Length - DataUrlBuilder.Base64.Length);
+        //    mimeTypeLength -= DataUrlBuilder.Base64.Length;
+        //    dataEncoding = DataEncoding.Base64;
+        //}
+
+        //MimeTypeInfo mediaType;
+
+        //if (mimePart.IsEmpty)
+        //{
+        //    mediaType = MimeTypeInfo.Parse(DataUrlBuilder.DEFAULT_MEDIA_TYPE);
+        //}
+        //else
+        //{
+            
+        //    ReadOnlyMemory<char> memory = span[DataUrlBuilder.Protocol.Length] == ';'
+        //                                    ? new StringBuilder(DataUrlBuilder.DEFAULT_MEDIA_TYPE.Length + mimePart.Length)
+        //                                        .Append(DataUrlBuilder.DEFAULT_MEDIA_TYPE)
+        //                                        .Append(mimePart).ToString()
+        //                                        .AsMemory()
+        //                                    : value.Slice(DataUrlBuilder.Protocol.Length, mimeTypeLength - DataUrlBuilder.Protocol.Length);
+
+        //    if (!MimeTypeInfo.TryParse(memory, out mediaType))
+        //    {
+        //        return false;
+        //    }
+        //}
+        //ReadOnlyMemory<char> embeddedData = value.Slice(startOfData + 1);
+        //info = new DataUrlInfo(in mediaType, dataEncoding, in embeddedData);
+
+        //return true;
+
+        //////////////////////////////////////////////////////////
+
+        //static int GetMimeTypeLength(ReadOnlySpan<char> span)
+        //{
+        //    int mimeTypeEndIndex = -1;
+
+        //    for (int i = 0; i < span.Length; i++)
+        //    {
+        //        char c = span[i];
+
+        //        if (c == ',')
+        //        {
+        //            mimeTypeEndIndex = i;
+        //            break;
+        //        }
+        //    }
+
+        //    return mimeTypeEndIndex;
+        //}
 
 
         //////////////////////////////////////////////////////////////

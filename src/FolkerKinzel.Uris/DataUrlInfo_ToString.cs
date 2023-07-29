@@ -10,7 +10,7 @@ public readonly partial struct DataUrlInfo
     /// <returns>A "data" URL (RFC 2397) representation of the instance.</returns>
     public override string ToString()
     {
-        var builder = new StringBuilder(ComputeCapacity());
+        var builder = new StringBuilder(DataUrl.Protocol.Length + _embeddedData.Length);
         return AppendTo(builder).ToString();
     }
 
@@ -28,36 +28,51 @@ public readonly partial struct DataUrlInfo
             throw new ArgumentNullException(nameof(builder));
         }
 
-        if (DataEncoding == DataEncoding.Base64 || IsEmpty)
-        {
-            _ = builder.EnsureCapacity(ComputeCapacity());
-            _ = builder.Append(DataUrlBuilder.Protocol).AppendMediaType(_mimeType.IsEmpty ? MimeType.Create("text", "plain") : MimeType.Create(in _mimeType)).Append(DataUrlBuilder.Base64).Append(',').Append(Data);
-        }
-        else if (TryGetEmbeddedText(out string? text))
-        {
-            string urlString = DataUrlBuilder.FromText(text);
-            _ = builder.Append(urlString);
-        }
-        else // URL encoded bytes
-        {
-            _ = TryGetEmbeddedBytes(out byte[]? bytes);
-            string urlString = DataUrlBuilder.FromBytes(bytes, MimeTypes.MimeType.Create(in _mimeType));
-            _ = builder.Append(urlString);
+        if(IsEmpty)
+        { 
+            return builder; 
         }
 
+        ReadOnlySpan<char> span = _embeddedData.Span;
+
+        if(span.StartsWith(DataUrl.DefaultMediaType))
+        {
+            span = span.Slice(DataUrl.DefaultMediaType.Length);
+        }
+
+        builder.Append(DataUrl.Protocol).Append(span);
         return builder;
+
+        //if (DataEncoding == DataEncoding.Base64 || IsEmpty)
+        //{
+        //    _ = builder.EnsureCapacity(ComputeCapacity());
+        //    _ = builder.Append(DataUrlBuilder.Protocol).AppendMediaType(_mimeType.IsEmpty ? MimeType.Create("text", "plain") : MimeType.Create(in _mimeType)).Append(DataUrlBuilder.Base64).Append(',').Append(Data);
+        //}
+        //else if (TryGetEmbeddedText(out string? text))
+        //{
+        //    string urlString = DataUrlBuilder.FromText(text);
+        //    _ = builder.Append(urlString);
+        //}
+        //else // URL encoded bytes
+        //{
+        //    _ = TryGetEmbeddedBytes(out byte[]? bytes);
+        //    string urlString = DataUrlBuilder.FromBytes(bytes, MimeTypes.MimeType.Create(in _mimeType));
+        //    _ = builder.Append(urlString);
+        //}
+
+        //return builder;
     }
 
-    private int ComputeCapacity()
-    {
-        int capacity = DataUrlBuilder.Protocol.Length + DataUrlBuilder.ESTIMATED_MIME_TYPE_LENGTH;
+    //private int ComputeCapacity()
+    //{
+    //    int capacity = DataUrlBuilder.Protocol.Length + DataUrlBuilder.ESTIMATED_MIME_TYPE_LENGTH;
 
-        if (DataEncoding == DataEncoding.Base64)
-        {
-            capacity += DataUrlBuilder.Base64.Length;
-        }
+    //    if (DataEncoding == DataEncoding.Base64)
+    //    {
+    //        capacity += DataUrlBuilder.Base64.Length;
+    //    }
 
-        return capacity;
-    }
+    //    return capacity;
+    //}
 
 }

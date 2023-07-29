@@ -13,5 +13,5 @@ public static class StringExtension
     /// <c>null</c> or empty <c>false</c> is returned.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsDataUrl([NotNullWhen(true)] this string? urlString)
-        => urlString is not null && urlString.StartsWith(DataUrlBuilder.Protocol, StringComparison.OrdinalIgnoreCase);
+        => urlString is not null && urlString.StartsWith(DataUrl.Protocol, StringComparison.OrdinalIgnoreCase);
 }

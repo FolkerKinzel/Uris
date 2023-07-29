@@ -289,7 +289,7 @@ public class DataUrlTests
     [TestMethod]
     public void FromTextOnNull()
     {
-        string urlString = DataUrlBuilder.FromText(null);
+        string urlString = DataUrlBuilder.FromText(null, ReadOnlyMemory<char>.Empty);
         Assert.IsNotNull(urlString);
         Assert.IsTrue(DataUrlInfo.TryParse(urlString, out DataUrlInfo dataUrl));
         Assert.IsTrue(dataUrl.TryGetEmbeddedText(out string? output));
@@ -299,7 +299,7 @@ public class DataUrlTests
     [TestMethod]
     public void FromTextOnStringEmpty()
     {
-        string urlString = DataUrlBuilder.FromText("");
+        string urlString = DataUrlBuilder.FromText("", ReadOnlyMemory<char>.Empty);
         Assert.IsTrue(DataUrlInfo.TryParse(urlString, out DataUrlInfo dataUrl));
         Assert.IsTrue(dataUrl.TryGetEmbeddedText(out string? output));
         Assert.AreEqual(string.Empty, output);
@@ -310,14 +310,13 @@ public class DataUrlTests
     {
         const string TEXT = "In Märchenbüchern herumstöbern.";
 
-        string dataUrl1 = DataUrlBuilder.FromText(TEXT);
+        string dataUrl1 = DataUrlBuilder.FromText(TEXT, ReadOnlyMemory<char>.Empty);
 
         Assert.IsTrue(DataUrlInfo.TryParse(dataUrl1, out DataUrlInfo dataUrl2));
 
-        Assert.AreEqual(dataUrl2.MimeTypeInfo.MediaType.ToString(), "text");
-        Assert.AreEqual(dataUrl2.MimeTypeInfo.SubType.ToString(), "plain");
+        Assert.AreEqual(dataUrl2.MimeType.ToString(), "text/plain");
 
-        Assert.AreEqual(1, dataUrl2.MimeTypeInfo.Parameters().Count());
+        Assert.AreEqual(1, MimeTypeInfo.Parse(dataUrl2.MimeType).Parameters().Count());
 
         Assert.IsTrue(dataUrl2.TryGetEmbeddedText(out string? outText));
         Assert.AreEqual(TEXT, outText);
@@ -346,7 +345,7 @@ public class DataUrlTests
         string text = "http://www.fölkerchen.de";
         //string test = DATA_PROTOCOL + "text/plain;charset=utf-8" + ";" + DEFAULT_ENCODING + "," + Uri.EscapeDataString(text);
 
-        string outText = DataUrlBuilder.FromText(text);
+        string outText = DataUrlBuilder.FromText(text, ReadOnlyMemory<char>.Empty);
 
         Assert.IsNotNull(outText);
         Assert.IsTrue(DataUrlInfo.TryParse(outText, out DataUrlInfo dataUrl));

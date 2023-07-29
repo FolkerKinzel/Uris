@@ -26,7 +26,7 @@ namespace Benchmarks
             string s = $"data:;charset={isoEncoding};base64,{Convert.ToBase64String(Encoding.GetEncoding(isoEncoding).GetBytes(data))}";
 
             _ = DataUrlInfo.TryParse(s, out _dataUrlText1);
-            _ = DataUrlInfo.TryParse(DataUrlBuilder.FromText(data), out _dataUrlText2);
+            _ = DataUrlInfo.TryParse(DataUrlBuilder.FromText(data, default(ReadOnlyMemory<char>)), out _dataUrlText2);
         }
 
 

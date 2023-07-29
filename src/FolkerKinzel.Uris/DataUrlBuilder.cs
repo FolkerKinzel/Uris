@@ -19,17 +19,15 @@ namespace FolkerKinzel.Uris;
 public static class DataUrlBuilder
 {
     #region const
-    internal const string Protocol = "data:";
-    internal const string Base64 = ";base64";
-    internal const string DEFAULT_MEDIA_TYPE = "text/plain";
     internal const int ESTIMATED_MIME_TYPE_LENGTH = 80;
+    internal const string UTF_8 = "utf-8";
     #endregion
 
     /// <summary>
     /// Embeds text in a "data" URL (RFC 2397).
     /// </summary>
     /// <param name="text">The text to embed into the "data" URL. <paramref name="text"/> MUST not be URL encoded.</param>
-    /// <param name="mimeTypeString">The Internet Media Type of the <paramref name="text"/> or <c>null</c> for <see cref="MimeString.OctetStream"/>.</param>
+    /// <param name="mimeTypeString">The Internet Media Type of the <paramref name="text"/>.</param>
     /// 
     /// <returns>A "data" URL, into which <paramref name="text"/> is embedded.</returns>
     /// <exception cref="FormatException"><paramref name="text"/> consists only of ASCII characters and the <see cref="Uri"/> class 
@@ -37,10 +35,11 @@ public static class DataUrlBuilder
     /// <remarks>If <paramref name="text"/>
     /// consists only of ASCII characters the method serializes it Url encoded, otherwise <paramref name="text"/> is serialized
     /// as Base64 using <see cref="UTF8Encoding"/>.</remarks>
-    public static string FromText(string? text, string? mimeTypeString = DEFAULT_MEDIA_TYPE) =>
-        MimeType.TryParse(string.IsNullOrWhiteSpace(mimeTypeString) ? MimeString.OctetStream : mimeTypeString, out MimeType? mimeType)
+    [SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
+    public static string FromText(string? text, in ReadOnlyMemory<char> mimeTypeString) =>
+        MimeType.TryParse(mimeTypeString.Span.IsWhiteSpace() ? DataUrl.DefaultMediaType.AsMemory() : mimeTypeString, out MimeType? mimeType)
                 ? FromText(text, mimeType)
-                : FromText(text, MimeString.OctetStream);
+                : FromText(text, DataUrl.DefaultMediaType.AsMemory());
 
 
     /// <summary>
@@ -73,13 +72,13 @@ public static class DataUrlBuilder
                 data = string.Empty;
             }
 
-            var sb = new StringBuilder(Protocol.Length + ESTIMATED_MIME_TYPE_LENGTH + data.Length);
-            return sb.Append(Protocol).AppendMediaType(mimeType).Append(',').Append(data).ToString();
+            var sb = new StringBuilder(DataUrl.Protocol.Length + ESTIMATED_MIME_TYPE_LENGTH + data.Length);
+            return sb.Append(DataUrl.Protocol).AppendMediaType(mimeType).Append(',').Append(data).ToString();
         }
         else
         {
             byte[] bytes = Encoding.UTF8.GetBytes(text);
-            mimeType.AppendParameter("charset", "utf-8");
+            mimeType.AppendParameter("charset", UTF_8);
             return FromBytes(bytes, mimeType);
         }
 
@@ -91,13 +90,14 @@ public static class DataUrlBuilder
     /// Embeds binary data in a "data" URL (RFC 2397).
     /// </summary>
     /// <param name="bytes">The binary data to embed into the "data" URL.</param>
-    /// <param name="mimeTypeString">The Internet Media Type of the <paramref name="bytes"/> or <c>null</c> for <see cref="MimeString.OctetStream"/>.</param>
+    /// <param name="mimeTypeString">The Internet Media Type of the <paramref name="bytes"/>.</param>
     /// <returns>A "data" URL, into which the binary data provided by the parameter <paramref name="bytes"/> is embedded.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="mimeTypeString"/> is <c>null</c>.</exception>
-    public static string FromBytes(byte[]? bytes, string? mimeTypeString = MimeString.OctetStream) =>
-        MimeType.TryParse(string.IsNullOrWhiteSpace(mimeTypeString) ? MimeString.OctetStream : mimeTypeString, out MimeType? mimeType)
+    [SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
+    public static string FromBytes(byte[]? bytes, in ReadOnlyMemory<char> mimeTypeString) =>
+        MimeType.TryParse(mimeTypeString.Span.IsWhiteSpace() ? MimeString.OctetStream.AsMemory() : mimeTypeString, out MimeType? mimeType)
                 ? FromBytes(bytes, mimeType)
-                : FromBytes(bytes, MimeString.OctetStream);
+                : FromBytes(bytes, MimeString.OctetStream.AsMemory());
 
 
     /// <summary>
@@ -116,8 +116,8 @@ public static class DataUrlBuilder
         }
 
         string data = bytes is null ? string.Empty : Convert.ToBase64String(bytes, Base64FormattingOptions.None);
-        var builder = new StringBuilder(Protocol.Length + ESTIMATED_MIME_TYPE_LENGTH + Base64.Length + 1 + data.Length);
-        return builder.Append(Protocol).AppendMediaType(mimeType).Append(Base64).Append(',').Append(data).ToString();
+        var builder = new StringBuilder(DataUrl.Protocol.Length + ESTIMATED_MIME_TYPE_LENGTH + DataUrl.Base64.Length + 1 + data.Length);
+        return builder.Append(DataUrl.Protocol).AppendMediaType(mimeType).Append(DataUrl.Base64).Append(',').Append(data).ToString();
 
         // $"data:{mediaTypeString};base64,{Convert.ToBase64String(bytes)}"
     }
@@ -149,6 +149,7 @@ public static class DataUrlBuilder
               : MimeType.TryParse(string.IsNullOrWhiteSpace(mimeTypeString) ? MimeString.OctetStream : mimeTypeString, out MimeType? mimeType)
                   ? FromFile(filePath, mimeType)
                   : FromFile(filePath, (string?)null);
+
 
     /// <summary>
     /// Embeds the content of a file in a "data" URL (RFC 2397).
@@ -182,6 +183,16 @@ public static class DataUrlBuilder
 
         return FromBytes(bytes, mimeType);
     }
+
+    public static string FromInfo(in DataUrlInfo info) => 
+        info.IsEmpty
+            ? string.Empty
+            : info.TryGetEmbeddedText(out string? embeddedText)
+                ? FromText(embeddedText, info.MimeType)
+                : info.TryGetEmbeddedBytes(out byte[]? embeddedBytes) 
+                         ? FromBytes(embeddedBytes, info.MimeType)
+                         : string.Empty;
+
 
     #region private
 

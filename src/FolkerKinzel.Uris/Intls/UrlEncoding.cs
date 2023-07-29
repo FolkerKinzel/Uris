@@ -23,16 +23,32 @@ internal static class UrlEncoding
     }
 
     [ExcludeFromCodeCoverage]
-    internal static bool TryDecode(string value, ReadOnlySpan<char> charSet, [NotNullWhen(true)] out string? decoded)
+    internal static bool TryDecode(string value, string charSet, [NotNullWhen(true)] out string? decoded)
     {
         try
         {
-            decoded = UnescapeValueFromUrlEncoding(value, charSet.IsEmpty ? null : charSet.ToString());
+            decoded = UnescapeValueFromUrlEncoding(value, charSet);
             return true;
         }
         catch
         {
             decoded = null;
+            return false;
+        }
+    }
+
+    internal static bool TryDecodeBytes(ReadOnlySpan<char> value, [NotNullWhen(true)] out byte[]? decoded)
+    {
+        try
+        {
+            Encoding ascii = TextEncoding.InitThrowingEncoding(20127);
+            byte[] bytes = ascii.GetBytes(value.ToString());
+            decoded = WebUtility.UrlDecodeToBytes(bytes, 0, bytes.Length);
+            return true;
+        }
+        catch 
+        {
+            decoded = null; 
             return false;
         }
     }
@@ -45,15 +61,12 @@ internal static class UrlEncoding
     /// <returns></returns>
     /// <exception cref="DecoderFallbackException"></exception>
     /// <exception cref="EncoderFallbackException"></exception>
-    private static string UnescapeValueFromUrlEncoding(string value, string? charSet)
+    private static string UnescapeValueFromUrlEncoding(string value, string charSet)
     {
         string result;
-
-        EncoderFallback encoderFallback = EncoderFallback.ExceptionFallback;
-        DecoderFallback decoderFallback = DecoderFallback.ExceptionFallback;
-
-        Encoding encoding = TextEncodingConverter.GetEncoding(charSet, encoderFallback, decoderFallback);
-        Encoding ascii = TextEncodingConverter.GetEncoding(20127, encoderFallback, decoderFallback);
+        
+        Encoding encoding = TextEncoding.InitThrowingEncoding(charSet);
+        Encoding ascii = TextEncoding.InitThrowingEncoding(20127);
 
         byte[] bytes = ascii.GetBytes(value);
 
@@ -61,18 +74,20 @@ internal static class UrlEncoding
         return result;
     }
 
-    internal static string UrlEncodeValueWithCharset(string value, string? charSet)
-    {
-        Encoding encoding = TextEncodingConverter.GetEncoding(charSet);
-        var bytes = encoding.GetBytes(value);
 
-        StringBuilder sb = new StringBuilder(3);
 
-        for (int i = 0; i < bytes.Length; i++)
-        {
-            sb.Append('%');
-            sb.Append(bytes[i].ToString("X2"));
-        }
-        return sb.ToString();
-    }
+    //internal static string UrlEncodeValueWithCharset(string value, string? charSet)
+    //{
+    //    Encoding encoding = TextEncodingConverter.GetEncoding(charSet);
+    //    var bytes = encoding.GetBytes(value);
+
+    //    StringBuilder sb = new StringBuilder(3);
+
+    //    for (int i = 0; i < bytes.Length; i++)
+    //    {
+    //        sb.Append('%');
+    //        sb.Append(bytes[i].ToString("X2"));
+    //    }
+    //    return sb.ToString();
+    //}
 }

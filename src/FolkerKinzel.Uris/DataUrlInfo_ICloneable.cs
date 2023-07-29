@@ -15,6 +15,7 @@ public readonly partial struct DataUrlInfo : ICloneable
     /// </remarks>
     object ICloneable.Clone() => Clone();
 
+
     /// <summary>
     /// Creates a new <see cref="DataUrlInfo"/> that is a copy of the current instance.
     /// </summary>
@@ -23,17 +24,8 @@ public readonly partial struct DataUrlInfo : ICloneable
     /// The copy is built on a separate <see cref="string"/>,
     /// which is case-normalized and only as long as needed.
     /// </remarks>
-    public DataUrlInfo Clone()
-    {
-        if (IsEmpty)
-        {
-            return default;
-        }
-
-        _ = DataUrlInfo.TryParse(ToString(), out DataUrlInfo dataUrl);
-
-        return dataUrl;
-    }
+    public DataUrlInfo Clone() => IsEmpty ? default
+                                          : new DataUrlInfo(_idx, _embeddedData.ToString().AsMemory());
 
 
 

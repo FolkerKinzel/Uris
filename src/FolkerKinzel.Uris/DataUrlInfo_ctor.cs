@@ -29,13 +29,11 @@ namespace FolkerKinzel.Uris;
 /// </para>
 /// <code language="c#" source="./../Examples/DataUrlExample.cs"/>
 /// </example>
-[StructLayout(LayoutKind.Auto)]
 public readonly partial struct DataUrlInfo
 {
-    private DataUrlInfo(in MimeTypeInfo mediaType, DataEncoding dataEncoding, in ReadOnlyMemory<char> embeddedData)
+    private DataUrlInfo(ushort idx, in ReadOnlyMemory<char> embeddedData)
     {
-        _mimeType = mediaType;
-        DataEncoding = dataEncoding;
         _embeddedData = embeddedData;
+        _idx = idx;
     }
 }
