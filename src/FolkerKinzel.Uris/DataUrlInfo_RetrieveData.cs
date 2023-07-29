@@ -10,9 +10,14 @@ public readonly partial struct DataUrlInfo
     /// <summary>
     /// Tries to retrieve the text, which is embedded in the "data" URL.
     /// </summary>
-    /// <param name="embeddedText">If the method returns <c>true</c> the parameter contains the text, which was embedded in the <see cref="DataUrlInfo"/>.
+    /// <param name="embeddedText">If the method returns <c>true</c> the parameter contains 
+    /// the embedded text.
     /// The parameter is passed uninitialized.</param>
-    /// <returns><c>true</c> if the data embedded in the data url could be parsed as text, <c>false</c> otherwise.</returns>
+    /// <returns><c>true</c> if the embedded <see cref="Data"/> in the "data" URL could 
+    /// be parsed as text, otherwise <c>false</c>.</returns>
+    /// <remarks>It depends of the <see cref="MimeType"/> whether the <see cref="Data"/> 
+    /// in the "data" URL is treated as embedded text. The <see cref="MimeType"/>
+    /// should rather be empty or have the Top-Level Media Type "text".</remarks>
     public bool TryGetEmbeddedText([NotNullWhen(true)] out string? embeddedText)
     {
         embeddedText = null;
@@ -45,18 +50,22 @@ public readonly partial struct DataUrlInfo
         else
         {
             // URL encoded String:
-            string? encodingName = TryGetEncodingFromMimeType(out encodingName) ? encodingName : DataUrlBuilder.UTF_8;
+            string? encodingName = TryGetEncodingFromMimeType(out encodingName) ? encodingName 
+                                                                                : DataUrlBuilder.UTF_8;
             return UrlEncoding.TryDecode(Data.ToString(), encodingName, out embeddedText);
         }
     }
 
     /// <summary>
-    /// Tries to retrieve the binary data, which is embedded in the "data" URL.
+    /// Tries to retrieve the binary <see cref="Data"/>, which is embedded in the "data" URL.
     /// </summary>
-    /// <param name="embeddedBytes">If the method returns <c>true</c> the parameter contains the binary data, which was embedded in the <see cref="DataUrlInfo"/>.
+    /// <param name="embeddedBytes">If the method returns <c>true</c> the parameter contains 
+    /// the embedded binary data.
     /// The parameter is passed uninitialized.</param>
-    /// <returns><c>true</c> if the data embedded in the data url could be parsed as binary data, <c>false</c> otherwise.</returns>
-    /// 
+    /// <returns><c>true</c> if the <see cref="Data"/> embedded in the "data" URL could be 
+    /// parsed as binary data, otherwise <c>false</c>.</returns>
+    /// <remarks>It depends of the <see cref="MimeType"/> whether the embedded <see cref="Data"/> 
+    /// in the "data" URL is treated as binary data.</remarks>
     /// <example>
     /// <note type="note">
     /// For the sake of better readability, exception handling is ommitted in the example.
@@ -78,10 +87,37 @@ public readonly partial struct DataUrlInfo
 
 
     /// <summary>
-    /// Returns an appropriate file type extension for the data embedded in the "data" URL. The file type extension contains the 
-    /// period (".").
+    /// Tries to retrieve the embedded <see cref="Data"/> decoded either as a <see cref="string"/> 
+    /// or as a byte array, depending on <see cref="MimeType"/>.
     /// </summary>
-    /// <returns>An appropriate file type extension for the data embedded in the <see cref="DataUrlInfo"/>.</returns>
+    /// <param name="data">The embedded <see cref="Data"/>. This can be either a <see cref="string"/> 
+    /// or a byte array. The parameter is passed uninitialized.</param>
+    /// <returns><c>true</c> if <see cref="Data"/> could be converted either into a <see cref="string"/>
+    /// or a byte array.</returns>
+    public bool TryGetEmbeddedData([NotNullWhen(true)] out object? data)
+    {
+        if (TryGetEmbeddedText(out string? embeddedText))
+        {
+            data = embeddedText;
+            return true;
+        }
+
+        if (TryGetEmbeddedBytes(out byte[]? embeddedBytes))
+        {
+            data = embeddedBytes;
+            return true;
+        }
+
+        data = null;
+        return false;
+    }
+
+
+    /// <summary>
+    /// Returns an appropriate file type extension for the <see cref="Data"/> embedded in the 
+    /// "data" URL. The file type extension contains the period (".").
+    /// </summary>
+    /// <returns>An appropriate file type extension for the embedded <see cref="Data"/>.</returns>
     /// 
     ///<example>
     /// <note type="note">
@@ -94,6 +130,7 @@ public readonly partial struct DataUrlInfo
     /// </example>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string GetFileTypeExtension() => MimeString.ToFileTypeExtension(MimeType.Span);
+
 
     private int GetEncoding(byte[] data, out Encoding enc)
     {
@@ -115,7 +152,7 @@ public readonly partial struct DataUrlInfo
         }
 
         MimeTypeParameterInfo charsetPara = info.Parameters().FirstOrDefault(Predicate);
-        if(charsetPara.IsEmpty)
+        if (charsetPara.IsEmpty)
         {
             encodingName = null;
             return false;
@@ -130,5 +167,5 @@ public readonly partial struct DataUrlInfo
 
 
 
-    
+
 }

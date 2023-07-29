@@ -50,9 +50,9 @@
       <DocumentationSource sourceFile="..\..\..\FolkerKinzel.MimeTypes\src\FolkerKinzel.MimeTypes\FolkerKinzel.MimeTypes.csproj" />
     </DocumentationSources>
     <NamespaceSummaries>
-      <NamespaceSummaryItem name="FolkerKinzel.Uris" isDocumented="True">Structures and Classes that support the work with URIs and Internet Media Types ("MIME Types").</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="FolkerKinzel.Uris" isDocumented="True">Structures and Classes that support working with URIs.</NamespaceSummaryItem>
 <NamespaceSummaryItem name="FolkerKinzel.Uris.Extensions" isDocumented="True">Contains static classes, which provide extension methods for String, Uri and ReadOnlySpan&lt;Char&gt;.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="FolkerKinzel.MimeTypes" isDocumented="True">Classes and Structures that support the work with Internet Media Types ("MIME types").</NamespaceSummaryItem>
+<NamespaceSummaryItem name="FolkerKinzel.MimeTypes" isDocumented="True">Classes and Structures that support working with Internet Media Types ("MIME types").</NamespaceSummaryItem>
 <NamespaceSummaryItem name="(global)" isDocumented="False" /></NamespaceSummaries>
     <VisibleItems>Attributes, ExplicitInterfaceImplementations, InheritedMembers, InheritedFrameworkMembers, Protected, ProtectedInternalAsProtected, NonBrowsable</VisibleItems>
   </PropertyGroup>

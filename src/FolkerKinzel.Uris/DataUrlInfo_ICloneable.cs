@@ -10,7 +10,7 @@ public readonly partial struct DataUrlInfo : ICloneable
     /// a copy of the <see cref="DataUrlInfo"/> structure: The copy is built on a separate <see cref="string"/>,
     /// which is case-normalized and only as long as needed.
     /// <note type="tip">
-    /// Use the instance method <see cref="DataUrlInfo.Clone"/> if you can to avoid the costs of boxing.
+    /// Use the instance method <see cref="DataUrlInfo.Clone"/>, if you can, to avoid the costs of boxing.
     /// </note>
     /// </remarks>
     object ICloneable.Clone() => Clone();

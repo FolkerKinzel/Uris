@@ -37,11 +37,7 @@ public readonly partial struct DataUrlInfo
         }
 
         // if text/plain is omitted and only the parameters are provided:
-        if (mimeTypeLength > 0 && span.StartsWith(';')) 
-        {
-            value = $"{DataUrl.DefaultMediaType}{span.ToString()}".AsMemory();
-            mimeTypeLength += DataUrl.DefaultMediaType.Length;
-        }
+        ushort hasIncompleteMimeType = mimeTypeLength > 0 && span.StartsWith(';') ? INCOMPLETE_MIME_TYPE_VALUE : (ushort)0;
 
         if(mimeTypeLength > MIME_TYPE_LENGTH_MAX_VALUE)
         {
@@ -49,6 +45,7 @@ public readonly partial struct DataUrlInfo
         }
 
         ushort idx = (ushort)(mimeTypeLength << MIME_TYPE_LENGTH_SHIFT);
+        idx |= hasIncompleteMimeType;
         idx |= (ushort)dataEncoding;
 
         info = new DataUrlInfo(idx, in value);
