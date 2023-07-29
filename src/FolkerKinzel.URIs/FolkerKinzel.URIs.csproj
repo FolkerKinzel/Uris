@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="DataUrlInfo_Parser.cs" />
+    <Compile Remove="DataUrlInfo_ToString - OBSOLETE.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\Nuget-Logo\Logo.png">

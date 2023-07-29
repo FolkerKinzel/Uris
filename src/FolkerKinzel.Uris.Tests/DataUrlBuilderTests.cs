@@ -1,4 +1,6 @@
-﻿namespace FolkerKinzel.Uris.Tests;
+﻿using FolkerKinzel.Uris.Intls;
+
+namespace FolkerKinzel.Uris.Tests;
 
 [TestClass]
 public class DataUrlBuilderTests
