@@ -186,7 +186,7 @@ public class DataUrlTests
         Assert.IsTrue(MimeType.TryParse("application/x-octet", out MimeType? mime));
 
         byte[] bytes = new byte[] { 1, 2, 3 };
-        string outText = DataUrlBuilder.FromBytes(bytes, mime);
+        string outText = DataUrl.FromBytes(bytes, mime);
 
         Assert.IsNotNull(outText);
 
@@ -200,11 +200,11 @@ public class DataUrlTests
     [TestMethod]
     public void FromBytesTest3()
     {
-        string outText = DataUrlBuilder.FromBytes(null, MimeType.Parse("text/plain"));
+        StringBuilder outText = DataUrl.AppendEmbeddedBytes(new StringBuilder(), null, MimeType.Parse("text/plain"));
 
         Assert.IsNotNull(outText);
 
-        Assert.IsTrue(DataUrl.TryParse(outText, out DataUrlInfo dataUrl));
+        Assert.IsTrue(DataUrl.TryParse(outText.ToString(), out DataUrlInfo dataUrl));
 
         Assert.IsTrue(dataUrl.TryGetEmbeddedBytes(out byte[]? outBytes));
 
@@ -316,7 +316,7 @@ public class DataUrlTests
 
         Assert.IsTrue(DataUrl.TryParse(dataUrl1, out DataUrlInfo dataUrl2));
 
-        Assert.AreEqual(dataUrl2.MimeType.ToString(), "text/plain");
+        Assert.AreEqual(dataUrl2.MimeType.ToString(), "text/plain;charset=utf-8");
 
         Assert.AreEqual(1, MimeTypeInfo.Parse(dataUrl2.MimeType).Parameters().Count());
 

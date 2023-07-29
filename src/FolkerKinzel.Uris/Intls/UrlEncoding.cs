@@ -6,21 +6,21 @@ namespace FolkerKinzel.Uris.Intls;
 
 internal static class UrlEncoding
 {
-    [ExcludeFromCodeCoverage]
-    internal static bool TryEncode(string input, [NotNullWhen(true)] out string? output)
-    {
-        Debug.Assert(input != null);
-        try
-        {
-            output = Uri.EscapeDataString(input);
-        }
-        catch
-        {
-            output = null;
-            return false;
-        }
-        return true;
-    }
+    //[ExcludeFromCodeCoverage]
+    //internal static bool TryEncode(string input, [NotNullWhen(true)] out string? output)
+    //{
+    //    Debug.Assert(input != null);
+    //    try
+    //    {
+    //        output = Uri.EscapeDataString(input);
+    //    }
+    //    catch
+    //    {
+    //        output = null;
+    //        return false;
+    //    }
+    //    return true;
+    //}
 
     [ExcludeFromCodeCoverage]
     internal static bool TryDecode(string value, string charSet, [NotNullWhen(true)] out string? decoded)

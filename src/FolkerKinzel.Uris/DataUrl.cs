@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FolkerKinzel.Uris.Intls;
+﻿using FolkerKinzel.Uris.Intls;
 
 namespace FolkerKinzel.Uris;
 
@@ -25,54 +20,45 @@ public static class DataUrl
     internal const string Base64 = ";base64";
 
     /// <summary>
-    /// Embeds text into a "data" URL (RFC 2397).
+    /// Embeds text URL-encoded into a "data" URL (RFC 2397).
     /// </summary>
-    /// <param name="text">The text to embed into the "data" URL. <paramref name="text"/> MUST not be URL encoded.</param>
-    /// <param name="mimeTypeString">The Internet Media Type of the <paramref name="text"/> or <c>null</c> for <see cref="DataUrl.DefaultMediaType"/>.</param>
+    /// <param name="text">The text to embed into the "data" URL. <paramref name="text"/> MUST not be passed 
+    /// URL-encoded.</param>
+    /// <param name="mimeTypeString">The Internet Media Type of the <paramref name="text"/> or <c>null</c> for 
+    /// <see cref="DataUrl.DefaultMediaType"/>.</param>
     /// 
     /// <returns>A "data" URL, into which <paramref name="text"/> is embedded.</returns>
-    /// <exception cref="FormatException"><paramref name="text"/> consists only of ASCII characters and the <see cref="Uri"/> class 
-    /// was not able to encode <paramref name="text"/> correctly.</exception>
-    /// <remarks>If <paramref name="text"/>
-    /// consists only of ASCII characters the method serializes it Url encoded, otherwise <paramref name="text"/> is serialized
-    /// as Base64 using <see cref="UTF8Encoding"/>.</remarks>
+    /// 
+    /// <exception cref="FormatException"><paramref name="text"/> could not URL-encoded.</exception>
     [SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
     public static string FromText(string? text, string? mimeTypeString = DataUrl.DefaultMediaType) =>
-        MimeType.TryParse(string.IsNullOrWhiteSpace(mimeTypeString) ? DataUrl.DefaultMediaType : mimeTypeString, out MimeType? mimeType)
-                ? FromText(text, mimeType)
-                : FromText(text, DataUrl.DefaultMediaType);
-
+        AppendEmbeddedText(new StringBuilder(), text, mimeTypeString).ToString();
 
     /// <summary>
-    /// Embeds text into a "data" URL (RFC 2397).
+    /// Embeds text URL-encoded into a "data" URL (RFC 2397).
     /// </summary>
-    /// <param name="text">The text to embed into the "data" URL. <paramref name="text"/> MUST not be URL encoded.</param>
+    /// <param name="text">The text to embed into the "data" URL. <paramref name="text"/> MUST not 
+    /// be passed URL-encoded.</param>
     /// <param name="mimeType">The <see cref="MimeType"/> of the <paramref name="text"/>.</param>
     /// 
     /// <returns>A "data" URL, into which <paramref name="text"/> is embedded.</returns>
-    /// <exception cref="FormatException"><paramref name="text"/> consists only of ASCII characters and the <see cref="Uri"/> class 
-    /// was not able to encode <paramref name="text"/> correctly.</exception>
-    /// <remarks>If <paramref name="text"/>
-    /// consists only of ASCII characters the method serializes it Url encoded, otherwise <paramref name="text"/> is serialized
-    /// as Base64 using <see cref="UTF8Encoding"/>.</remarks>
+    /// 
     /// <exception cref="ArgumentNullException"><paramref name="mimeType"/> is <c>null</c>.</exception>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string FromText(string? text, MimeType mimeType) => DataUrlBuilder.FromText(text, mimeType);
+    /// <exception cref="FormatException"><paramref name="text"/> could not URL-encoded.</exception>
+    public static string FromText(string? text, MimeType mimeType) => 
+        AppendEmbeddedText(new StringBuilder(), text, mimeType).ToString();
     
-
 
     /// <summary>
     /// Embeds binary data into a "data" URL (RFC 2397).
     /// </summary>
     /// <param name="bytes">The binary data to embed into the "data" URL.</param>
-    /// <param name="mimeTypeString">The Internet Media Type of the <paramref name="bytes"/> or <c>null</c> for <see cref="MimeString.OctetStream"/>.</param>
+    /// <param name="mimeTypeString">The Internet Media Type of the <paramref name="bytes"/> or <c>null</c> for 
+    /// <see cref="MimeString.OctetStream"/>.</param>
     /// <returns>A "data" URL, into which the binary data provided by the parameter <paramref name="bytes"/> is embedded.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="mimeTypeString"/> is <c>null</c>.</exception>
     [SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
     public static string FromBytes(byte[]? bytes, string? mimeTypeString = MimeString.OctetStream) =>
-        MimeType.TryParse(string.IsNullOrWhiteSpace(mimeTypeString) ? MimeString.OctetStream : mimeTypeString, out MimeType? mimeType)
-                ? FromBytes(bytes, mimeType)
-                : FromBytes(bytes, MimeString.OctetStream);
+        AppendEmbeddedBytes(new StringBuilder(), bytes, mimeTypeString).ToString();
 
 
     /// <summary>
@@ -83,7 +69,8 @@ public static class DataUrl
     /// <returns>A "data" URL, into which the binary data provided by the parameter <paramref name="bytes"/> is embedded.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="mimeType"/> is <c>null</c>.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string FromBytes(byte[]? bytes, MimeType mimeType) => DataUrlBuilder.FromBytes(bytes, mimeType);
+    public static string FromBytes(byte[]? bytes, MimeType mimeType) => 
+        AppendEmbeddedBytes(new StringBuilder(), bytes, mimeType).ToString();
     
 
 
@@ -91,9 +78,11 @@ public static class DataUrl
     /// Embeds the content of a file into a "data" URL (RFC 2397).
     /// </summary>
     /// <param name="filePath">Path to the file whose content has to be embedded into the "data" URL.</param>
-    /// <param name="mimeTypeString">The Internet Media Type ("MIME type") of the file to embed or <c>null</c> to let the method automatically
+    /// <param name="mimeTypeString">The Internet Media Type ("MIME type") of the file to embed or <c>null</c> 
+    /// to let the method automatically
     /// retrieve the <see cref="MimeType"/> from the file type extension.</param>
-    /// <returns>A "data" URL, into which the content of the file provided by the parameter <paramref name="filePath"/> is embedded.</returns>
+    /// <returns>A "data" URL, into which the content of the file provided by the parameter 
+    /// <paramref name="filePath"/> is embedded.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="filePath"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException"><paramref name="filePath"/> is not a valid file path.</exception>
     /// <exception cref="IOException">I/O error.</exception>
@@ -108,11 +97,7 @@ public static class DataUrl
     /// <code language="c#" source="./../Examples/DataUrlExample.cs"/>
     /// </example>
     public static string FromFile(string filePath, string? mimeTypeString = null) =>
-        string.IsNullOrWhiteSpace(mimeTypeString)
-              ? FromFile(filePath, MimeType.FromFileName(filePath))
-              : MimeType.TryParse(mimeTypeString, out MimeType? mimeType)
-                  ? FromFile(filePath, mimeType)
-                  : FromFile(filePath, (string?)null);
+        AppendFileContent(new StringBuilder(), filePath, mimeTypeString).ToString();
 
 
     /// <summary>
@@ -136,8 +121,134 @@ public static class DataUrl
     ///<exception cref="ArgumentNullException"><paramref name="filePath"/> or <paramref name="mimeType"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException"><paramref name="filePath"/> is not a valid file path.</exception>
     /// <exception cref="IOException">I/O error.</exception>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string FromFile(string filePath, MimeType mimeType) => DataUrlBuilder.FromFile(filePath, mimeType);
+    public static string FromFile(string filePath, MimeType mimeType) => 
+        AppendFileContent(new StringBuilder(), filePath, mimeType).ToString();
+
+    /// <summary>
+    /// Appends embedded text as "data" URL (RFC 2397) to the end of a <see cref="StringBuilder"/>.
+    /// </summary>
+    /// <param name="builder">The <see cref="StringBuilder"/> to which a "data" URL is appended.</param>
+    /// <param name="text">The text to embed into the "data" URL. <paramref name="text"/> MUST not be 
+    /// passed URL-encoded.</param>
+    /// <param name="mimeTypeString">The Internet Media Type of the <paramref name="text"/> or <c>null</c> for 
+    /// <see cref="DataUrl.DefaultMediaType"/>.</param>
+    /// 
+    /// <returns>A reference to <paramref name="builder"/>.</returns>
+    /// 
+    /// <exception cref="ArgumentNullException"><paramref name="builder"/>
+    /// is <c>null</c>.</exception>
+    /// <exception cref="FormatException"><paramref name="text"/> could not URL-encoded.</exception>
+    internal static StringBuilder AppendEmbeddedText(StringBuilder builder, string? text, string? mimeTypeString = DataUrl.DefaultMediaType) =>
+         MimeType.TryParse(string.IsNullOrWhiteSpace(mimeTypeString) ? DataUrl.DefaultMediaType : mimeTypeString, out MimeType? mimeType)
+                ? AppendEmbeddedText(builder, text, mimeType)
+                : AppendEmbeddedText(builder, text, DataUrl.DefaultMediaType);
+
+
+    /// <summary>
+    /// Appends embedded text as "data" URL (RFC 2397) to the end of a <see cref="StringBuilder"/>.
+    /// </summary>
+    /// <param name="builder">The <see cref="StringBuilder"/> to which a "data" URL is appended.</param>
+    /// <param name="text">The text to embed into the "data" URL. <paramref name="text"/> MUST not be 
+    /// passed URL-encoded.</param>
+    /// <param name="mimeType">The <see cref="MimeType"/> of the <paramref name="text"/>.</param>
+    /// 
+    /// <returns>A reference to <paramref name="builder"/>.</returns>
+    /// 
+    /// <exception cref="ArgumentNullException"><paramref name="builder"/> or <paramref name="mimeType"/> 
+    /// is <c>null</c>.</exception>
+    /// <exception cref="FormatException"><paramref name="text"/> could not URL-encoded.</exception>
+    internal static StringBuilder AppendEmbeddedText(StringBuilder builder, string? text, MimeType mimeType) => 
+        builder is null
+            ? throw new ArgumentNullException(nameof(builder))
+            : mimeType is null 
+                ? throw new ArgumentNullException(nameof(mimeType))
+                : builder.AppendEmbeddedTextInternal(text, mimeType);
+
+    /// <summary>
+    /// Appends binary data as "data" URL (RFC 2397) to the end of a <see cref="StringBuilder"/>.
+    /// </summary>
+    /// <param name="builder">The <see cref="StringBuilder"/> to which a "data" URL is appended.</param>
+    /// <param name="bytes">The binary data to embed into the "data" URL.</param>
+    /// <param name="mimeTypeString">The Internet Media Type of the <paramref name="bytes"/> or <c>null</c> for 
+    /// <see cref="MimeString.OctetStream"/>.</param>
+    /// 
+    /// <returns>A reference to <paramref name="builder"/>.</returns>
+    /// 
+    /// <exception cref="ArgumentNullException"><paramref name="builder"/>
+    /// is <c>null</c>.</exception>
+    internal static StringBuilder AppendEmbeddedBytes(StringBuilder builder,
+                                                      byte[]? bytes,
+                                                      string? mimeTypeString = MimeString.OctetStream) =>
+        MimeType.TryParse(string.IsNullOrWhiteSpace(mimeTypeString) ? MimeString.OctetStream : mimeTypeString, out MimeType? mimeType)
+                ? AppendEmbeddedBytes(builder, bytes, mimeType)
+                : AppendEmbeddedBytes(builder, bytes, MimeString.OctetStream);
+
+    /// <summary>
+    /// Appends binary data as "data" URL (RFC 2397) to the end of a <see cref="StringBuilder"/>.
+    /// </summary>
+    /// <param name="builder">The <see cref="StringBuilder"/> to which a "data" URL is appended.</param>
+    /// <param name="bytes">The binary data to embed into the "data" URL.</param>
+    /// <param name="mimeType">The <see cref="MimeType"/> of the <paramref name="bytes"/>.</param>
+    /// 
+    /// <returns>A reference to <paramref name="builder"/>.</returns>
+    /// 
+    /// <exception cref="ArgumentNullException"><paramref name="builder"/> or <paramref name="mimeType"/>
+    /// is <c>null</c>.</exception>
+    internal static StringBuilder AppendEmbeddedBytes(StringBuilder builder, byte[]? bytes, MimeType mimeType) =>
+        builder is null
+            ? throw new ArgumentNullException(nameof(builder))
+            : mimeType is null
+                ? throw new ArgumentNullException(nameof(mimeType))
+                : builder.AppendEmbeddedBytesInternal(bytes, mimeType);
+
+
+    /// <summary>
+    /// Appends the content of a file as "data" URL (RFC 2397) to the end of a <see cref="StringBuilder"/>.
+    /// </summary>
+    /// <param name="builder">The <see cref="StringBuilder"/> to which a "data" URL is appended.</param>
+    /// <param name="filePath">Abolute path to the file which content is to embed into the "data" URL.</param>
+    /// <param name="mimeTypeString">The Internet Media Type ("MIME type") of the file to embed or <c>null</c> 
+    /// to let the method automatically
+    /// retrieve the <see cref="MimeType"/> from the file type extension.</param>
+    /// 
+    /// <returns>A reference to <paramref name="builder"/>.</returns>
+    /// 
+    /// <exception cref="ArgumentNullException"><paramref name="builder"/>, <paramref name="filePath"/>, 
+    /// or <paramref name="mimeType"/> is <c>null</c>.</exception>
+    /// <exception cref="ArgumentException"><paramref name="filePath"/> is not a valid file path.</exception>
+    /// <exception cref="IOException">I/O error.</exception>
+    internal static StringBuilder AppendFileContent(this StringBuilder builder,
+                                                    string filePath,
+                                                    string? mimeTypeString = null) =>
+        string.IsNullOrWhiteSpace(mimeTypeString)
+              ? AppendFileContent(builder, filePath, MimeType.FromFileName(filePath))
+              : MimeType.TryParse(mimeTypeString, out MimeType? mimeType)
+                  ? AppendFileContent(builder, filePath, mimeType)
+                  : AppendFileContent(builder, filePath, (string?)null);
+
+
+
+    /// <summary>
+    /// Appends the content of a file as "data" URL (RFC 2397) to the end of a <see cref="StringBuilder"/>.
+    /// </summary>
+    /// <param name="builder">The <see cref="StringBuilder"/> to which a "data" URL is appended.</param>
+    /// <param name="filePath">Abolute path to the file which content is to embed into the "data" URL.</param>
+    /// <param name="mimeType">The <see cref="MimeType"/> of the file whose content is to embed.</param>
+    /// 
+    /// <returns>A reference to <paramref name="builder"/>.</returns>
+    /// 
+    /// <exception cref="ArgumentNullException"><paramref name="builder"/>, <paramref name="filePath"/>, 
+    /// or <paramref name="mimeType"/> is <c>null</c>.</exception>
+    /// <exception cref="ArgumentException"><paramref name="filePath"/> is not a valid file path.</exception>
+    /// <exception cref="IOException">I/O error.</exception>
+    internal static StringBuilder AppendFileContent(this StringBuilder builder, string filePath, MimeType mimeType) => 
+        builder is null
+            ? throw new ArgumentNullException(nameof(builder))
+            : filePath is null
+                ? throw new ArgumentNullException(nameof(filePath))
+                : mimeType is null 
+                    ? throw new ArgumentNullException(nameof(mimeType))
+                    : builder.AppendFileContentInternal(filePath, mimeType);
 
 
     /// <summary>
@@ -193,7 +304,7 @@ public static class DataUrl
     /// that provides the contents of the "data" URL. The parameter is passed uninitialized.</param>
     /// <returns><c>true</c> if <paramref name="value"/> could be parsed as <see cref="DataUrlInfo"/>, otherwise <c>false</c>.</returns>
     /// <seealso cref="TryParse(ReadOnlyMemory{char}, out DataUrlInfo)"/>
-    public static bool TryParse(string? value, out DataUrlInfo info)
+    public static bool TryParse(string? value, [NotNull] out DataUrlInfo info)
     {
         ReadOnlyMemory<char> mem = value.AsMemory();
         return DataUrlInfo.TryParseInternal(ref mem, out info);
@@ -210,5 +321,5 @@ public static class DataUrl
     /// of the "data" URL. The parameter is passed uninitialized.</param>
     /// <returns><c>true</c> if <paramref name="value"/> could be parsed as <see cref="DataUrlInfo"/>, <c>false</c> otherwise.</returns>
     /// <seealso cref="TryParse(string?, out DataUrlInfo)"/>
-    public static bool TryParse(ReadOnlyMemory<char> value, out DataUrlInfo info) => DataUrlInfo.TryParseInternal(ref value, out info);
+    public static bool TryParse(ReadOnlyMemory<char> value, [NotNull] out DataUrlInfo info) => DataUrlInfo.TryParseInternal(ref value, out info);
 }

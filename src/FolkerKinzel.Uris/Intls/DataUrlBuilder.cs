@@ -5,117 +5,94 @@
 /// embeds data in-line in a URL. A "data" URL can be created automatically from 
 /// the data to embed. This can be a file, a byte array or a <see cref="string"/>. 
 /// </summary>
-/// <example>
-/// <note type="note">
-/// For the sake of better readability, exception handling is ommitted in the example.
-/// </note>
-/// <para>
-/// Creating and parsing a "data" URL:
-/// </para>
-/// <code language="c#" source="./../Examples/DataUrlExample.cs"/>
-/// </example>
 internal static class DataUrlBuilder
 {
     internal const int ESTIMATED_MIME_TYPE_LENGTH = 80;
     internal const string UTF_8 = "utf-8";
+    private const string CHARSET_KEY = "charset";
+    private const int COMMA_LENGTH = 1;
 
     /// <summary>
-    /// Embeds text in a "data" URL (RFC 2397).
+    /// Appends embedded text as "data" URL (RFC 2397) to the end of a <see cref="StringBuilder"/>.
     /// </summary>
+    /// <param name="builder">The <see cref="StringBuilder"/> to which a "data" URL is appended.</param>
     /// <param name="text">The text to embed into the "data" URL. <paramref name="text"/> MUST not be URL encoded.</param>
     /// <param name="mimeType">The <see cref="MimeType"/> of the <paramref name="text"/>.</param>
     /// 
-    /// <returns>A "data" URL, into which <paramref name="text"/> is embedded.</returns>
-    /// <exception cref="FormatException"><paramref name="text"/> consists only of ASCII characters and the <see cref="Uri"/> class 
-    /// was not able to encode <paramref name="text"/> correctly.</exception>
-    /// <remarks>If <paramref name="text"/>
-    /// consists only of ASCII characters the method serializes it Url encoded, otherwise <paramref name="text"/> is serialized
-    /// as Base64 using <see cref="UTF8Encoding"/>.</remarks>
-    /// <exception cref="ArgumentNullException"><paramref name="mimeType"/> is <c>null</c>.</exception>
-    internal static string FromText(string? text, MimeType mimeType)
+    /// <returns>A reference to <paramref name="builder"/>.</returns>
+    /// <exception cref="FormatException"><paramref name="text"/> could not URL-encoded.</exception>
+    internal static StringBuilder AppendEmbeddedTextInternal(this StringBuilder builder, string? text, MimeType mimeType)
     {
-        if (mimeType is null)
-        {
-            throw new ArgumentNullException(nameof(mimeType));
-        }
+        Debug.Assert(builder != null);
+        Debug.Assert(mimeType != null);
 
         text ??= string.Empty;
-        text = Uri.UnescapeDataString(text);
 
-        if (text.IsAscii())
+        string data = Uri.EscapeDataString(text);
+
+        if (data.Length == text.Length)
         {
-            if (!UrlEncoding.TryEncode(text, out string? data))
-            {
-                data = string.Empty;
-            }
-
-            var sb = new StringBuilder(DataUrl.Protocol.Length + ESTIMATED_MIME_TYPE_LENGTH + data.Length);
-            return sb.Append(DataUrl.Protocol).AppendMediaType(mimeType).Append(',').Append(data).ToString();
+            mimeType.RemoveParameter(CHARSET_KEY);
         }
         else
         {
-            byte[] bytes = Encoding.UTF8.GetBytes(text);
-            mimeType.AppendParameter("charset", UTF_8);
-            return FromBytes(bytes, mimeType);
+            mimeType.AppendParameter(CHARSET_KEY, UTF_8);
         }
+
+        _ = builder.EnsureCapacity(builder.Length
+                                   + DataUrl.Protocol.Length
+                                   + ESTIMATED_MIME_TYPE_LENGTH
+                                   + COMMA_LENGTH
+                                   + data.Length);
+        return builder.Append(DataUrl.Protocol).AppendMediaType(mimeType).Append(',').Append(data);
 
         // $"data:,{Uri.EscapeDataString(text)}"
     }
 
     /// <summary>
-    /// Embeds binary data in a "data" URL (RFC 2397).
+    /// Appends binary data as "data" URL (RFC 2397) to the end of a <see cref="StringBuilder"/>.
     /// </summary>
+    /// <param name="builder">The <see cref="StringBuilder"/> to which a "data" URL is appended.</param>
     /// <param name="bytes">The binary data to embed into the "data" URL.</param>
     /// <param name="mimeType">The <see cref="MimeType"/> of the <paramref name="bytes"/>.</param>
-    /// <returns>A "data" URL, into which the binary data provided by the parameter <paramref name="bytes"/> is embedded.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="mimeType"/> is <c>null</c>.</exception>
-    internal static string FromBytes(byte[]? bytes, MimeType mimeType)
+    /// <returns>A reference to <paramref name="builder"/>.</returns>
+    internal static StringBuilder AppendEmbeddedBytesInternal(this StringBuilder builder, byte[]? bytes, MimeType mimeType)
     {
-
-        if (mimeType is null)
-        {
-            throw new ArgumentNullException(nameof(mimeType));
-        }
+        Debug.Assert(builder != null);
+        Debug.Assert(mimeType != null);
 
         string data = bytes is null ? string.Empty : Convert.ToBase64String(bytes, Base64FormattingOptions.None);
-        var builder = new StringBuilder(DataUrl.Protocol.Length + ESTIMATED_MIME_TYPE_LENGTH + DataUrl.Base64.Length + 1 + data.Length);
-        return builder.Append(DataUrl.Protocol).AppendMediaType(mimeType).Append(DataUrl.Base64).Append(',').Append(data).ToString();
+        _ = builder.EnsureCapacity(builder.Length
+                                   + DataUrl.Protocol.Length
+                                   + ESTIMATED_MIME_TYPE_LENGTH
+                                   + DataUrl.Base64.Length
+                                   + COMMA_LENGTH
+                                   + data.Length);
+        return builder.Append(DataUrl.Protocol).AppendMediaType(mimeType).Append(DataUrl.Base64).Append(',').Append(data);
 
         // $"data:{mediaTypeString};base64,{Convert.ToBase64String(bytes)}"
     }
 
     /// <summary>
-    /// Embeds the content of a file in a "data" URL (RFC 2397).
+    /// Appends the content of a file as "data" URL (RFC 2397) to the end of a <see cref="StringBuilder"/>.
     /// </summary>
+    /// <param name="builder">The <see cref="StringBuilder"/> to which a "data" URL is appended.</param>
     /// <param name="filePath">Abolute path to the file which content is to embed into the "data" URL.</param>
-    /// <param name="mimeType">The <see cref="MimeType"/> of the file to embed.</param>
+    /// <param name="mimeType">The <see cref="MimeType"/> of the file whose content is to embed.</param>
     /// 
-    /// <returns>A "data" URL, into which the content of the file provided by the parameter <paramref name="filePath"/> is embedded.</returns>
+    /// <returns>A reference to <paramref name="builder"/>.</returns>
     /// 
-    ///<example>
-    /// <note type="note">
-    /// For the sake of better readability, exception handling is ommitted in the example.
-    /// </note>
-    /// <para>
-    /// Creating and parsing a "data" URL:
-    /// </para>
-    /// <code language="c#" source="./../Examples/DataUrlExample.cs"/>
-    /// </example>
-    /// 
-    ///<exception cref="ArgumentNullException"><paramref name="filePath"/> or <paramref name="mimeType"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException"><paramref name="filePath"/> is not a valid file path.</exception>
     /// <exception cref="IOException">I/O error.</exception>
-    internal static string FromFile(string filePath, MimeType mimeType)
+    internal static StringBuilder AppendFileContentInternal(this StringBuilder builder, string filePath, MimeType mimeType)
     {
-        if (mimeType is null)
-        {
-            throw new ArgumentNullException(nameof(mimeType));
-        }
+        Debug.Assert(builder != null);
+        Debug.Assert(filePath != null);
+        Debug.Assert(mimeType != null);
 
-        byte[] bytes = LoadFile(filePath);
-
-        return FromBytes(bytes, mimeType);
+        return builder.AppendEmbeddedBytesInternal(LoadFile(filePath), mimeType);
     }
+
 
     [ExcludeFromCodeCoverage]
     private static byte[] LoadFile(string path)

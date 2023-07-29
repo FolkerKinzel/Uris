@@ -16,9 +16,9 @@ public readonly partial struct DataUrlInfo
     private readonly ReadOnlyMemory<char> _embeddedData;
     private readonly ushort _idx;
 
-    private int MimeTypeLength => _idx >> 1;
+    private int MimeTypeLength => _idx >> MIME_TYPE_LENGTH_SHIFT;
 
-    private bool HasIncompleteMimeType => (_idx & INCOMPLETE_MIME_TYPE_VALUE) == INCOMPLETE_MIME_TYPE_VALUE;
+    private bool IncompleteMimeType => (_idx & INCOMPLETE_MIME_TYPE_VALUE) == INCOMPLETE_MIME_TYPE_VALUE;
 
     private int EmbeddedDataStartIndex => IsEmpty ? 0 
                                                   : MimeTypeLength
@@ -30,7 +30,7 @@ public readonly partial struct DataUrlInfo
     /// </summary>
     public ReadOnlyMemory<char> MimeType => 
         MimeTypeLength == 0 ? DataUrl.DefaultMediaType.AsMemory()
-                            : HasIncompleteMimeType 
+                            : IncompleteMimeType 
                                     ? (DataUrl.DefaultMediaType + _embeddedData.Span.Slice(0, MimeTypeLength).ToString()).AsMemory()
                                     :_embeddedData.Slice(0, MimeTypeLength);
 
@@ -55,7 +55,7 @@ public readonly partial struct DataUrlInfo
     /// <value>
     /// <c>true</c> if <see cref="Data"/> contains text, otherwise <c>false</c>.
     /// </value>
-    public bool ContainsEmbeddedText => MimeTypeLength == 0 || _embeddedData.Span.StartsWith("text/".AsSpan(), StringComparison.OrdinalIgnoreCase);
+    public bool ContainsEmbeddedText => MimeTypeLength == 0 || IncompleteMimeType || _embeddedData.Span.StartsWith("text/".AsSpan(), StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// Indicates whether <see cref="Data"/> contains binary data.

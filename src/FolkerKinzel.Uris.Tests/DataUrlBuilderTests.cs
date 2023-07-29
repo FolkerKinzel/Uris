@@ -33,7 +33,7 @@ public class DataUrlBuilderTests
 
         MimeType mime = MimeType.Parse("image/png");
 
-        string url1 = DataUrlBuilder.FromFile(path, mime);
+        string url1 = DataUrl.FromFile(path, mime);
         StringAssert.Contains(url1, "image/png");
     }
 }
