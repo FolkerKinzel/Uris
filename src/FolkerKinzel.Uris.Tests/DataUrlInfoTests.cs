@@ -242,13 +242,13 @@ namespace FolkerKinzel.Uris.Tests
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void AppendToTest1() => _ = DataUrl.AppendEmbeddedText(null!, "", MimeType.Parse(MimeString.OctetStream));
+        public void AppendToTest1() => _ = DataUrl.AppendEmbeddedTextTo(null!, "", MimeType.Parse(MimeString.OctetStream));
 
         [TestMethod]
         public void AppendToTest2()
         {
             var stringBuilder = new StringBuilder();
-            _ = DataUrl.AppendEmbeddedText(stringBuilder, null, MimeType.Parse(MimeString.OctetStream));
+            _ = DataUrl.AppendEmbeddedTextTo(stringBuilder, null, MimeType.Parse(MimeString.OctetStream));
             Assert.AreNotEqual(0, stringBuilder.Length);
         }
 
@@ -259,7 +259,7 @@ namespace FolkerKinzel.Uris.Tests
 
             Assert.IsTrue(DataUrl.TryParse("data:application/octet-stream,%01%02%03", out DataUrlInfo info));
             Assert.IsTrue(info.TryGetEmbeddedBytes(out byte[]? embeddedBytes));
-            DataUrl.AppendEmbeddedBytes(sb, embeddedBytes, MimeType.Parse(MimeString.OctetStream));
+            DataUrl.AppendEmbeddedBytesTo(sb, embeddedBytes, MimeType.Parse(MimeString.OctetStream));
             Assert.AreNotEqual(0, sb.Length);
         }
 
@@ -270,7 +270,7 @@ namespace FolkerKinzel.Uris.Tests
 
             Assert.IsTrue(DataUrl.TryParse("data:application/octet-stream;base64,ABCD", out DataUrlInfo info));
             Assert.IsTrue(info.TryGetEmbeddedBytes(out byte[]? embeddedBytes));
-            _ = DataUrl.AppendEmbeddedBytes(sb, embeddedBytes, MimeType.Parse(MimeString.OctetStream));
+            _ = DataUrl.AppendEmbeddedBytesTo(sb, embeddedBytes, MimeType.Parse(MimeString.OctetStream));
             Assert.AreNotEqual(0, sb.Length);
         }
 

@@ -6,11 +6,14 @@
 public static class UriExtension
 {
     /// <summary>
-    /// Returns <c>true</c> if the <see cref="Uri"/> passed as parameter is a "data" URL. (RFC 2397)
+    /// Returns <c>true</c> if the <see cref="Uri"/> is a "data" URL. (RFC 2397)
     /// </summary>
     /// <param name="uri">The <see cref="Uri"/> to examine.</param>
-    /// <returns><c>true</c> if <paramref name="uri"/> is a "data" URL. If <paramref name="uri"/> is 
-    /// <c>null</c>&#160;<c>false</c> is returned.</returns>
+    /// <returns><c>true</c> if <paramref name="uri"/> is a "data" URL.</returns>
+    /// <remarks>Leading white space is skipped.</remarks>
+    /// 
+    /// <exception cref="ArgumentNullException"><paramref name="uri"/> is <c>null</c>.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsDataUrl([NotNullWhen(true)] this Uri? uri) => uri is not null && uri.OriginalString.IsDataUrl();
+    public static bool IsDataUrl([NotNullWhen(true)] this Uri? uri) => 
+        uri?.OriginalString.AsSpan().IsDataUrl() ?? throw new ArgumentNullException(nameof(uri));
 }

@@ -200,7 +200,7 @@ public class DataUrlTests
     [TestMethod]
     public void FromBytesTest3()
     {
-        StringBuilder outText = DataUrl.AppendEmbeddedBytes(new StringBuilder(), null, MimeType.Parse("text/plain"));
+        StringBuilder outText = DataUrl.AppendEmbeddedBytesTo(new StringBuilder(), null, MimeType.Parse("text/plain"));
 
         Assert.IsNotNull(outText);
 
