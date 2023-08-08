@@ -1,4 +1,5 @@
 ﻿using FolkerKinzel.Uris.Intls;
+using System.Web;
 
 namespace FolkerKinzel.Uris.Tests;
 
@@ -310,8 +311,6 @@ public class DataUrlTests
     [TestMethod()]
     public void FromTextTest1()
     {
-        
-
         const string TEXT = "In Märchenbüchern herumstöbern.";
 
         string dataUrl1 = DataUrl.FromText(TEXT);

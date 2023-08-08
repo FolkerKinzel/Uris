@@ -83,6 +83,7 @@ internal static class DataUrlBuilder
         }
     }
 
+
     /// <summary>
     /// Appends binary data as "data" URL (RFC 2397) to the end of a <see cref="StringBuilder"/>.
     /// </summary>
@@ -110,7 +111,7 @@ internal static class DataUrlBuilder
                                    + ESTIMATED_MIME_TYPE_LENGTH
                                    + COMMA_LENGTH
                                    + data.Length);
-        return builder.Append(DataUrl.Scheme).AppendMediaType(mimeType).Append(',').Append(data);
+        return builder.Append(DataUrl.Scheme).AppendMediaType(mimeType).Append(',').Append(data).Replace("+", "%20", builder.Length - data.Length, data.Length);
 
         // $"data:{mediaTypeString},{UrlEncoding.EncodeBytes(bytes)}"
     }
