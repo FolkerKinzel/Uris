@@ -2,12 +2,14 @@
 
 
 ### .NET library that supports working with URIs
-[Project Reference and Release Notes](https://github.com/FolkerKinzel/Uris/releases/tag/v2.0.0-beta.1)
+[Project Reference and Release Notes](https://github.com/FolkerKinzel/Uris/releases/tag/v3.0.0-beta.1)
 
 The library supports:
-- The "data" URL scheme ([RFC 2397](https://datatracker.ietf.org/doc/html/rfc2397)):
-  - The static `DataUrlBuilder` class: Provides functionality to build a "data" URL that embeds data in-line in a URL-string. DataUrlBuilder creates a "data" URL-string from the data to embed. This can be either a file or a byte array or a string. 
-  - The `DataUrlInfo` struct allows to retrieve the data from a "data" URL-string and to find automatically an appropriate file type extension for it.
+- The "data" URL scheme ([RFC 2397](https://datatracker.ietf.org/doc/html/rfc2397)) which allows to embed data directly inside of a URI. The static `DataUrl` class allows 
+  - building such URIs from files, byte arrays or text that's to embed,
+  - parsing "data" URL strings as `DataUrlInfo` structs in order to examine its content without having to allocate a lot of sub strings,
+  - retrieving the embedded data from "data" URL strings,
+  - retrieving an appropriate file type extension for the embedded data.
 
 The library is designed to support performance and small heap allocation.
 

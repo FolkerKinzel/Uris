@@ -14,6 +14,6 @@ public static class ReadOnlySpanExtension
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
     public static bool IsDataUrl(this ReadOnlySpan<char> span)
-        => span.TrimStart().StartsWith(DataUrl.Protocol.AsSpan(), StringComparison.OrdinalIgnoreCase);
+        => span.TrimStart().StartsWith(DataUrl.Scheme.AsSpan(), StringComparison.OrdinalIgnoreCase);
 
 }

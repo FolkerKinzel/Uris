@@ -9,8 +9,8 @@ internal static class DataUrlBuilder
 {
     internal const int ESTIMATED_MIME_TYPE_LENGTH = 80;
     internal const string UTF_8 = "utf-8";
-    private const string CHARSET_KEY = "charset";
     private const int COMMA_LENGTH = 1;
+    private const string CHARSET = "charset";
 
     /// <summary>
     /// Appends embedded text as "data" URL (RFC 2397) to the end of a <see cref="StringBuilder"/>.
@@ -19,6 +19,7 @@ internal static class DataUrlBuilder
     /// <param name="text">The text to embed into the "data" URL. <paramref name="text"/> MUST not be URL encoded.</param>
     /// <param name="mimeType">The <see cref="MimeType"/> of the <paramref name="text"/>.</param>
     /// <param name="dataEncoding">The encoding to use to embed the <paramref name="text"/>.</param>
+    /// 
     /// <returns>A reference to <paramref name="builder"/>.</returns>
     /// <exception cref="FormatException"><paramref name="text"/> could not URL-encoded.</exception>
     internal static StringBuilder AppendEmbeddedTextInternal(this StringBuilder builder,
@@ -31,14 +32,15 @@ internal static class DataUrlBuilder
 
         text ??= string.Empty;
 
-        string? charSet = mimeType.Parameters.FirstOrDefault(Predicate)?.Value ?? UTF_8;
+        string charSet = InitCharSet(text, mimeType);
+
         byte[] value = SerializeText(text, mimeType, charSet);
 
         return builder.AppendEmbeddedBytesInternal(value, mimeType, dataEncoding);
 
         ////////////////////////////////////////////////////////////////////////////
 
-        static bool Predicate(MimeTypeParameter parameter) => parameter.IsCharSetParameter;
+        static bool IsCharSetParameter(MimeTypeParameter parameter) => parameter.IsCharSetParameter;
 
         static byte[] SerializeText(string text, MimeType mimeType, string charSet)
         {
@@ -51,10 +53,33 @@ internal static class DataUrlBuilder
             catch
             {
                 value = Encoding.UTF8.GetBytes(text);
-                mimeType.AppendParameter("charset", UTF_8);
+
+                Debug.Assert(mimeType.Parameters.Any(IsCharSetParameter));
+                mimeType.AppendParameter(CHARSET, UTF_8);
             }
 
             return value;
+        }
+
+        static string InitCharSet(string text, MimeType mimeType)
+        {
+            MimeTypeParameter? charSetParameter = mimeType.Parameters.FirstOrDefault(IsCharSetParameter);
+
+            string charSet;
+            if (charSetParameter is null)
+            {
+                charSet = UTF_8;
+                if (mimeType.IsTextPlain && !text.IsAscii())
+                {
+                    mimeType.AppendParameter(CHARSET, UTF_8);
+                }
+            }
+            else
+            {
+                charSet = charSetParameter.Value ?? UTF_8;
+            }
+
+            return charSet;
         }
     }
 
@@ -81,11 +106,11 @@ internal static class DataUrlBuilder
         string data = bytes is null ? string.Empty
                                     : UrlEncoding.EncodeBytes(bytes);
         _ = builder.EnsureCapacity(builder.Length
-                                   + DataUrl.Protocol.Length
+                                   + DataUrl.Scheme.Length
                                    + ESTIMATED_MIME_TYPE_LENGTH
                                    + COMMA_LENGTH
                                    + data.Length);
-        return builder.Append(DataUrl.Protocol).AppendMediaType(mimeType).Append(',').Append(data);
+        return builder.Append(DataUrl.Scheme).AppendMediaType(mimeType).Append(',').Append(data);
 
         // $"data:{mediaTypeString},{UrlEncoding.EncodeBytes(bytes)}"
     }
@@ -98,12 +123,12 @@ internal static class DataUrlBuilder
         string data = bytes is null ? string.Empty
                                     : Convert.ToBase64String(bytes, Base64FormattingOptions.None);
         _ = builder.EnsureCapacity(builder.Length
-                                   + DataUrl.Protocol.Length
+                                   + DataUrl.Scheme.Length
                                    + ESTIMATED_MIME_TYPE_LENGTH
                                    + DataUrl.Base64.Length
                                    + COMMA_LENGTH
                                    + data.Length);
-        return builder.Append(DataUrl.Protocol).AppendMediaType(mimeType).Append(DataUrl.Base64).Append(',').Append(data);
+        return builder.Append(DataUrl.Scheme).AppendMediaType(mimeType).Append(DataUrl.Base64).Append(',').Append(data);
 
         // $"data:{mediaTypeString};base64,{Convert.ToBase64String(bytes)}"
     }
@@ -114,7 +139,7 @@ internal static class DataUrlBuilder
     /// <param name="builder">The <see cref="StringBuilder"/> to which a "data" URL is appended.</param>
     /// <param name="filePath">Abolute path to the file which content is to embed into the "data" URL.</param>
     /// <param name="mimeType">The <see cref="MimeType"/> of the file whose content is to embed.</param>
-    /// <param name="dataEncoding">The encoding to use to embed the <paramref name="bytes"/>.</param>
+    /// <param name="dataEncoding">The encoding to use to embed the file.</param>
     /// 
     /// <returns>A reference to <paramref name="builder"/>.</returns>
     /// 

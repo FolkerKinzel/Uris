@@ -16,7 +16,7 @@ public readonly partial struct DataUrlInfo
             return false;
         }
 
-        value = value.Slice(DataUrl.Protocol.Length);
+        value = value.Slice(DataUrl.Scheme.Length);
         ReadOnlySpan<char> span = value.Span;
         int mimeTypeLength = span.IndexOf(',');
                

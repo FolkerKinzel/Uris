@@ -3,26 +3,8 @@ using System.Text;
 
 namespace FolkerKinzel.Uris.Intls;
 
-
 internal static class UrlEncoding
 {
-    //[ExcludeFromCodeCoverage]
-    //internal static bool TryEncode(string input, [NotNullWhen(true)] out string? output)
-    //{
-    //    Debug.Assert(input != null);
-    //    try
-    //    {
-    //        output = Uri.EscapeDataString(input);
-    //    }
-    //    catch
-    //    {
-    //        output = null;
-    //        return false;
-    //    }
-    //    return true;
-    //}
-
-    [ExcludeFromCodeCoverage]
     internal static bool TryDecode(string value, string charSet, [NotNullWhen(true)] out string? decoded)
     {
         try
@@ -33,23 +15,6 @@ internal static class UrlEncoding
         catch
         {
             decoded = null;
-            return false;
-        }
-    }
-
-    internal static bool TryEncode(string value, string charSet, [NotNullWhen(true)] out string? encoded)
-    {
-        Debug.Assert(value != null);
-
-        try
-        {
-            Encoding enc = TextEncodingConverter.GetEncoding(charSet, throwOnInvalidWebName: true);
-            encoded = EncodeBytes(enc.GetBytes(value));
-            return true;
-        }
-        catch
-        {
-            encoded = null;
             return false;
         }
     }
@@ -102,20 +67,4 @@ internal static class UrlEncoding
         return result;
     }
 
-
-
-    //internal static string UrlEncodeValueWithCharset(string value, string? charSet)
-    //{
-    //    Encoding encoding = TextEncodingConverter.GetEncoding(charSet);
-    //    var bytes = encoding.GetBytes(value);
-
-    //    StringBuilder sb = new StringBuilder(3);
-
-    //    for (int i = 0; i < bytes.Length; i++)
-    //    {
-    //        sb.Append('%');
-    //        sb.Append(bytes[i].ToString("X2"));
-    //    }
-    //    return sb.ToString();
-    //}
 }

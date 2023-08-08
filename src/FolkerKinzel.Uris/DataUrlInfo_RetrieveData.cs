@@ -117,7 +117,7 @@ public readonly partial struct DataUrlInfo
     /// Returns an appropriate file type extension for the <see cref="Data"/> embedded in the 
     /// "data" URL. The file type extension contains the period (".").
     /// </summary>
-    /// <returns>An appropriate file type extension for the embedded <see cref="Data"/>.</returns>
+    /// <returns>An appropriate file type extension for the embedded <see cref="Data"/>. The extension starts with the period ".".</returns>
     /// 
     ///<example>
     /// <note type="note">
