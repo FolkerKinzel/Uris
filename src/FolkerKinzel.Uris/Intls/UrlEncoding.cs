@@ -54,12 +54,16 @@ internal static class UrlEncoding
         }
     }
 
+
     internal static string EncodeBytes(byte[] value)
     {
         Debug.Assert(value != null);
         byte[] encodedBytes = WebUtility.UrlEncodeToBytes(value, 0, value.Length);
-        return Encoding.ASCII.GetString(encodedBytes);
+
+        // WebUtility guaranties UTF-8 not ASCII
+        return Encoding.UTF8.GetString(encodedBytes);
     }
+
 
     internal static bool TryDecodeBytes(ReadOnlySpan<char> value, [NotNullWhen(true)] out byte[]? decoded)
     {

@@ -47,7 +47,7 @@ public static class DataUrl
     /// <exception cref="FormatException"><paramref name="text"/> could not URL-encoded.</exception>
     public static string FromText(string? text, MimeType mimeType) => 
         AppendEmbeddedTextTo(new StringBuilder(), text, mimeType).ToString();
-    
+
 
     /// <summary>
     /// Embeds binary data into a "data" URL (RFC 2397).
@@ -55,10 +55,14 @@ public static class DataUrl
     /// <param name="bytes">The binary data to embed into the "data" URL.</param>
     /// <param name="mimeTypeString">The Internet Media Type of the <paramref name="bytes"/> or <c>null</c> for 
     /// <see cref="MimeString.OctetStream"/>.</param>
+    /// <param name="dataEncoding">The encoding to use to embed the <paramref name="bytes"/>.</param>
+    /// 
     /// <returns>A "data" URL, into which the binary data provided by the parameter <paramref name="bytes"/> is embedded.</returns>
     [SuppressMessage("Globalization", "CA1303:Literale nicht als lokalisierte Parameter übergeben", Justification = "<Ausstehend>")]
-    public static string FromBytes(byte[]? bytes, string? mimeTypeString = MimeString.OctetStream) =>
-        AppendEmbeddedBytesTo(new StringBuilder(), bytes, mimeTypeString).ToString();
+    public static string FromBytes(byte[]? bytes,
+                                   string? mimeTypeString = MimeString.OctetStream,
+                                   DataEncoding dataEncoding = DataEncoding.Base64) =>
+        AppendEmbeddedBytesTo(new StringBuilder(), bytes, mimeTypeString, dataEncoding).ToString();
 
 
     /// <summary>
@@ -66,12 +70,14 @@ public static class DataUrl
     /// </summary>
     /// <param name="bytes">The binary data to embed into the "data" URL.</param>
     /// <param name="mimeType">The <see cref="MimeType"/> of the <paramref name="bytes"/>.</param>
+    /// <param name="dataEncoding">The encoding to use to embed the <paramref name="bytes"/>.</param>
+    /// 
     /// <returns>A "data" URL, into which the binary data provided by the parameter <paramref name="bytes"/> is embedded.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="mimeType"/> is <c>null</c>.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string FromBytes(byte[]? bytes, MimeType mimeType) => 
-        AppendEmbeddedBytesTo(new StringBuilder(), bytes, mimeType).ToString();
-    
+    public static string FromBytes(byte[]? bytes, MimeType mimeType, DataEncoding dataEncoding = DataEncoding.Base64) => 
+        AppendEmbeddedBytesTo(new StringBuilder(), bytes, mimeType, dataEncoding).ToString();
+
 
 
     /// <summary>
@@ -81,6 +87,8 @@ public static class DataUrl
     /// <param name="mimeTypeString">The Internet Media Type ("MIME type") of the file to embed or <c>null</c> 
     /// to let the method automatically
     /// retrieve the <see cref="MimeType"/> from the file type extension.</param>
+    /// <param name="dataEncoding">The encoding to use to embed the <paramref name="bytes"/>.</param>
+    /// 
     /// <returns>A "data" URL, into which the content of the file provided by the parameter 
     /// <paramref name="filePath"/> is embedded.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="filePath"/> is <c>null</c>.</exception>
@@ -96,8 +104,8 @@ public static class DataUrl
     /// </para>
     /// <code language="c#" source="./../Examples/DataUrlExample.cs"/>
     /// </example>
-    public static string FromFile(string filePath, string? mimeTypeString = null) =>
-        AppendFileContentTo(new StringBuilder(), filePath, mimeTypeString).ToString();
+    public static string FromFile(string filePath, string? mimeTypeString = null, DataEncoding dataEncoding = DataEncoding.Base64) =>
+        AppendFileContentTo(new StringBuilder(), filePath, mimeTypeString, dataEncoding).ToString();
 
 
     /// <summary>
@@ -105,6 +113,7 @@ public static class DataUrl
     /// </summary>
     /// <param name="filePath">Path to the file whose content has to be embedded into the "data" URL.</param>
     /// <param name="mimeType">The <see cref="MimeType"/> of the file to embed.</param>
+    /// <param name="dataEncoding">The encoding to use to embed the <paramref name="bytes"/>.</param>
     /// 
     /// <returns>A "data" URL into which the content of the file provided by the parameter <paramref name="filePath"/> is embedded.</returns>
     /// 
@@ -121,8 +130,9 @@ public static class DataUrl
     ///<exception cref="ArgumentNullException"><paramref name="filePath"/> or <paramref name="mimeType"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException"><paramref name="filePath"/> is not a valid file path.</exception>
     /// <exception cref="IOException">I/O error.</exception>
-    public static string FromFile(string filePath, MimeType mimeType) => 
-        AppendFileContentTo(new StringBuilder(), filePath, mimeType).ToString();
+    public static string FromFile(string filePath, MimeType mimeType, DataEncoding dataEncoding = DataEncoding.Base64) => 
+        AppendFileContentTo(new StringBuilder(), filePath, mimeType, dataEncoding).ToString();
+
 
     /// <summary>
     /// Appends embedded text as "data" URL (RFC 2397) to the end of a <see cref="StringBuilder"/>.
@@ -138,7 +148,7 @@ public static class DataUrl
     /// <exception cref="ArgumentNullException"><paramref name="builder"/>
     /// is <c>null</c>.</exception>
     /// <exception cref="FormatException"><paramref name="text"/> could not URL-encoded.</exception>
-    internal static StringBuilder AppendEmbeddedTextTo(StringBuilder builder, string? text, string? mimeTypeString = DataUrl.DefaultMediaType) =>
+    public static StringBuilder AppendEmbeddedTextTo(StringBuilder builder, string? text, string? mimeTypeString = DataUrl.DefaultMediaType) =>
          MimeType.TryParse(string.IsNullOrWhiteSpace(mimeTypeString) ? DataUrl.DefaultMediaType : mimeTypeString, out MimeType? mimeType)
                 ? AppendEmbeddedTextTo(builder, text, mimeType)
                 : AppendEmbeddedTextTo(builder, text, DataUrl.DefaultMediaType);
@@ -157,12 +167,13 @@ public static class DataUrl
     /// <exception cref="ArgumentNullException"><paramref name="builder"/> or <paramref name="mimeType"/> 
     /// is <c>null</c>.</exception>
     /// <exception cref="FormatException"><paramref name="text"/> could not URL-encoded.</exception>
-    internal static StringBuilder AppendEmbeddedTextTo(StringBuilder builder, string? text, MimeType mimeType) => 
+    public static StringBuilder AppendEmbeddedTextTo(StringBuilder builder, string? text, MimeType mimeType) => 
         builder is null
             ? throw new ArgumentNullException(nameof(builder))
             : mimeType is null 
                 ? throw new ArgumentNullException(nameof(mimeType))
                 : builder.AppendEmbeddedTextInternal(text, mimeType);
+
 
     /// <summary>
     /// Appends binary data as "data" URL (RFC 2397) to the end of a <see cref="StringBuilder"/>.
@@ -171,17 +182,20 @@ public static class DataUrl
     /// <param name="bytes">The binary data to embed into the "data" URL.</param>
     /// <param name="mimeTypeString">The Internet Media Type of the <paramref name="bytes"/> or <c>null</c> for 
     /// <see cref="MimeString.OctetStream"/>.</param>
+    /// <param name="dataEncoding">The encoding to use to embed the <paramref name="bytes"/>.</param>
+    /// 
     /// 
     /// <returns>A reference to <paramref name="builder"/>.</returns>
     /// 
-    /// <exception cref="ArgumentNullException"><paramref name="builder"/>
-    /// is <c>null</c>.</exception>
-    internal static StringBuilder AppendEmbeddedBytesTo(StringBuilder builder,
+    /// <exception cref="ArgumentNullException"><paramref name="builder"/> is <c>null</c>.</exception>
+    public static StringBuilder AppendEmbeddedBytesTo(StringBuilder builder,
                                                       byte[]? bytes,
-                                                      string? mimeTypeString = MimeString.OctetStream) =>
+                                                      string? mimeTypeString = MimeString.OctetStream,
+                                                      DataEncoding dataEncoding = DataEncoding.Base64) =>
         MimeType.TryParse(string.IsNullOrWhiteSpace(mimeTypeString) ? MimeString.OctetStream : mimeTypeString, out MimeType? mimeType)
-                ? AppendEmbeddedBytesTo(builder, bytes, mimeType)
-                : AppendEmbeddedBytesTo(builder, bytes, MimeString.OctetStream);
+                ? AppendEmbeddedBytesTo(builder, bytes, mimeType, dataEncoding)
+                : AppendEmbeddedBytesTo(builder, bytes, MimeString.OctetStream, dataEncoding);
+
 
     /// <summary>
     /// Appends binary data as "data" URL (RFC 2397) to the end of a <see cref="StringBuilder"/>.
@@ -189,17 +203,21 @@ public static class DataUrl
     /// <param name="builder">The <see cref="StringBuilder"/> to which a "data" URL is appended.</param>
     /// <param name="bytes">The binary data to embed into the "data" URL.</param>
     /// <param name="mimeType">The <see cref="MimeType"/> of the <paramref name="bytes"/>.</param>
+    /// <param name="dataEncoding">The encoding to use to embed the <paramref name="bytes"/>.</param>
     /// 
     /// <returns>A reference to <paramref name="builder"/>.</returns>
     /// 
     /// <exception cref="ArgumentNullException"><paramref name="builder"/> or <paramref name="mimeType"/>
     /// is <c>null</c>.</exception>
-    internal static StringBuilder AppendEmbeddedBytesTo(StringBuilder builder, byte[]? bytes, MimeType mimeType) =>
+    public static StringBuilder AppendEmbeddedBytesTo(StringBuilder builder,
+                                                      byte[]? bytes,
+                                                      MimeType mimeType,
+                                                      DataEncoding dataEncoding = DataEncoding.Base64) =>
         builder is null
             ? throw new ArgumentNullException(nameof(builder))
             : mimeType is null
                 ? throw new ArgumentNullException(nameof(mimeType))
-                : builder.AppendEmbeddedBytesInternal(bytes, mimeType);
+                : builder.AppendEmbeddedBytesInternal(bytes, mimeType, dataEncoding);
 
 
     /// <summary>
@@ -210,6 +228,7 @@ public static class DataUrl
     /// <param name="mimeTypeString">The Internet Media Type ("MIME type") of the file to embed or <c>null</c> 
     /// to let the method automatically
     /// retrieve the <see cref="MimeType"/> from the file type extension.</param>
+    /// <param name="dataEncoding">The encoding to use to embed the <paramref name="bytes"/>.</param>
     /// 
     /// <returns>A reference to <paramref name="builder"/>.</returns>
     /// 
@@ -217,14 +236,15 @@ public static class DataUrl
     /// or <paramref name="mimeType"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException"><paramref name="filePath"/> is not a valid file path.</exception>
     /// <exception cref="IOException">I/O error.</exception>
-    internal static StringBuilder AppendFileContentTo(this StringBuilder builder,
+    public static StringBuilder AppendFileContentTo(this StringBuilder builder,
                                                     string filePath,
-                                                    string? mimeTypeString = null) =>
+                                                    string? mimeTypeString = null,
+                                                    DataEncoding dataEncoding = DataEncoding.Base64) =>
         string.IsNullOrWhiteSpace(mimeTypeString)
-              ? AppendFileContentTo(builder, filePath, MimeType.FromFileName(filePath))
+              ? AppendFileContentTo(builder, filePath, MimeType.FromFileName(filePath), dataEncoding)
               : MimeType.TryParse(mimeTypeString, out MimeType? mimeType)
-                  ? AppendFileContentTo(builder, filePath, mimeType)
-                  : AppendFileContentTo(builder, filePath, (string?)null);
+                  ? AppendFileContentTo(builder, filePath, mimeType, dataEncoding)
+                  : AppendFileContentTo(builder, filePath, (string?)null, dataEncoding);
 
 
 
@@ -234,6 +254,7 @@ public static class DataUrl
     /// <param name="builder">The <see cref="StringBuilder"/> to which a "data" URL is appended.</param>
     /// <param name="filePath">Abolute path to the file which content is to embed into the "data" URL.</param>
     /// <param name="mimeType">The <see cref="MimeType"/> of the file whose content is to embed.</param>
+    /// <param name="dataEncoding">The encoding to use to embed the <paramref name="bytes"/>.</param>
     /// 
     /// <returns>A reference to <paramref name="builder"/>.</returns>
     /// 
@@ -241,14 +262,17 @@ public static class DataUrl
     /// or <paramref name="mimeType"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException"><paramref name="filePath"/> is not a valid file path.</exception>
     /// <exception cref="IOException">I/O error.</exception>
-    internal static StringBuilder AppendFileContentTo(this StringBuilder builder, string filePath, MimeType mimeType) => 
+    public static StringBuilder AppendFileContentTo(this StringBuilder builder,
+                                                      string filePath,
+                                                      MimeType mimeType,
+                                                      DataEncoding dataEncoding = DataEncoding.Base64) => 
         builder is null
             ? throw new ArgumentNullException(nameof(builder))
             : filePath is null
                 ? throw new ArgumentNullException(nameof(filePath))
                 : mimeType is null 
                     ? throw new ArgumentNullException(nameof(mimeType))
-                    : builder.AppendFileContentInternal(filePath, mimeType);
+                    : builder.AppendFileContentInternal(filePath, mimeType, dataEncoding);
 
 
     /// <summary>
