@@ -37,6 +37,30 @@ internal static class UrlEncoding
         }
     }
 
+    internal static bool TryEncode(string value, string charSet, [NotNullWhen(true)] out string? encoded)
+    {
+        Debug.Assert(value != null);
+
+        try
+        {
+            Encoding enc = TextEncodingConverter.GetEncoding(charSet, throwOnInvalidWebName: true);
+            encoded = EncodeBytes(enc.GetBytes(value));
+            return true;
+        }
+        catch
+        {
+            encoded = null;
+            return false;
+        }
+    }
+
+    internal static string EncodeBytes(byte[] value)
+    {
+        Debug.Assert(value != null);
+        byte[] encodedBytes = WebUtility.UrlEncodeToBytes(value, 0, value.Length);
+        return Encoding.ASCII.GetString(encodedBytes);
+    }
+
     internal static bool TryDecodeBytes(ReadOnlySpan<char> value, [NotNullWhen(true)] out byte[]? decoded)
     {
         try
@@ -46,9 +70,9 @@ internal static class UrlEncoding
             decoded = WebUtility.UrlDecodeToBytes(bytes, 0, bytes.Length);
             return true;
         }
-        catch 
+        catch
         {
-            decoded = null; 
+            decoded = null;
             return false;
         }
     }
@@ -64,7 +88,7 @@ internal static class UrlEncoding
     private static string UnescapeValueFromUrlEncoding(string value, string charSet)
     {
         string result;
-        
+
         Encoding encoding = TextEncoding.InitThrowingEncoding(charSet);
         Encoding ascii = TextEncoding.InitThrowingEncoding(20127);
 

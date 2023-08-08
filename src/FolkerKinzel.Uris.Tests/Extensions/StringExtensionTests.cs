@@ -1,4 +1,5 @@
-﻿namespace FolkerKinzel.Uris.Extensions.Tests
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+namespace FolkerKinzel.Uris.Extensions.Tests
 {
     [TestClass]
     public class StringExtensionTests
@@ -12,10 +13,16 @@
         [DataRow("DATA:bla", true)]
         [DataRow("dotu:bla", false)]
         [DataRow("", false)]
-        [DataRow(null, false)]
-        public void IsDataUrlTest1(string? input, bool expected)
+        public void IsDataUrlTest1(string input, bool expected)
             => Assert.AreEqual(expected, input.IsDataUrl());
 
-        
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void IsDataUrlTest2()
+        {
+            string? input = null;
+            _ = input!.IsDataUrl();
+        }
     }
 }

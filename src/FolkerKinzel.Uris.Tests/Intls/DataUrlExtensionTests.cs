@@ -1,64 +1,64 @@
-﻿namespace FolkerKinzel.Uris.Intls.Tests
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+namespace FolkerKinzel.Uris.Intls.Tests;
+
+[TestClass]
+public class DataUrlExtensionTests
 {
-    [TestClass]
-    public class DataUrlExtensionTests
+    //private const string DATA_URL_PROTOCOL = "data:";
+    //private const string BASE64 = ";base64,";
+
+    
+
+    //[TestMethod]
+    //public void AppendDataUrlProtocolTest()
+    //{
+    //    var sb = new StringBuilder();
+    //    Assert.AreEqual(sb, sb.Append(DATA_URL_PROTOCOL));
+    //    Assert.AreEqual(DATA_URL_PROTOCOL, sb.ToString());
+    //}
+
+    //[TestMethod]
+    //public void AppendBase64Test()
+    //{
+    //    var sb = new StringBuilder();
+    //    Assert.AreEqual(sb, sb.Append(BASE64));
+    //    Assert.AreEqual(BASE64, sb.ToString());
+    //}
+
+    [TestMethod]
+    public void AppendMediaTypeTest1()
     {
-        //private const string DATA_URL_PROTOCOL = "data:";
-        //private const string BASE64 = ";base64,";
+        Assert.IsTrue(MimeType.TryParse("text/plain", out MimeType? media));
 
-        
+        var sb = new StringBuilder();
 
-        //[TestMethod]
-        //public void AppendDataUrlProtocolTest()
-        //{
-        //    var sb = new StringBuilder();
-        //    Assert.AreEqual(sb, sb.Append(DATA_URL_PROTOCOL));
-        //    Assert.AreEqual(DATA_URL_PROTOCOL, sb.ToString());
-        //}
+        Assert.AreEqual(sb, sb.AppendMediaType(media));
 
-        //[TestMethod]
-        //public void AppendBase64Test()
-        //{
-        //    var sb = new StringBuilder();
-        //    Assert.AreEqual(sb, sb.Append(BASE64));
-        //    Assert.AreEqual(BASE64, sb.ToString());
-        //}
+        Assert.AreEqual("", sb.ToString());
+    }
 
-        [TestMethod]
-        public void AppendMediaTypeTest1()
-        {
-            Assert.IsTrue(MimeType.TryParse("text/plain", out MimeType? media));
+    [TestMethod]
+    public void AppendMediaTypeTest2()
+    {
+        Assert.IsTrue(MimeType.TryParse("text/plain;charset=iso-8859-1", out MimeType? media));
 
-            var sb = new StringBuilder();
+        var sb = new StringBuilder();
 
-            Assert.AreEqual(sb, sb.AppendMediaType(media));
+        Assert.AreEqual(sb, sb.AppendMediaType(media));
 
-            Assert.AreEqual("", sb.ToString());
-        }
+        Assert.AreEqual(";charset=iso-8859-1", sb.ToString());
+    }
 
-        [TestMethod]
-        public void AppendMediaTypeTest2()
-        {
-            Assert.IsTrue(MimeType.TryParse("text/plain;charset=iso-8859-1", out MimeType? media));
+    [TestMethod]
+    public void AppendMediaTypeTest3()
+    {
+        string input = "text/html;charset=iso-8859-1";
+        Assert.IsTrue(MimeType.TryParse(input, out MimeType? media));
 
-            var sb = new StringBuilder();
+        var sb = new StringBuilder();
 
-            Assert.AreEqual(sb, sb.AppendMediaType(media));
+        Assert.AreEqual(sb, sb.AppendMediaType(media));
 
-            Assert.AreEqual(";charset=iso-8859-1", sb.ToString());
-        }
-
-        [TestMethod]
-        public void AppendMediaTypeTest3()
-        {
-            string input = "text/html;charset=iso-8859-1";
-            Assert.IsTrue(MimeType.TryParse(input, out MimeType? media));
-
-            var sb = new StringBuilder();
-
-            Assert.AreEqual(sb, sb.AppendMediaType(media));
-
-            Assert.AreEqual(input, sb.ToString());
-        }
+        Assert.AreEqual(input, sb.ToString());
     }
 }

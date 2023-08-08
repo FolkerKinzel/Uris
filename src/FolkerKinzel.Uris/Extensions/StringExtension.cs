@@ -10,7 +10,7 @@ public static class StringExtension
     /// </summary>
     /// <param name="urlString">The <see cref="string"/> to examine.</param>
     /// <returns><c>true</c> if <paramref name="urlString"/> is a "data" URL. If <paramref name="urlString"/> is 
-    /// <c>null</c>, or empty, or consists only of white space characters <c>false</c> is returned.</returns>
+    /// empty or consists only of white space characters <c>false</c> is returned.</returns>
     /// <remarks>Leading white space is skipped.</remarks>
     /// 
     /// <exception cref="ArgumentNullException"><paramref name="urlString"/> is <c>null</c>.</exception>
