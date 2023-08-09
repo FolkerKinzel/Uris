@@ -483,4 +483,8 @@ public class DataUrlTests
         Assert.AreNotEqual(0, sb.Length);
     }
 
+
+    [TestMethod]
+    public void TryGetEmbeddedDataTest1() => Assert.IsFalse(DataUrl.TryGetEmbeddedData((string?)null, out _, out _));
+   
 }
