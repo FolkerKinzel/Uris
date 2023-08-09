@@ -66,6 +66,7 @@ public readonly partial struct DataUrlInfo
     /// parsed as binary data, otherwise <c>false</c>.</returns>
     /// <remarks>It depends of the <see cref="MimeType"/> whether the embedded <see cref="Data"/> 
     /// in the "data" URL is treated as binary data.</remarks>
+    /// 
     /// <example>
     /// <note type="note">
     /// For the sake of better readability, exception handling is ommitted in the example.

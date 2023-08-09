@@ -26,8 +26,17 @@ public readonly partial struct DataUrlInfo
                                                     + COMMA_LENGTH;
 
     /// <summary>
-    /// Information about the Internet Media Type of the embedded data.
+    /// Internet Media Type of the embedded <see cref="Data"/>.
     /// </summary>
+    /// <example>
+    /// <note type="note">
+    /// For the sake of better readability, exception handling is ommitted in the example.
+    /// </note>
+    /// <para>
+    /// Creating and parsing a "data" URL:
+    /// </para>
+    /// <code language="c#" source="./../Examples/DataUrlExample.cs"/>
+    /// </example>
     public ReadOnlyMemory<char> MimeType => 
         MimeTypeLength == 0 ? DataUrl.DefaultMediaType.AsMemory()
                             : IncompleteMimeType 
@@ -35,8 +44,17 @@ public readonly partial struct DataUrlInfo
                                     :_embeddedData.Slice(0, MimeTypeLength);
 
     /// <summary>
-    /// The encoding of the data in <see cref="Data"/>.
+    /// The encoding of <see cref="Data"/>.
     /// </summary>
+    /// <example>
+    /// <note type="note">
+    /// For the sake of better readability, exception handling is ommitted in the example.
+    /// </note>
+    /// <para>
+    /// Creating and parsing a "data" URL:
+    /// </para>
+    /// <code language="c#" source="./../Examples/DataUrlExample.cs"/>
+    /// </example>
     public DataEncoding DataEncoding => (DataEncoding)(_idx & DATA_ENCODING_MAX_VALUE);
 
     /// <summary>
@@ -50,15 +68,24 @@ public readonly partial struct DataUrlInfo
     public ReadOnlySpan<char> Data => _embeddedData.Span.Slice(EmbeddedDataStartIndex);
 
     /// <summary>
-    /// Indicates whether <see cref="Data"/> contains text.
+    /// Indicates whether <see cref="Data"/> represents text.
     /// </summary>
     /// <value>
     /// <c>true</c> if <see cref="Data"/> contains text, otherwise <c>false</c>.
     /// </value>
+    /// <example>
+    /// <note type="note">
+    /// For the sake of better readability, exception handling is ommitted in the example.
+    /// </note>
+    /// <para>
+    /// Creating and parsing a "data" URL:
+    /// </para>
+    /// <code language="c#" source="./../Examples/DataUrlExample.cs"/>
+    /// </example>
     public bool ContainsEmbeddedText => MimeTypeLength == 0 || IncompleteMimeType || _embeddedData.Span.StartsWith("text/".AsSpan(), StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
-    /// Indicates whether <see cref="Data"/> contains binary data.
+    /// Indicates whether <see cref="Data"/> represents binary data.
     /// </summary>
     /// <value>
     /// <c>true</c> if <see cref="Data"/> contains binary data, otherwise <c>false</c>.
@@ -67,6 +94,15 @@ public readonly partial struct DataUrlInfo
     /// This property has not an either/or relation to <see cref="ContainsEmbeddedText"/>: <see cref="Data"/>
     /// could represent binary encoded text.
     /// </remarks>
+    /// <example>
+    /// <note type="note">
+    /// For the sake of better readability, exception handling is ommitted in the example.
+    /// </note>
+    /// <para>
+    /// Creating and parsing a "data" URL:
+    /// </para>
+    /// <code language="c#" source="./../Examples/DataUrlExample.cs"/>
+    /// </example>
     public bool ContainsEmbeddedBytes => DataEncoding == DataEncoding.Base64 || !ContainsEmbeddedText;
 
     /// <summary>
@@ -78,7 +114,7 @@ public readonly partial struct DataUrlInfo
     public bool IsEmpty => _embeddedData.IsEmpty;
 
     /// <summary>
-    /// Returns a <see cref="DataUrlInfo"/> instance, which is <see cref="Empty"/>.
+    /// Returns an empty <see cref="DataUrlInfo"/> instance.
     /// </summary>
     public static DataUrlInfo Empty => default;
 
