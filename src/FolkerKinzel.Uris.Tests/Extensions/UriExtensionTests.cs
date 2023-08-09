@@ -8,7 +8,7 @@ public class UriExtensionTests
     [DataRow("DATA:,bla", true)]
     [DataRow("dotu:,bla", false)]
     [DataRow("http://www.contoso.com/", false)]
-    public void IsDataUrlTest2(string? input, bool expected)
+    public void IsDataUrlTest2(string input, bool expected)
     {
         Uri? uri = new Uri(input);
         Assert.AreEqual(expected, uri.IsDataUrl());

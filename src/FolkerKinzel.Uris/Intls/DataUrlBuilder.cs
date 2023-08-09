@@ -54,11 +54,17 @@ internal static class DataUrlBuilder
             {
                 value = Encoding.UTF8.GetBytes(text);
 
-                Debug.Assert(mimeType.Parameters.Any(IsCharSetParameter));
+                AssertMimeTypeHasCharSetParameter(mimeType);
                 mimeType.AppendParameter(CHARSET, UTF_8);
             }
 
             return value;
+
+            ///////////////////////////////////////////////////////////
+
+            [ExcludeFromCodeCoverage]
+            [Conditional("DEBUG")]
+            static void AssertMimeTypeHasCharSetParameter(MimeType mimeType) => Debug.Assert(mimeType.Parameters.Any(IsCharSetParameter));
         }
 
         static string InitCharSet(string text, MimeType mimeType)
@@ -66,7 +72,7 @@ internal static class DataUrlBuilder
             MimeTypeParameter? charSetParameter = mimeType.Parameters.FirstOrDefault(IsCharSetParameter);
 
             string charSet;
-            if (charSetParameter is null)
+            if (charSetParameter?.Value is null)
             {
                 charSet = UTF_8;
                 if (mimeType.IsTextPlain && !text.IsAscii())
@@ -76,7 +82,7 @@ internal static class DataUrlBuilder
             }
             else
             {
-                charSet = charSetParameter.Value ?? UTF_8;
+                charSet = charSetParameter.Value;
             }
 
             return charSet;
@@ -104,13 +110,14 @@ internal static class DataUrlBuilder
         Debug.Assert(builder != null);
         Debug.Assert(mimeType != null);
 
-        string data = bytes is null ? string.Empty
-                                    : UrlEncoding.EncodeBytes(bytes);
+        string data = bytes is null ? string.Empty : UrlEncoding.EncodeBytes(bytes);
+
         _ = builder.EnsureCapacity(builder.Length
                                    + DataUrl.Scheme.Length
                                    + ESTIMATED_MIME_TYPE_LENGTH
                                    + COMMA_LENGTH
                                    + data.Length);
+
         return builder.Append(DataUrl.Scheme).AppendMediaType(mimeType).Append(',').Append(data).Replace("+", "%20", builder.Length - data.Length, data.Length);
 
         // $"data:{mediaTypeString},{UrlEncoding.EncodeBytes(bytes)}"

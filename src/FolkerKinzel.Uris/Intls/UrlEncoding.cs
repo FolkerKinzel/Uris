@@ -5,7 +5,7 @@ namespace FolkerKinzel.Uris.Intls;
 
 internal static class UrlEncoding
 {
-    internal static bool TryDecode(string value, string charSet, [NotNullWhen(true)] out string? decoded)
+    internal static bool TryDecodeString(string value, string charSet, [NotNullWhen(true)] out string? decoded)
     {
         try
         {
@@ -30,12 +30,13 @@ internal static class UrlEncoding
     }
 
 
-    internal static bool TryDecodeBytes(ReadOnlySpan<char> value, [NotNullWhen(true)] out byte[]? decoded)
+    internal static bool TryDecodeBytes(string value, [NotNullWhen(true)] out byte[]? decoded)
     {
         try
         {
             Encoding ascii = TextEncoding.InitThrowingEncoding(20127);
-            byte[] bytes = ascii.GetBytes(value.ToString());
+            byte[] bytes = ascii.GetBytes(value);
+
             decoded = WebUtility.UrlDecodeToBytes(bytes, 0, bytes.Length);
             return true;
         }

@@ -31,7 +31,8 @@ public readonly partial struct DataUrlInfo : IEquatable<DataUrlInfo>
     public bool Equals(in DataUrlInfo other)
         => this.IsEmpty || other.IsEmpty
             ? this.IsEmpty && other.IsEmpty
-            : EqualsData(in other) && StringComparer.Ordinal.Equals(GetFileTypeExtension(), other.GetFileTypeExtension());
+            : EqualsData(in other) && 
+              StringComparer.Ordinal.Equals(GetFileTypeExtension(), other.GetFileTypeExtension());
 
     #region private
 
