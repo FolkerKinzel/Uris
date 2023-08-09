@@ -460,7 +460,7 @@ public class DataUrlTests
     {
         const string TEXT = "In Märchenbüchern herumstöbern.";
 
-        var mime = MimeType.Create("text", "plain").AppendParameter("charset", "iso-8859-1");
+        MimeType mime = MimeType.Create("text", "plain").AppendParameter("charset", "iso-8859-1");
 
         string dataUrl1 = DataUrl.FromText(TEXT, mime);
 
