@@ -231,6 +231,38 @@ public class DataUrlTests
         Assert.AreNotEqual(0, url.Length);
     }
 
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentNullException))]
+    public void FromBytesTest5() => _ = DataUrl.FromBytes(Array.Empty<byte>(), (MimeType?)null!);
+
+
+    [TestMethod]
+    public void FromBytesTest6()
+    {
+        string url = DataUrl.FromBytes(null, "nixmime/äöü");
+        Assert.AreNotEqual(0, url.Length);
+        Assert.IsTrue(DataUrl.TryParse(url, out DataUrlInfo info));
+        Assert.AreEqual("application/octet-stream", info.MimeType.ToString());
+    }
+
+    [TestMethod]
+    public void FromBytesTest7()
+    {
+        string url = DataUrl.FromBytes(null, "image/png");
+        Assert.AreNotEqual(0, url.Length);
+        Assert.IsTrue(DataUrl.TryParse(url, out DataUrlInfo info));
+        Assert.AreEqual("image/png", info.MimeType.ToString());
+    }
+
+    [TestMethod]
+    public void FromBytesTest8()
+    {
+        string url = DataUrl.FromBytes(null, "");
+        Assert.AreNotEqual(0, url.Length);
+        Assert.IsTrue(DataUrl.TryParse(url, out DataUrlInfo info));
+        Assert.AreEqual("application/octet-stream", info.MimeType.ToString());
+    }
+
 
     [TestMethod]
     public void FromFileTest1()
@@ -320,6 +352,29 @@ public class DataUrlTests
     }
 
     [TestMethod]
+    [ExpectedException(typeof(ArgumentNullException))]
+    public void FromFileTest9() => _ = DataUrl.FromFile("test.jpg", (MimeType?)null!);
+
+    [TestMethod]
+    public void FromFileTest10()
+    {
+        string url = DataUrl.FromFile(TestFiles.FolkerPng, "nixmime/äöü");
+        Assert.AreNotEqual(0, url.Length);
+        Assert.IsTrue(DataUrl.TryParse(url, out DataUrlInfo info));
+        Assert.AreEqual("image/png", info.MimeType.ToString());
+    }
+
+    [TestMethod]
+    public void FromFileTest11()
+    {
+        string url = DataUrl.FromFile(TestFiles.FolkerPng, "image/jpeg");
+        Assert.AreNotEqual(0, url.Length);
+        Assert.IsTrue(DataUrl.TryParse(url, out DataUrlInfo info));
+        Assert.AreEqual("image/jpeg", info.MimeType.ToString());
+    }
+
+
+    [TestMethod]
     public void FromTextOnNull()
     {
         string urlString = DataUrl.FromText(null);
@@ -400,8 +455,46 @@ public class DataUrlTests
         StringAssert.Contains(url, ";charset=utf-8");
     }
 
+    [TestMethod()]
+    public void FromTextTest6()
+    {
+        const string TEXT = "In Märchenbüchern herumstöbern.";
 
+        var mime = MimeType.Create("text", "plain").AppendParameter("charset", "iso-8859-1");
 
+        string dataUrl1 = DataUrl.FromText(TEXT, mime);
+
+        Assert.IsTrue(DataUrl.TryParse(dataUrl1, out DataUrlInfo info));
+
+        Assert.AreEqual(info.MimeType.ToString(), "text/plain;charset=iso-8859-1");
+
+        Assert.AreEqual(1, MimeTypeInfo.Parse(info.MimeType).Parameters().Count());
+
+        Assert.IsTrue(info.TryGetEmbeddedText(out string? outText));
+        Assert.AreEqual(TEXT, outText);
+    }
+
+    [TestMethod()]
+    [ExpectedException(typeof(ArgumentNullException))]
+    public void FromTextTest7() => _ = DataUrl.FromText("text", (MimeType?)null!);
+
+    [TestMethod]
+    public void FromTextTest8()
+    {
+        string url = DataUrl.FromText(null, "nixmime/äöü");
+        Assert.AreNotEqual(0, url.Length);
+        Assert.IsTrue(DataUrl.TryParse(url, out DataUrlInfo info));
+        Assert.AreEqual("text/plain", info.MimeType.ToString());
+    }
+
+    [TestMethod]
+    public void FromTextTest9()
+    {
+        string url = DataUrl.FromText(null, "text/html");
+        Assert.AreNotEqual(0, url.Length);
+        Assert.IsTrue(DataUrl.TryParse(url, out DataUrlInfo info));
+        Assert.AreEqual("text/html", info.MimeType.ToString());
+    }
 
 
     [TestMethod]
@@ -485,6 +578,35 @@ public class DataUrlTests
 
 
     [TestMethod]
+    [ExpectedException(typeof(ArgumentNullException))]
+    public void AppendEmbeddedBytesToTest3() => _ = DataUrl.AppendEmbeddedBytesTo(null!, Array.Empty<byte>());
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentNullException))]
+    public void AppendEmbeddedFileToTest1() => _ = DataUrl.AppendEmbeddedFileTo(null!, "path");
+
+
+    [TestMethod]
     public void TryGetEmbeddedDataTest1() => Assert.IsFalse(DataUrl.TryGetEmbeddedData((string?)null, out _, out _));
-   
+
+    [TestMethod]
+    public void TryGetEmbeddedDataTest2()
+    {
+        Assert.IsTrue(DataUrl.TryGetEmbeddedData("data:image/jpeg,ABC", out object? data, out string? ext));
+        Assert.IsInstanceOfType(data, typeof(byte[]));
+        Assert.AreEqual(".jpg", ext);
+    }
+
+    [TestMethod]
+    public void TryGetEmbeddedDataTest3() => Assert.IsFalse(DataUrl.TryGetEmbeddedData("data:image/jpeg;base64,ÄÖÜ", out _, out _));
+
+    [TestMethod]
+    public void TryGetEmbeddedDataTest4()
+    {
+        Assert.IsTrue(DataUrl.TryGetEmbeddedData($"data:text/äöü,{Uri.EscapeDataString("ÄÖÜ")}", out object? data, out string? ext));
+        Assert.IsInstanceOfType(data, typeof(string));
+        Assert.AreEqual("ÄÖÜ", data.ToString());
+        Assert.AreEqual(".bin", ext);
+    }
+
 }

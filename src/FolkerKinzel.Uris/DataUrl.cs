@@ -116,7 +116,7 @@ public static class DataUrl
     public static string FromFile(string filePath,
                                   string? mimeTypeString = null,
                                   DataEncoding dataEncoding = DataEncoding.Base64) =>
-        AppendFileContentTo(new StringBuilder(), filePath, mimeTypeString, dataEncoding).ToString();
+        AppendEmbeddedFileTo(new StringBuilder(), filePath, mimeTypeString, dataEncoding).ToString();
 
 
     /// <summary>
@@ -144,7 +144,7 @@ public static class DataUrl
     public static string FromFile(string filePath,
                                   MimeType mimeType,
                                   DataEncoding dataEncoding = DataEncoding.Base64) => 
-        AppendFileContentTo(new StringBuilder(), filePath, mimeType, dataEncoding).ToString();
+        AppendEmbeddedFileTo(new StringBuilder(), filePath, mimeType, dataEncoding).ToString();
 
 
     /// <summary>
@@ -256,15 +256,15 @@ public static class DataUrl
     /// <exception cref="ArgumentNullException"><paramref name="builder"/> or <paramref name="filePath"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException"><paramref name="filePath"/> is not a valid file path.</exception>
     /// <exception cref="IOException">I/O error.</exception>
-    public static StringBuilder AppendFileContentTo(this StringBuilder builder,
+    public static StringBuilder AppendEmbeddedFileTo(this StringBuilder builder,
                                                     string filePath,
                                                     string? mimeTypeString = null,
                                                     DataEncoding dataEncoding = DataEncoding.Base64) =>
         string.IsNullOrWhiteSpace(mimeTypeString)
-              ? AppendFileContentTo(builder, filePath, MimeType.FromFileName(filePath), dataEncoding)
+              ? AppendEmbeddedFileTo(builder, filePath, MimeType.FromFileName(filePath), dataEncoding)
               : MimeType.TryParse(mimeTypeString, out MimeType? mimeType)
-                  ? AppendFileContentTo(builder, filePath, mimeType, dataEncoding)
-                  : AppendFileContentTo(builder, filePath, (string?)null, dataEncoding);
+                  ? AppendEmbeddedFileTo(builder, filePath, mimeType, dataEncoding)
+                  : AppendEmbeddedFileTo(builder, filePath, (string?)null, dataEncoding);
 
 
 
@@ -282,7 +282,7 @@ public static class DataUrl
     /// or <paramref name="mimeType"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException"><paramref name="filePath"/> is not a valid file path.</exception>
     /// <exception cref="IOException">I/O error.</exception>
-    public static StringBuilder AppendFileContentTo(this StringBuilder builder,
+    public static StringBuilder AppendEmbeddedFileTo(this StringBuilder builder,
                                                       string filePath,
                                                       MimeType mimeType,
                                                       DataEncoding dataEncoding = DataEncoding.Base64) => 
