@@ -1,5 +1,6 @@
 ﻿using FolkerKinzel.Uris.Intls;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OneOf;
 using System.Web;
 
 namespace FolkerKinzel.Uris.Tests;
@@ -592,20 +593,22 @@ public class DataUrlTests
     [TestMethod]
     public void TryGetEmbeddedDataTest2()
     {
-        Assert.IsTrue(DataUrl.TryGetEmbeddedData("data:image/jpeg,ABC", out object? data, out string? ext));
-        Assert.IsInstanceOfType(data, typeof(byte[]));
+        Assert.IsTrue(DataUrl.TryGetEmbeddedData("data:image/jpeg,ABC", out OneOf<string, byte[]> data, out string? ext));
+        Assert.IsInstanceOfType(data.Value, typeof(byte[]));
         Assert.AreEqual(".jpg", ext);
     }
+
 
     [TestMethod]
     public void TryGetEmbeddedDataTest3() => Assert.IsFalse(DataUrl.TryGetEmbeddedData("data:image/jpeg;base64,ÄÖÜ", out _, out _));
 
+
     [TestMethod]
     public void TryGetEmbeddedDataTest4()
     {
-        Assert.IsTrue(DataUrl.TryGetEmbeddedData($"data:text/äöü,{Uri.EscapeDataString("ÄÖÜ")}", out object? data, out string? ext));
-        Assert.IsInstanceOfType(data, typeof(string));
-        Assert.AreEqual("ÄÖÜ", data.ToString());
+        Assert.IsTrue(DataUrl.TryGetEmbeddedData($"data:text/äöü,{Uri.EscapeDataString("ÄÖÜ")}", out OneOf<string, byte[]> data, out string? ext));
+        Assert.IsInstanceOfType(data.Value, typeof(string));
+        Assert.AreEqual("ÄÖÜ", data.Value.ToString());
         Assert.AreEqual(".bin", ext);
     }
 

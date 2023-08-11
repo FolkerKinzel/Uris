@@ -50,7 +50,7 @@ public readonly partial struct DataUrlInfo
         else
         {
             // URL encoded String:
-            string? encodingName = TryGetEncodingFromMimeType(out encodingName) ? encodingName 
+            string? encodingName = TryGetEncodingFromMimeType(out encodingName) ? encodingName
                                                                                 : DataUrlBuilder.UTF_8;
             return UrlEncoding.TryDecodeString(Data.ToString(), encodingName, out embeddedText);
         }
@@ -95,7 +95,7 @@ public readonly partial struct DataUrlInfo
     /// or a byte array. The parameter is passed uninitialized.</param>
     /// <returns><c>true</c> if <see cref="Data"/> could be converted either into a <see cref="string"/>
     /// or a byte array.</returns>
-    public bool TryGetEmbeddedData([NotNullWhen(true)] out object? data)
+    public bool TryGetEmbeddedData(out OneOf<string, byte[]> data)
     {
         if (TryGetEmbeddedText(out string? embeddedText))
         {
@@ -109,7 +109,7 @@ public readonly partial struct DataUrlInfo
             return true;
         }
 
-        data = null;
+        data = default;
         return false;
     }
 

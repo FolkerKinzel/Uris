@@ -312,7 +312,7 @@ public static class DataUrl
     /// </example>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool TryGetEmbeddedData(string? dataUrl,
-                                  [NotNullWhen(true)] out object? data,
+                                  out OneOf<string, byte[]> data,
                                   [NotNullWhen(true)] out string? fileTypeExtension) =>
         TryGetEmbeddedData(dataUrl.AsMemory(), out data, out fileTypeExtension);
 
@@ -327,12 +327,13 @@ public static class DataUrl
     /// is passed uninitialized.</param>
     /// <returns><c>true</c> if <paramref name="dataUrl"/> is a valid "data" URL, otherwise <c>false</c>.</returns>
     public static bool TryGetEmbeddedData(ReadOnlyMemory<char> dataUrl,
-                                  [NotNullWhen(true)] out object? data,
+                                  out OneOf<string, byte[]> data,
                                   [NotNullWhen(true)] out string? fileTypeExtension)
     {
         if(!DataUrlInfo.TryParseInternal(ref dataUrl, out DataUrlInfo info))
         {
-            data = fileTypeExtension = null;
+            data = default;
+            fileTypeExtension = null;
             return false;
         }
 
@@ -342,7 +343,8 @@ public static class DataUrl
             return true;
         }
 
-        data = fileTypeExtension = null;
+        data = default;
+        fileTypeExtension = null;
         return false;
     }
 
@@ -362,7 +364,7 @@ public static class DataUrl
     /// </para>
     /// <code language="c#" source="./../Examples/DataUrlExample.cs"/>
     /// </example>
-    public static bool TryParse(string? value, [NotNull] out DataUrlInfo info)
+    public static bool TryParse(string? value, out DataUrlInfo info)
     {
         ReadOnlyMemory<char> mem = value.AsMemory();
         return DataUrlInfo.TryParseInternal(ref mem, out info);
@@ -378,5 +380,5 @@ public static class DataUrl
     /// structure that provides the contents
     /// of the "data" URL. The parameter is passed uninitialized.</param>
     /// <returns><c>true</c> if <paramref name="value"/> could be parsed as <see cref="DataUrlInfo"/>, <c>false</c> otherwise.</returns>
-    public static bool TryParse(ReadOnlyMemory<char> value, [NotNull] out DataUrlInfo info) => DataUrlInfo.TryParseInternal(ref value, out info);
+    public static bool TryParse(ReadOnlyMemory<char> value, out DataUrlInfo info) => DataUrlInfo.TryParseInternal(ref value, out info);
 }

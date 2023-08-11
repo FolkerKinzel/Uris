@@ -11,12 +11,12 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageIcon>Logo.png</PackageIcon>
     <PackageReadmeFile>NugetReadme.md</PackageReadmeFile>
-    <PackageVersion>3.0.0-beta.2</PackageVersion>
-    <FileVersion>3.0.0.11</FileVersion>
-    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <PackageVersion>4.0.0-beta.1</PackageVersion>
+    <FileVersion>4.0.0.0</FileVersion>
+    <AssemblyVersion>4.0.0.0</AssemblyVersion>
     <Description>.NET library that supports working with URIs</Description>
     <PackageTags>URI URL C# .NET</PackageTags>
-    <PackageReleaseNotes>https://github.com/FolkerKinzel/Uris/releases/tag/v3.0.0-beta.2</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/FolkerKinzel/Uris/releases/tag/v4.0.0-beta.1</PackageReleaseNotes>
     <PackageIconUrl />
     <PackageProjectUrl>https://github.com/FolkerKinzel/Uris</PackageProjectUrl>
     <RepositoryUrl>https://github.com/FolkerKinzel/Uris.git</RepositoryUrl>
@@ -46,6 +46,7 @@
     <Using Include="FolkerKinzel.Strings" />
     <Using Include="FolkerKinzel.Strings.Polyfills" />
     <Using Include="FolkerKinzel.MimeTypes" />
+	  <Using Include="OneOf"/>
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="alt\**" />
@@ -80,6 +81,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="OneOf" Version="3.0.255" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Res.Designer.cs">

@@ -1,9 +1,12 @@
 ﻿using System;
 
-namespace Examples
+namespace Examples;
+
+internal class Program
 {
-    internal class Program
+    private static void Main()
     {
-        private static void Main() => DataUrlExample.Example();
+        //OneOfTest.Test();
+        DataUrlExample.Example();
     }
 }
