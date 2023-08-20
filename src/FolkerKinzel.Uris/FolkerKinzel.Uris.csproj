@@ -11,12 +11,12 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageIcon>Logo.png</PackageIcon>
     <PackageReadmeFile>NugetReadme.md</PackageReadmeFile>
-    <PackageVersion>4.0.0-beta.1</PackageVersion>
-    <FileVersion>4.0.0.6</FileVersion>
+    <PackageVersion>4.0.0</PackageVersion>
+    <FileVersion>4.0.0.9</FileVersion>
     <AssemblyVersion>4.0.0.0</AssemblyVersion>
     <Description>.NET library that supports working with URIs</Description>
     <PackageTags>URI URL C# .NET</PackageTags>
-    <PackageReleaseNotes>https://github.com/FolkerKinzel/Uris/releases/tag/v4.0.0-beta.1</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/FolkerKinzel/Uris/releases/tag/v4.0.0</PackageReleaseNotes>
     <PackageIconUrl />
     <PackageProjectUrl>https://github.com/FolkerKinzel/Uris</PackageProjectUrl>
     <RepositoryUrl>https://github.com/FolkerKinzel/Uris.git</RepositoryUrl>
