@@ -1,4 +1,4 @@
-﻿- Use the nuget package OneOf for the return values of several methods.
+﻿- Release version on nuget.
 
 >**Notes to users who build .NET Core 2.x/3.0 applications based on the .NET Standard 2.0 part of the package:**  
 >You might get a compiler error. This is caused by a Microsoft dependency. You can get rid of this error, if you copy `<SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>` to a `<PropertyGroup>` of your project file (at own risk).
