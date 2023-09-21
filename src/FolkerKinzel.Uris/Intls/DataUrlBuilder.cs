@@ -105,38 +105,38 @@ internal static class DataUrlBuilder
         dataEncoding == DataEncoding.Base64 ? builder.AppendEmbeddedBytesBase64Encoded(bytes, mimeType)
                                             : builder.AppendEmbeddedBytesUrlEncoded(bytes, mimeType);
 
-    private static StringBuilder AppendEmbeddedBytesUrlEncoded(this StringBuilder builder, byte[]? bytes, MimeType mimeType)
+    private static StringBuilder AppendEmbeddedBytesUrlEncoded(this StringBuilder builder,
+                                                               ReadOnlySpan<byte> bytes,
+                                                               MimeType mimeType)
     {
         Debug.Assert(builder != null);
         Debug.Assert(mimeType != null);
-
-        string data = bytes is null ? string.Empty : UrlEncoding.EncodeBytes(bytes);
 
         _ = builder.EnsureCapacity(builder.Length
                                    + DataUrl.Scheme.Length
                                    + ESTIMATED_MIME_TYPE_LENGTH
                                    + COMMA_LENGTH
-                                   + data.Length);
+                                   + (int)(bytes.Length * 2.5));
 
-        return builder.Append(DataUrl.Scheme).AppendMediaType(mimeType).Append(',').Append(data).Replace("+", "%20", builder.Length - data.Length, data.Length);
+        return builder.Append(DataUrl.Scheme).AppendMediaType(mimeType).Append(',').AppendUrlEncoded(bytes);
 
         // $"data:{mediaTypeString},{UrlEncoding.EncodeBytes(bytes)}"
     }
 
-    private static StringBuilder AppendEmbeddedBytesBase64Encoded(this StringBuilder builder, byte[]? bytes, MimeType mimeType)
+    private static StringBuilder AppendEmbeddedBytesBase64Encoded(this StringBuilder builder,
+                                                                  ReadOnlySpan<byte> bytes,
+                                                                  MimeType mimeType)
     {
         Debug.Assert(builder != null);
         Debug.Assert(mimeType != null);
 
-        string data = bytes is null ? string.Empty
-                                    : Convert.ToBase64String(bytes, Base64FormattingOptions.None);
         _ = builder.EnsureCapacity(builder.Length
                                    + DataUrl.Scheme.Length
                                    + ESTIMATED_MIME_TYPE_LENGTH
                                    + DataUrl.Base64.Length
                                    + COMMA_LENGTH
-                                   + data.Length);
-        return builder.Append(DataUrl.Scheme).AppendMediaType(mimeType).Append(DataUrl.Base64).Append(',').Append(data);
+                                   + (int)Math.Ceiling(bytes.Length / 3.0) * 4);
+        return builder.Append(DataUrl.Scheme).AppendMediaType(mimeType).Append(DataUrl.Base64).Append(',').AppendBase64(bytes);
 
         // $"data:{mediaTypeString};base64,{Convert.ToBase64String(bytes)}"
     }

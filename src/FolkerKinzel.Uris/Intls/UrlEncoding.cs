@@ -5,19 +5,19 @@ namespace FolkerKinzel.Uris.Intls;
 
 internal static class UrlEncoding
 {
-    internal static bool TryDecodeString(string value, string charSet, [NotNullWhen(true)] out string? decoded)
-    {
-        try
-        {
-            decoded = UnescapeValueFromUrlEncoding(value, charSet);
-            return true;
-        }
-        catch
-        {
-            decoded = null;
-            return false;
-        }
-    }
+    //internal static bool TryDecodeString(string value, string charSet, [NotNullWhen(true)] out string? decoded)
+    //{
+    //    try
+    //    {
+    //        decoded = UnescapeValueFromUrlEncoding(value, charSet);
+    //        return true;
+    //    }
+    //    catch
+    //    {
+    //        decoded = null;
+    //        return false;
+    //    }
+    //}
 
 
     internal static string EncodeBytes(byte[] value)
@@ -47,25 +47,25 @@ internal static class UrlEncoding
         }
     }
 
-    /// <summary>
-    /// Removes URL encoding from <paramref name="value"/>.
-    /// </summary>
-    /// <param name="value"></param>
-    /// <param name="charSet"></param>
-    /// <returns></returns>
-    /// <exception cref="DecoderFallbackException"></exception>
-    /// <exception cref="EncoderFallbackException"></exception>
-    private static string UnescapeValueFromUrlEncoding(string value, string charSet)
-    {
-        string result;
+    ///// <summary>
+    ///// Removes URL encoding from <paramref name="value"/>.
+    ///// </summary>
+    ///// <param name="value"></param>
+    ///// <param name="charSet"></param>
+    ///// <returns></returns>
+    ///// <exception cref="DecoderFallbackException"></exception>
+    ///// <exception cref="EncoderFallbackException"></exception>
+    //private static string UnescapeValueFromUrlEncoding(string value, string charSet)
+    //{
+    //    string result;
 
-        Encoding encoding = TextEncoding.InitThrowingEncoding(charSet);
-        Encoding ascii = TextEncoding.InitThrowingEncoding(20127);
+    //    Encoding encoding = TextEncoding.InitThrowingEncoding(charSet);
+    //    Encoding ascii = TextEncoding.InitThrowingEncoding(20127);
 
-        byte[] bytes = ascii.GetBytes(value);
+    //    byte[] bytes = ascii.GetBytes(value);
 
-        result = encoding.GetString(WebUtility.UrlDecodeToBytes(bytes, 0, bytes.Length));
-        return result;
-    }
+    //    result = encoding.GetString(WebUtility.UrlDecodeToBytes(bytes, 0, bytes.Length));
+    //    return result;
+    //}
 
 }

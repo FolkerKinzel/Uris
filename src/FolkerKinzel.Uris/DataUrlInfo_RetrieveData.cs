@@ -30,7 +30,7 @@ public readonly partial struct DataUrlInfo
         // als Base64 codierter Text:
         if (DataEncoding == DataEncoding.Base64)
         {
-            if (!Base64Parser.TryDecode(Data.ToString(), out byte[]? data))
+            if(!Base64Parser.TryDecode(Data, out byte[]? data))
             {
                 return false;
             }
@@ -52,7 +52,7 @@ public readonly partial struct DataUrlInfo
             // URL encoded String:
             string? encodingName = TryGetEncodingFromMimeType(out encodingName) ? encodingName
                                                                                 : DataUrlBuilder.UTF_8;
-            return UrlEncoding.TryDecodeString(Data.ToString(), encodingName, out embeddedText);
+            return UrlEncoding.TryDecode(Data, encodingName, true, out embeddedText);
         }
     }
 
@@ -82,8 +82,8 @@ public readonly partial struct DataUrlInfo
 
         return ContainsEmbeddedBytes &&
                (this.DataEncoding == DataEncoding.Base64
-                    ? Base64Parser.TryDecode(Data.ToString(), out embeddedBytes)
-                    : UrlEncoding.TryDecodeBytes(Data.ToString(), out embeddedBytes));
+                    ? Base64Parser.TryDecode(Data, out embeddedBytes)
+                    : UrlEncoding.TryDecodeToBytes(Data, true, out embeddedBytes));
     }
 
 

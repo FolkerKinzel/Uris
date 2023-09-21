@@ -16,11 +16,11 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<Using Include="FolkerKinzel.Uris" />
-		<Using Include="FolkerKinzel.MimeTypes"/>
-		<Using Include="Microsoft.VisualStudio.TestTools.UnitTesting"/>
-		<Using Include="FolkerKinzel.Strings"/>
-		<Using Include="System.Text"/>
-		<Using Remove="System.Net.Http"/>
+		<Using Include="FolkerKinzel.MimeTypes" />
+		<Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+		<Using Include="FolkerKinzel.Strings" />
+		<Using Include="System.Text" />
+		<Using Remove="System.Net.Http" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -33,6 +33,7 @@
 		<Compile Remove="Intls\AsciiDataDecoder.cs" />
 		<Compile Remove="Intls\MimeCacheTests.cs" />
 		<Compile Remove="Intls\TextEncodingConverterTests.cs" />
+		<Compile Remove="Intls\UrlEncodingTests.cs" />
 		<Compile Remove="MimeTypeTests.cs" />
 	</ItemGroup>
 
