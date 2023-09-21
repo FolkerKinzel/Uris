@@ -12,7 +12,7 @@
     <PackageIcon>Logo.png</PackageIcon>
     <PackageReadmeFile>NugetReadme.md</PackageReadmeFile>
     <PackageVersion>4.0.0</PackageVersion>
-    <FileVersion>4.0.0.10</FileVersion>
+    <FileVersion>4.0.0.15</FileVersion>
     <AssemblyVersion>4.0.0.0</AssemblyVersion>
     <Description>.NET library that supports working with URIs</Description>
     <PackageTags>URI URL C# .NET</PackageTags>
@@ -60,6 +60,7 @@
     <Compile Remove="DataUrlInfo_Parser.cs" />
     <Compile Remove="DataUrlInfo_ToString - OBSOLETE.cs" />
     <Compile Remove="DataUrlInfo_ToString.cs" />
+    <Compile Remove="Intls\UrlEncoding.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\Nuget-Logo\Logo.png">
@@ -72,7 +73,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FolkerKinzel.MimeTypes" Version="4.0.1" />
+    <PackageReference Include="FolkerKinzel.MimeTypes" Version="4.0.3" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -81,7 +82,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="OneOf" Version="3.0.255" />
+    <PackageReference Include="OneOf" Version="3.0.263" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Res.Designer.cs">
