@@ -2,8 +2,8 @@
 [![NuGet](https://img.shields.io/nuget/v/FolkerKinzel.Uris)](https://www.nuget.org/packages/FolkerKinzel.Uris/)
 [![GitHub](https://img.shields.io/github/license/FolkerKinzel/Uris)](https://github.com/FolkerKinzel/Uris/blob/master/LICENSE)
 
-### .NET library that supports working with URIs
-[Project Reference and Release Notes](https://github.com/FolkerKinzel/Uris/releases/tag/v4.0.0)
+## .NET library that supports working with URIs
+[Project Reference and Release Notes](https://github.com/FolkerKinzel/Uris/releases/tag/v4.0.1)
 
 The library supports:
 - The "data" URL scheme ([RFC 2397](https://datatracker.ietf.org/doc/html/rfc2397)) which allows to embed data into a URI. The static `DataUrl` class allows 
