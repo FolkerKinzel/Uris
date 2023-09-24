@@ -41,7 +41,7 @@ public readonly partial struct DataUrlInfo
         MimeTypeLength == 0 ? DataUrl.DefaultMediaType.AsMemory()
                             : IncompleteMimeType 
                                     ? (DataUrl.DefaultMediaType + _embeddedData.Span.Slice(0, MimeTypeLength).ToString()).AsMemory()
-                                    :_embeddedData.Slice(0, MimeTypeLength);
+                                    : _embeddedData.Slice(0, MimeTypeLength);
 
     /// <summary>
     /// The encoding of <see cref="Data"/>.

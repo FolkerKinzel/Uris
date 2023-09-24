@@ -20,6 +20,7 @@ public readonly partial struct DataUrlInfo : IEquatable<DataUrlInfo>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(DataUrlInfo other) => Equals(in other);
 
+
     /// <summary>
     /// Determines whether the value of this instance is equal to the value of <paramref name="other"/>. 
     /// </summary>
@@ -31,10 +32,17 @@ public readonly partial struct DataUrlInfo : IEquatable<DataUrlInfo>
     public bool Equals(in DataUrlInfo other)
         => this.IsEmpty || other.IsEmpty
             ? this.IsEmpty && other.IsEmpty
-            : EqualsData(in other) && 
-              StringComparer.Ordinal.Equals(GetFileTypeExtension(), other.GetFileTypeExtension());
+            : EqualsMimeType(in other) && EqualsData(in other);
 
     #region private
+
+    private bool EqualsMimeType(in DataUrlInfo other)
+    {
+        bool thisParsed = MimeTypeInfo.TryParse(this.MimeType, out MimeTypeInfo thisMime);
+        bool otherParsed = MimeTypeInfo.TryParse(other.MimeType, out MimeTypeInfo otherMime);
+
+        return !(thisParsed || otherParsed) || thisMime.Equals(otherMime, true);
+    }
 
     private bool EqualsData(in DataUrlInfo other)
         => this.ContainsEmbeddedText

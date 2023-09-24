@@ -1,6 +1,6 @@
 ﻿namespace FolkerKinzel.Uris.Intls;
 
-internal static class Base64Parser
+internal static class Base64Helper
 {
     internal static bool TryDecode(ReadOnlySpan<char> base64, [NotNullWhen(true)] out byte[]? decoded)
     {

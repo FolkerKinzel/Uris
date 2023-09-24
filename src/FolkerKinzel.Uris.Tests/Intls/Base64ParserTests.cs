@@ -9,5 +9,5 @@ public class Base64ParserTests
     [DataRow("AB")]
     //[DataRow("A")]
     [DataRow("")]
-    public void ParseTest2(string input) => Assert.IsTrue(Base64Parser.TryDecode(input.AsSpan(), out _));
+    public void ParseTest2(string input) => Assert.IsTrue(Base64Helper.TryDecode(input.AsSpan(), out _));
 }

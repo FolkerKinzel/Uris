@@ -95,7 +95,6 @@ public class DataUrlInfoTests
         //Assert.IsTrue(dataUrl1 == o2);
         //Assert.IsFalse(o1 != o2);
         Assert.AreEqual(o1.GetHashCode(), o2.GetHashCode());
-
     }
 
 
@@ -159,6 +158,71 @@ public class DataUrlInfoTests
     {
         Assert.IsTrue(DataUrl.TryParse("data:,A", out DataUrlInfo info));
         Assert.AreNotEqual(DataUrlInfo.Empty, (object)info);
+    }
+
+    [TestMethod]
+    public void EqualsTest9b()
+    {
+        Assert.IsTrue(DataUrl.TryParse("data:,A", out DataUrlInfo info));
+        Assert.AreNotEqual((object)info, DataUrlInfo.Empty);
+    }
+
+    [TestMethod]
+    public void EqualsTest10()
+    {
+        Assert.IsTrue(DataUrl.TryParse("data:,A", out DataUrlInfo info1));
+        Assert.IsTrue(DataUrl.TryParse("data:quark,A", out DataUrlInfo info2));
+        Assert.AreNotEqual(info1, info2);
+    }
+
+    [TestMethod]
+    public void EqualsTest10b()
+    {
+        Assert.IsTrue(DataUrl.TryParse("data:quark,A", out DataUrlInfo info1));
+        Assert.IsTrue(DataUrl.TryParse("data:,A", out DataUrlInfo info2));
+        Assert.AreNotEqual(info1, info2);
+    }
+
+    [TestMethod]
+    public void EqualsTest11()
+    {
+        Assert.IsTrue(DataUrl.TryParse("data:,A", out DataUrlInfo info1));
+        Assert.IsTrue(DataUrl.TryParse("data:text/plain;charset=utf-8,A", out DataUrlInfo info2));
+        Assert.AreEqual(info1, info2);
+    }
+
+    
+
+    [TestMethod]
+    public void EqualsTest12()
+    {
+        Assert.IsTrue(DataUrl.TryParse("data:text/html,A", out DataUrlInfo info1));
+        Assert.IsTrue(DataUrl.TryParse("data:text/plain;charset=utf-8,A", out DataUrlInfo info2));
+        Assert.AreNotEqual(info1, info2);
+    }
+
+    [TestMethod]
+    public void EqualsTest13()
+    {
+        Assert.IsTrue(DataUrl.TryParse("data:quark,A", out DataUrlInfo info1));
+        Assert.IsTrue(DataUrl.TryParse("data:blödelblubb,A", out DataUrlInfo info2));
+        Assert.AreEqual(info1, info2);
+    }
+
+    [TestMethod]
+    public void EqualsTest14()
+    {
+        Assert.IsTrue(DataUrl.TryParse("data:,A", out DataUrlInfo info1));
+        Assert.IsTrue(DataUrl.TryParse("data:,B", out DataUrlInfo info2));
+        Assert.AreNotEqual(info1, info2);
+    }
+
+    [TestMethod]
+    public void EqualsTest15()
+    {
+        Assert.IsTrue(DataUrl.TryParse("data:application/octet-stream;base64,1234", out DataUrlInfo info1));
+        Assert.IsTrue(DataUrl.TryParse("data:application/octet-stream;base64,1234", out DataUrlInfo info2));
+        Assert.AreEqual(info1, info2);
     }
 
     [TestMethod]
