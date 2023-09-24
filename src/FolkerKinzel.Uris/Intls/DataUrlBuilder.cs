@@ -116,7 +116,7 @@ internal static class DataUrlBuilder
                                    + DataUrl.Scheme.Length
                                    + ESTIMATED_MIME_TYPE_LENGTH
                                    + COMMA_LENGTH
-                                   + (int)(bytes.Length * 2.5));
+                                   + (int)(bytes.Length * UrlEncoding.EncodedLengthFactor));
 
         return builder.Append(DataUrl.Scheme).AppendMediaType(mimeType).Append(',').AppendUrlEncoded(bytes);
 
@@ -135,7 +135,8 @@ internal static class DataUrlBuilder
                                    + ESTIMATED_MIME_TYPE_LENGTH
                                    + DataUrl.Base64.Length
                                    + COMMA_LENGTH
-                                   + (int)Math.Ceiling(bytes.Length / 3.0) * 4);
+                                   + Base64.GetEncodedLength(bytes.Length));
+
         return builder.Append(DataUrl.Scheme).AppendMediaType(mimeType).Append(DataUrl.Base64).Append(',').AppendBase64(bytes);
 
         // $"data:{mediaTypeString};base64,{Convert.ToBase64String(bytes)}"
