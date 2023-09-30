@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using FolkerKinzel.MimeTypes;
 using FolkerKinzel.Uris.Intls;
+using FolkerKinzel.Uris.Properties;
 
 namespace FolkerKinzel.Uris;
 
@@ -112,7 +113,7 @@ public static class DataUrl
     /// <param name="dataEncoding">The encoding to use to embed the <paramref name="bytes"/>.</param>
     /// 
     /// <returns>A "data" URL, into which the binary data provided by the parameter <paramref name="bytes"/> is embedded.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="mimeType"/> is <c>null</c>.</exception>
+    /// <exception cref="ArgumentException"><paramref name="mimeType"/> is an empty struct.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string FromBytes(byte[]? bytes,
                                    in MimeTypeInfo mimeType,
@@ -185,7 +186,12 @@ public static class DataUrl
     /// <returns>A "data" URL into which the content of the file provided by the parameter <paramref name="filePath"/> is embedded.</returns>
     /// 
     ///<exception cref="ArgumentNullException"><paramref name="filePath"/> or <paramref name="mimeType"/> is <c>null</c>.</exception>
-    /// <exception cref="ArgumentException"><paramref name="filePath"/> is not a valid file path.</exception>
+    /// <exception cref="ArgumentException">
+    /// <para>
+    /// <paramref name="filePath"/> is not a valid file path
+    /// </para>
+    /// <para>- or -</para>
+    /// <para><paramref name="mimeType"/> is an empty struct.</para></exception>
     /// <exception cref="IOException">I/O error.</exception>
     public static string FromFile(string filePath,
                                   in MimeTypeInfo mimeType,
@@ -304,13 +310,16 @@ public static class DataUrl
     /// <returns>A reference to <paramref name="builder"/>.</returns>
     /// 
     /// <exception cref="ArgumentNullException"><paramref name="builder"/> is <c>null</c>.</exception>
+    /// <exception cref="ArgumentException"><paramref name="mimeType"/> is an empty struct.</exception>
     public static StringBuilder AppendEmbeddedBytesTo(StringBuilder builder,
                                                       byte[]? bytes,
                                                       in MimeTypeInfo mimeType,
                                                       DataEncoding dataEncoding = DataEncoding.Base64)
         => builder is null
             ? throw new ArgumentNullException(nameof(builder))
-            : builder.AppendEmbeddedBytesInternal(bytes, in mimeType, dataEncoding);
+            : mimeType.IsEmpty
+                ? throw new ArgumentException(Res.EmptyStruct, nameof(mimeType))
+                : builder.AppendEmbeddedBytesInternal(bytes, in mimeType, dataEncoding);
 
 
     /// <summary>
@@ -337,6 +346,7 @@ public static class DataUrl
               : MimeTypeInfo.TryParse(mimeType, out MimeTypeInfo mimeTypeInfo)
                   ? AppendEmbeddedFileTo(builder, filePath, in mimeTypeInfo, dataEncoding)
                   : AppendEmbeddedFileTo(builder, filePath, (string?)null, dataEncoding);
+
 
     /// <summary>
     /// Appends the content of a file as "data" URL (RFC 2397) to the end of a <see cref="StringBuilder"/>.
@@ -380,7 +390,12 @@ public static class DataUrl
     /// 
     /// <exception cref="ArgumentNullException"><paramref name="builder"/> or <paramref name="filePath"/>, 
     /// is <c>null</c>.</exception>
-    /// <exception cref="ArgumentException"><paramref name="filePath"/> is not a valid file path.</exception>
+    /// <exception cref="ArgumentException">
+    /// <para>
+    /// <paramref name="filePath"/> is not a valid file path
+    /// </para>
+    /// <para>- or -</para>
+    /// <para><paramref name="mimeType"/> is an empty struct.</para></exception>
     /// <exception cref="IOException">I/O error.</exception>
     public static StringBuilder AppendEmbeddedFileTo(StringBuilder builder,
                                                      string filePath,
@@ -390,7 +405,9 @@ public static class DataUrl
             ? throw new ArgumentNullException(nameof(builder))
             : filePath is null
                 ? throw new ArgumentNullException(nameof(filePath))
-                : builder.AppendFileContentInternal(filePath, in mimeType, dataEncoding);
+                : mimeType.IsEmpty
+                     ? throw new ArgumentException(Res.EmptyStruct, nameof(mimeType))
+                     : builder.AppendFileContentInternal(filePath, in mimeType, dataEncoding);
 
 
     /// <summary>

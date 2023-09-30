@@ -264,6 +264,10 @@ public class DataUrlTests
         Assert.AreEqual("application/octet-stream", info.MimeType.ToString());
     }
 
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void FromBytesTest9() => _ = DataUrl.FromBytes(new byte[] { 1, 2, 3 }, new MimeTypeInfo());
+
 
     [TestMethod]
     public void FromFileTest1()
@@ -373,6 +377,10 @@ public class DataUrlTests
         Assert.IsTrue(DataUrl.TryParse(url, out DataUrlInfo info));
         Assert.AreEqual("image/jpeg", info.MimeType.ToString());
     }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void FromFileTest12() => _ = DataUrl.FromFile(TestFiles.FolkerPng, new MimeTypeInfo());
 
 
     [TestMethod]
