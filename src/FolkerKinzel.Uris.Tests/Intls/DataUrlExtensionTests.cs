@@ -28,11 +28,11 @@ public class DataUrlExtensionTests
     [TestMethod]
     public void AppendMediaTypeTest1()
     {
-        Assert.IsTrue(MimeType.TryParse("text/plain", out MimeType? media));
+        Assert.IsTrue(MimeTypeInfo.TryParse("text/plain", out MimeTypeInfo media));
 
         var sb = new StringBuilder();
 
-        Assert.AreEqual(sb, sb.AppendMediaType(media));
+        Assert.AreEqual(sb, sb.AppendMediaType(in media));
 
         Assert.AreEqual("", sb.ToString());
     }
@@ -40,11 +40,11 @@ public class DataUrlExtensionTests
     [TestMethod]
     public void AppendMediaTypeTest2()
     {
-        Assert.IsTrue(MimeType.TryParse("text/plain;charset=iso-8859-1", out MimeType? media));
+        Assert.IsTrue(MimeTypeInfo.TryParse("text/plain;charset=iso-8859-1", out MimeTypeInfo media));
 
         var sb = new StringBuilder();
 
-        Assert.AreEqual(sb, sb.AppendMediaType(media));
+        Assert.AreEqual(sb, sb.AppendMediaType(in media));
 
         Assert.AreEqual(";charset=iso-8859-1", sb.ToString());
     }
@@ -53,11 +53,11 @@ public class DataUrlExtensionTests
     public void AppendMediaTypeTest3()
     {
         string input = "text/html;charset=iso-8859-1";
-        Assert.IsTrue(MimeType.TryParse(input, out MimeType? media));
+        Assert.IsTrue(MimeTypeInfo.TryParse(input, out MimeTypeInfo media));
 
         var sb = new StringBuilder();
 
-        Assert.AreEqual(sb, sb.AppendMediaType(media));
+        Assert.AreEqual(sb, sb.AppendMediaType(in media));
 
         Assert.AreEqual(input, sb.ToString());
     }

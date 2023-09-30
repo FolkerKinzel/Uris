@@ -77,8 +77,8 @@ public class DataUrlInfoTests
 
         byte[]? bytes = encoding.GetBytes(input);
 
-        var mime = MimeType.Parse($"text/plain; charset={encodingName}");
-        string urlStr2 = DataUrl.FromBytes(bytes, mime);
+        //var mime = MimeType.Parse($"text/plain; charset={encodingName}");
+        string urlStr2 = DataUrl.FromBytes(bytes, $"text/plain; charset={encodingName}");
 
         Assert.IsTrue(DataUrl.TryParse(urlStr1, out DataUrlInfo dataUrl1));
         Assert.IsTrue(DataUrl.TryParse(urlStr2, out DataUrlInfo dataUrl2));

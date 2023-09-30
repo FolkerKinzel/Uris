@@ -1,4 +1,6 @@
-﻿namespace FolkerKinzel.Uris;
+﻿using FolkerKinzel.Uris.Intls;
+
+namespace FolkerKinzel.Uris;
 
 public readonly partial struct DataUrlInfo
 {
@@ -17,10 +19,7 @@ public readonly partial struct DataUrlInfo
         }
         else if (TryGetEmbeddedBytes(out byte[]? bytes))
         {
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                hash.Add(bytes[i]);
-            }
+            hash.AddBytes(bytes);
         }
         return hash.ToHashCode();
     }

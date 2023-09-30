@@ -32,7 +32,7 @@ public class DataUrlTests
 
         Assert.IsTrue(MimeType.TryParse("application/x-octet", out MimeType? mime));
 
-        outText = DataUrl.FromBytes(new byte[] { 1, 2, 3 }, mime);
+        outText = DataUrl.FromBytes(new byte[] { 1, 2, 3 }, mime.AsInfo());
 
         Assert.IsNotNull(outText);
     }
@@ -49,7 +49,7 @@ public class DataUrlTests
 
         Assert.IsTrue(MimeType.TryParse("application/x-octet", out MimeType? mime));
 
-        outText = DataUrl.FromBytes(new byte[] { 1, 2, 3 }, mime);
+        outText = DataUrl.FromBytes(new byte[] { 1, 2, 3 }, mime.AsInfo());
 
         Assert.IsNotNull(outText);
     }
@@ -158,7 +158,7 @@ public class DataUrlTests
     public void TryParseTest12()
     {
         byte[] data = new byte[] { 1, 2, 3 };
-        string url = DataUrl.FromBytes(data, MimeType.Parse("application/x-stuff; key=\";bla,blabla\""));
+        string url = DataUrl.FromBytes(data, MimeType.Parse("application/x-stuff; key=\";bla,blabla\"").AsInfo());
         Assert.IsTrue(DataUrl.TryParse(url, out DataUrlInfo dataUrl));
         Assert.IsTrue(dataUrl.TryGetEmbeddedBytes(out byte[]? parsed));
         CollectionAssert.AreEqual(data, parsed);
@@ -200,7 +200,7 @@ public class DataUrlTests
         Assert.IsTrue(MimeType.TryParse("application/x-octet", out MimeType? mime));
 
         byte[] bytes = new byte[] { 1, 2, 3 };
-        string outText = DataUrl.FromBytes(bytes, mime);
+        string outText = DataUrl.FromBytes(bytes, mime.AsInfo());
 
         Assert.IsNotNull(outText);
 
@@ -214,7 +214,7 @@ public class DataUrlTests
     [TestMethod]
     public void FromBytesTest3()
     {
-        StringBuilder outText = DataUrl.AppendEmbeddedBytesTo(new StringBuilder(), null, MimeType.Parse("text/plain"));
+        StringBuilder outText = DataUrl.AppendEmbeddedBytesTo(new StringBuilder(), null, MimeType.Parse("text/plain").AsInfo());
 
         Assert.IsNotNull(outText);
 
@@ -232,9 +232,9 @@ public class DataUrlTests
         Assert.AreNotEqual(0, url.Length);
     }
 
-    [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
-    public void FromBytesTest5() => _ = DataUrl.FromBytes(Array.Empty<byte>(), (MimeType?)null!);
+    //[TestMethod]
+    //[ExpectedException(typeof(ArgumentNullException))]
+    //public void FromBytesTest5() => _ = DataUrl.FromBytes(Array.Empty<byte>(), (MimeType?)null!);
 
 
     [TestMethod]
@@ -346,15 +346,15 @@ public class DataUrlTests
         string path = Path.Combine(TestContext.TestRunDirectory, fileName);
         File.WriteAllBytes(path, testData);
 
-        MimeType mime = MimeType.Parse("image/png");
+        MimeTypeInfo mime = MimeTypeInfo.Parse("image/png");
 
-        string url1 = DataUrl.FromFile(path, mime);
+        string url1 = DataUrl.FromFile(path, in mime);
         StringAssert.Contains(url1, "image/png");
     }
 
-    [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
-    public void FromFileTest9() => _ = DataUrl.FromFile("test.jpg", (MimeType?)null!);
+    //[TestMethod]
+    //[ExpectedException(typeof(ArgumentNullException))]
+    //public void FromFileTest9() => _ = DataUrl.FromFile("test.jpg", (MimeType?)null!);
 
     [TestMethod]
     public void FromFileTest10()
@@ -504,7 +504,7 @@ public class DataUrlTests
         byte[] buf = new byte[1024 * 1024];
         new Random().NextBytes(buf);
 
-        string url = DataUrl.FromBytes(buf, MimeType.Parse("application/octet-stream"));
+        string url = DataUrl.FromBytes(buf, "application/octet-stream");
         Assert.IsTrue(DataUrl.TryParse(url, out DataUrlInfo info));
         Assert.IsTrue(info.TryGetEmbeddedBytes(out _));
     }
@@ -562,7 +562,7 @@ public class DataUrlTests
 
         Assert.IsTrue(DataUrl.TryParse("data:application/octet-stream,%01%02%03", out DataUrlInfo info));
         Assert.IsTrue(info.TryGetEmbeddedBytes(out byte[]? embeddedBytes));
-        DataUrl.AppendEmbeddedBytesTo(sb, embeddedBytes, MimeType.Parse(MimeString.OctetStream));
+        DataUrl.AppendEmbeddedBytesTo(sb, embeddedBytes, MimeType.Parse(MimeString.OctetStream).AsInfo());
         Assert.AreNotEqual(0, sb.Length);
     }
 
@@ -573,7 +573,7 @@ public class DataUrlTests
 
         Assert.IsTrue(DataUrl.TryParse("data:application/octet-stream;base64,ABCD", out DataUrlInfo info));
         Assert.IsTrue(info.TryGetEmbeddedBytes(out byte[]? embeddedBytes));
-        _ = DataUrl.AppendEmbeddedBytesTo(sb, embeddedBytes, MimeType.Parse(MimeString.OctetStream));
+        _ = DataUrl.AppendEmbeddedBytesTo(sb, embeddedBytes, MimeString.OctetStream);
         Assert.AreNotEqual(0, sb.Length);
     }
 

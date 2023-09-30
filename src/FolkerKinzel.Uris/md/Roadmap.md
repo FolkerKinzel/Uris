@@ -1,13 +1,13 @@
 ﻿# FolkerKinzel.Uris
 ## Roadmap
+### 5.0.1 
+- [ ] Cleanup: Remove deprecated symbols
 
-### 2.0.0-beta.2
-- [ ] Use `Convert.TryFromBase64Chars(ReadOnlySpan<char>, Span<byte>, int)`
 
 ### 2.0.0-beta.1
 - [x] Dependency update
 - [x] .NET 7 support
-- [ ] Higher code coverage 
+- [x] Higher code coverage 
 
 ### 1.0.0-beta.2
 - [x] Replace the method `DataUrlInfo.ParseBom` with `FolkerKinzel.Strings.ParseBom`
