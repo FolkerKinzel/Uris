@@ -203,32 +203,73 @@ public class DataUrlTests
         string outText = DataUrl.FromBytes(bytes, mime.AsInfo());
 
         Assert.IsNotNull(outText);
-
         Assert.IsTrue(DataUrl.TryParse(outText, out DataUrlInfo dataUrl));
-
         Assert.IsTrue(dataUrl.TryGetEmbeddedBytes(out byte[]? outBytes));
-
         CollectionAssert.AreEqual(bytes, outBytes);
     }
 
     [TestMethod]
-    public void FromBytesTest3()
+    public void FromBytesTest2b()
     {
-        StringBuilder outText = DataUrl.AppendEmbeddedBytesTo(new StringBuilder(), null, MimeType.Parse("text/plain").AsInfo());
+        Assert.IsTrue(MimeType.TryParse("application/x-octet", out MimeType? mime));
+
+        byte[] bytes = new byte[] { 1, 2, 3 };
+        string outText = DataUrl.FromBytes(bytes.AsEnumerable(), mime.AsInfo());
 
         Assert.IsNotNull(outText);
-
-        Assert.IsTrue(DataUrl.TryParse(outText.ToString(), out DataUrlInfo dataUrl));
-
+        Assert.IsTrue(DataUrl.TryParse(outText, out DataUrlInfo dataUrl));
         Assert.IsTrue(dataUrl.TryGetEmbeddedBytes(out byte[]? outBytes));
-
-        CollectionAssert.AreEqual(Array.Empty<byte>(), outBytes);
+        CollectionAssert.AreEqual(bytes, outBytes);
     }
+
+    [TestMethod]
+    public void FromBytesTest2c()
+    {
+        Assert.IsTrue(MimeType.TryParse("application/x-octet", out MimeType? mime));
+
+        byte[] bytes = new byte[] { 1, 2, 3 };
+        string outText = DataUrl.FromBytes(bytes.ToList(), mime.AsInfo());
+
+        Assert.IsNotNull(outText);
+        Assert.IsTrue(DataUrl.TryParse(outText, out DataUrlInfo dataUrl));
+        Assert.IsTrue(dataUrl.TryGetEmbeddedBytes(out byte[]? outBytes));
+        CollectionAssert.AreEqual(bytes, outBytes);
+    }
+
+    [TestMethod]
+    public void FromBytesTest2d()
+    {
+        Assert.IsTrue(MimeType.TryParse("application/x-octet", out MimeType? mime));
+
+        byte[] bytes = new byte[] { 1, 2, 3 };
+        string outText = DataUrl.FromBytes(bytes.AsSpan(), mime.AsInfo());
+
+        Assert.IsNotNull(outText);
+        Assert.IsTrue(DataUrl.TryParse(outText, out DataUrlInfo dataUrl));
+        Assert.IsTrue(dataUrl.TryGetEmbeddedBytes(out byte[]? outBytes));
+        CollectionAssert.AreEqual(bytes, outBytes);
+    }
+
+   
 
     [TestMethod]
     public void FromBytesTest4()
     {
         string url = DataUrl.FromBytes(null, dataEncoding: DataEncoding.Url);
+        Assert.AreNotEqual(0, url.Length);
+    }
+
+    [TestMethod]
+    public void FromBytesTest4b()
+    {
+        string url = DataUrl.FromBytes((IEnumerable<byte>?)null, dataEncoding: DataEncoding.Url);
+        Assert.AreNotEqual(0, url.Length);
+    }
+
+    [TestMethod]
+    public void FromBytesTest4d()
+    {
+        string url = DataUrl.FromBytes(ReadOnlySpan<byte>.Empty, dataEncoding: DataEncoding.Url);
         Assert.AreNotEqual(0, url.Length);
     }
 
@@ -589,6 +630,54 @@ public class DataUrlTests
     [TestMethod]
     [ExpectedException(typeof(ArgumentNullException))]
     public void AppendEmbeddedBytesToTest3() => _ = DataUrl.AppendEmbeddedBytesTo(null!, Array.Empty<byte>());
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentNullException))]
+    public void AppendEmbeddedBytesToTest3b() => _ = DataUrl.AppendEmbeddedBytesTo(null!, ReadOnlySpan<byte>.Empty, MimeTypeInfo.Parse("image/png"));
+
+    [TestMethod]
+    public void AppendEmbeddedBytesToTest4()
+    {
+        StringBuilder outText = DataUrl.AppendEmbeddedBytesTo(new StringBuilder(), (byte[]?)null, MimeType.Parse("text/plain").AsInfo());
+
+        Assert.IsNotNull(outText);
+        Assert.IsTrue(DataUrl.TryParse(outText.ToString(), out DataUrlInfo dataUrl));
+        Assert.IsTrue(dataUrl.TryGetEmbeddedBytes(out byte[]? outBytes));
+        CollectionAssert.AreEqual(Array.Empty<byte>(), outBytes);
+    }
+
+    [TestMethod]
+    public void AppendEmbeddedBytesToTest5()
+    {
+        StringBuilder outText = DataUrl.AppendEmbeddedBytesTo(new StringBuilder(), (IEnumerable<byte>?)null);
+
+        Assert.IsNotNull(outText);
+        Assert.IsTrue(DataUrl.TryParse(outText.ToString(), out DataUrlInfo dataUrl));
+        Assert.IsTrue(dataUrl.TryGetEmbeddedBytes(out byte[]? outBytes));
+        CollectionAssert.AreEqual(Array.Empty<byte>(), outBytes);
+    }
+
+    [TestMethod]
+    public void AppendEmbeddedBytesToTest6()
+    {
+        StringBuilder outText = DataUrl.AppendEmbeddedBytesTo(new StringBuilder(), (IEnumerable<byte>?)null, MimeType.Parse("text/plain").AsInfo());
+
+        Assert.IsNotNull(outText);
+        Assert.IsTrue(DataUrl.TryParse(outText.ToString(), out DataUrlInfo dataUrl));
+        Assert.IsTrue(dataUrl.TryGetEmbeddedBytes(out byte[]? outBytes));
+        CollectionAssert.AreEqual(Array.Empty<byte>(), outBytes);
+    }
+
+    [TestMethod]
+    public void AppendEmbeddedBytesToTest7()
+    {
+        StringBuilder outText = DataUrl.AppendEmbeddedBytesTo(new StringBuilder(), ReadOnlySpan<byte>.Empty, MimeType.Parse("text/plain").AsInfo());
+
+        Assert.IsNotNull(outText);
+        Assert.IsTrue(DataUrl.TryParse(outText.ToString(), out DataUrlInfo dataUrl));
+        Assert.IsTrue(dataUrl.TryGetEmbeddedBytes(out byte[]? outBytes));
+        CollectionAssert.AreEqual(Array.Empty<byte>(), outBytes);
+    }
 
     [TestMethod]
     [ExpectedException(typeof(ArgumentNullException))]

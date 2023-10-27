@@ -36,7 +36,7 @@ internal static class DataUrlBuilder
 
         byte[] value = SerializeText(text, mimeType, charSet);
 
-        return builder.AppendEmbeddedBytesInternal(value, mimeType.AsInfo(), dataEncoding);
+        return builder.AppendEmbeddedBytesIntl(value, mimeType.AsInfo(), dataEncoding);
 
         ////////////////////////////////////////////////////////////////////////////
 
@@ -96,7 +96,6 @@ internal static class DataUrlBuilder
         }
     }
 
-
     /// <summary>
     /// Appends binary data as "data" URL (RFC 2397) to the end of a <see cref="StringBuilder"/>.
     /// </summary>
@@ -105,12 +104,12 @@ internal static class DataUrlBuilder
     /// <param name="mimeType">The <see cref="MimeType"/> of the <paramref name="bytes"/>.</param>
     /// <param name="dataEncoding">The encoding to use to embed the <paramref name="bytes"/>.</param>
     /// <returns>A reference to <paramref name="builder"/>.</returns>
-    internal static StringBuilder AppendEmbeddedBytesInternal(this StringBuilder builder,
-                                                              byte[]? bytes,
+    internal static StringBuilder AppendEmbeddedBytesIntl(this StringBuilder builder,
+                                                              ReadOnlySpan<byte> bytes,
                                                               in MimeTypeInfo mimeType,
-                                                              DataEncoding dataEncoding) =>
-        dataEncoding == DataEncoding.Base64 ? builder.AppendEmbeddedBytesBase64Encoded(bytes, in mimeType)
-                                            : builder.AppendEmbeddedBytesUrlEncoded(bytes, in mimeType);
+                                                              DataEncoding dataEncoding) 
+        =>  dataEncoding == DataEncoding.Base64 ? builder.AppendEmbeddedBytesBase64Encoded(bytes, in mimeType)
+                                                : builder.AppendEmbeddedBytesUrlEncoded(bytes, in mimeType);
 
     private static StringBuilder AppendEmbeddedBytesUrlEncoded(this StringBuilder builder,
                                                                ReadOnlySpan<byte> bytes,
@@ -160,12 +159,15 @@ internal static class DataUrlBuilder
     /// 
     /// <exception cref="ArgumentException"><paramref name="filePath"/> is not a valid file path.</exception>
     /// <exception cref="IOException">I/O error.</exception>
-    internal static StringBuilder AppendFileContentInternal(this StringBuilder builder, string filePath, in MimeTypeInfo mimeType, DataEncoding dataEncoding)
+    internal static StringBuilder AppendFileContentInternal(this StringBuilder builder,
+                                                            string filePath,
+                                                            in MimeTypeInfo mimeType,
+                                                            DataEncoding dataEncoding)
     {
         Debug.Assert(builder != null);
         Debug.Assert(filePath != null);
 
-        return builder.AppendEmbeddedBytesInternal(LoadFile(filePath), in mimeType, dataEncoding);
+        return builder.AppendEmbeddedBytesIntl(LoadFile(filePath), in mimeType, dataEncoding);
     }
 
 

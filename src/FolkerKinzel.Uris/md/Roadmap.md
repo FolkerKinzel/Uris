@@ -1,14 +1,15 @@
 ﻿# FolkerKinzel.Uris
 ## Roadmap
 ### 5.1.0
+- [ ] Dependency update
 - [ ] Implement `string DataUrl.FromBytes(IEnumerable<byte>?, string?, DataEncoding)`
 - [ ] Implement `string DataUrl.FromBytes(ReadOnlySpan<byte>, string?, DataEncoding)`
 - [ ] Implement `string DataUrl.FromBytes(IEnumerable<byte>?, in MimeTypeInfo, DataEncoding)`
 - [ ] Implement `string DataUrl.FromBytes(ReadOnlySpan<byte>, in MimeTypeInfo, DataEncoding)`
-- [ ] Implement `StringBuilder DataUrl.AppendEmbeddedBytesTo(StringBuilder, IEnumerable<byte>?, string?, DataEncoding)`
-- [ ] Implement `StringBuilder DataUrl.AppendEmbeddedBytesTo(StringBuilder, ReadOnlySpan<byte>, string?, DataEncoding)`
-- [ ] Implement `StringBuilder DataUrl.AppendEmbeddedBytesTo(StringBuilder, IEnumerable<byte>?, in MimeTypeInfo, DataEncoding)`
-- [ ] Implement `StringBuilder DataUrl.AppendEmbeddedBytesTo(StringBuilder, ReadOnlySpan<byte>, in MimeTypeInfo, DataEncoding)`
+- [x] Implement `StringBuilder DataUrl.AppendEmbeddedBytesTo(StringBuilder, IEnumerable<byte>?, string?, DataEncoding)`
+- [x] Implement `StringBuilder DataUrl.AppendEmbeddedBytesTo(StringBuilder, ReadOnlySpan<byte>, string?, DataEncoding)`
+- [x] Implement `StringBuilder DataUrl.AppendEmbeddedBytesTo(StringBuilder, IEnumerable<byte>?, in MimeTypeInfo, DataEncoding)`
+- [x] Implement `StringBuilder DataUrl.AppendEmbeddedBytesTo(StringBuilder, ReadOnlySpan<byte>, in MimeTypeInfo, DataEncoding)`
 
 ### 5.0.1
 - [x] Dependency update
