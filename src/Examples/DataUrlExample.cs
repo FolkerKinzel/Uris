@@ -12,9 +12,9 @@ public static class DataUrlExample
         string dataUrl = DataUrl.FromFile(fotoFilePath);
         File.Delete(fotoFilePath);
 
-        // Uncomment this, to show the content of the
+        // Uncomment this to show the content of the
         // "data" URL in the Microsoft Edge browser.
-        // (Make shure to have this browser installed.):
+        // (Make shure you have this browser installed.):
         // ShowPictureInMicrosoftEdge(dataUrl);
 
         Console.WriteLine(dataUrl);
@@ -44,7 +44,6 @@ public static class DataUrlExample
             && data.Value is byte[] bytes)
         {
             path = Path.Combine(Directory.GetCurrentDirectory(), $"{Guid.NewGuid()}{fileTypeExtension}");
-
             File.WriteAllBytes(path, bytes);
         }
         
