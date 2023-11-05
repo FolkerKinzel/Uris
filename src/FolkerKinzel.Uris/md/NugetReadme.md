@@ -14,7 +14,7 @@ The library supports:
 
 The library is designed to support performance and small heap allocation.
 
-[See code examples at GitHub](https://github.com/FolkerKinzel/Uris)
+[See code examples on GitHub](https://github.com/FolkerKinzel/Uris)
 
 [Version History](https://github.com/FolkerKinzel/Uris/releases)
 
