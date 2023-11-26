@@ -147,7 +147,7 @@ public class DataUrlInfoTests
 
 
     [TestMethod]
-    public void EqualsTest7() => Assert.AreNotEqual(DataUrlInfo.Empty, 42);
+    public void EqualsTest7() => Assert.AreNotEqual<object?>(DataUrlInfo.Empty, 42);
 
     [TestMethod]
     public void EqualsTest8() => Assert.AreEqual(DataUrlInfo.Empty, (object)DataUrlInfo.Empty);

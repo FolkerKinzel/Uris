@@ -1,6 +1,7 @@
 ﻿using FolkerKinzel.Uris.Intls;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OneOf;
+using System.Diagnostics.CodeAnalysis;
 using System.Web;
 
 namespace FolkerKinzel.Uris.Tests;
@@ -8,10 +9,8 @@ namespace FolkerKinzel.Uris.Tests;
 [TestClass]
 public class DataUrlTests
 {
-
-#pragma warning disable CS8618 // Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Erwägen Sie die Deklaration als Nullable.
-    public TestContext TestContext { get; set; }
-#pragma warning restore CS8618 // Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Erwägen Sie die Deklaration als Nullable.
+    [NotNull]
+    public TestContext? TestContext { get; set; }
 
     [TestMethod]
     public void TryParseTest1()
@@ -157,7 +156,7 @@ public class DataUrlTests
     [TestMethod]
     public void TryParseTest12()
     {
-        byte[] data = new byte[] { 1, 2, 3 };
+        byte[] data = [1, 2, 3];
         string url = DataUrl.FromBytes(data, MimeType.Parse("application/x-stuff; key=\";bla,blabla\"").AsInfo());
         Assert.IsTrue(DataUrl.TryParse(url, out DataUrlInfo dataUrl));
         Assert.IsTrue(dataUrl.TryGetEmbeddedBytes(out byte[]? parsed));
@@ -199,7 +198,7 @@ public class DataUrlTests
     {
         Assert.IsTrue(MimeType.TryParse("application/x-octet", out MimeType? mime));
 
-        byte[] bytes = new byte[] { 1, 2, 3 };
+        byte[] bytes = [1, 2, 3];
         string outText = DataUrl.FromBytes(bytes, mime.AsInfo());
 
         Assert.IsNotNull(outText);
@@ -213,7 +212,7 @@ public class DataUrlTests
     {
         Assert.IsTrue(MimeType.TryParse("application/x-octet", out MimeType? mime));
 
-        byte[] bytes = new byte[] { 1, 2, 3 };
+        byte[] bytes = [1, 2, 3];
         string outText = DataUrl.FromBytes(bytes.AsEnumerable(), mime.AsInfo());
 
         Assert.IsNotNull(outText);
@@ -227,7 +226,7 @@ public class DataUrlTests
     {
         Assert.IsTrue(MimeType.TryParse("application/x-octet", out MimeType? mime));
 
-        byte[] bytes = new byte[] { 1, 2, 3 };
+        byte[] bytes = [1, 2, 3];
         string outText = DataUrl.FromBytes(bytes.ToList(), mime.AsInfo());
 
         Assert.IsNotNull(outText);
@@ -241,7 +240,7 @@ public class DataUrlTests
     {
         Assert.IsTrue(MimeType.TryParse("application/x-octet", out MimeType? mime));
 
-        byte[] bytes = new byte[] { 1, 2, 3 };
+        byte[] bytes = [1, 2, 3];
         string outText = DataUrl.FromBytes(bytes.AsSpan(), mime.AsInfo());
 
         Assert.IsNotNull(outText);
@@ -267,6 +266,7 @@ public class DataUrlTests
     }
 
     [TestMethod]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0301:Simplify collection initialization", Justification = "<Pending>")]
     public void FromBytesTest4d()
     {
         string url = DataUrl.FromBytes(ReadOnlySpan<byte>.Empty, dataEncoding: DataEncoding.Url);
@@ -375,8 +375,8 @@ public class DataUrlTests
     public void FromFileTest7()
     {
         const string fileName = "test.jpg";
-        byte[] testData = new byte[] { 1, 2, 3 };
-        string path = Path.Combine(TestContext.TestRunDirectory, fileName);
+        byte[] testData = [1, 2, 3];
+        string path = Path.Combine(TestContext.TestRunResultsDirectory!, fileName);
         File.WriteAllBytes(path, testData);
 
         string url1 = DataUrl.FromFile(path);
@@ -387,8 +387,8 @@ public class DataUrlTests
     public void FromFileTest8()
     {
         const string fileName = "test.jpg";
-        byte[] testData = new byte[] { 1, 2, 3 };
-        string path = Path.Combine(TestContext.TestRunDirectory, fileName);
+        byte[] testData = [1, 2, 3];
+        string path = Path.Combine(TestContext.TestRunResultsDirectory!, fileName);
         File.WriteAllBytes(path, testData);
 
         MimeTypeInfo mime = MimeTypeInfo.Parse("image/png");
@@ -633,6 +633,7 @@ public class DataUrlTests
 
     [TestMethod]
     [ExpectedException(typeof(ArgumentNullException))]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0301:Simplify collection initialization", Justification = "<Pending>")]
     public void AppendEmbeddedBytesToTest3b() => _ = DataUrl.AppendEmbeddedBytesTo(null!, ReadOnlySpan<byte>.Empty, MimeTypeInfo.Parse("image/png"));
 
     [TestMethod]
@@ -669,6 +670,7 @@ public class DataUrlTests
     }
 
     [TestMethod]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0301:Simplify collection initialization", Justification = "<Pending>")]
     public void AppendEmbeddedBytesToTest7()
     {
         StringBuilder outText = DataUrl.AppendEmbeddedBytesTo(new StringBuilder(), ReadOnlySpan<byte>.Empty, MimeType.Parse("text/plain").AsInfo());

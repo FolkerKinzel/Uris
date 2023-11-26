@@ -14,7 +14,7 @@ internal static class CollectionConverter
     {
         if(coll is null)
         {
-            return ReadOnlySpan<T>.Empty;
+            return [];
         }
 
         ReadOnlySpan<T> span = coll switch {
