@@ -4,7 +4,7 @@
 
 ## .NET library that supports working with URIs
 
-[Project Reference and Release Notes](https://github.com/FolkerKinzel/Uris/releases/tag/v5.2.0)
+[Project Reference and Release Notes](https://github.com/FolkerKinzel/Uris/releases/tag/v5.2.1)
 
 The library supports:
 - The "data" URL scheme ([RFC 2397](https://datatracker.ietf.org/doc/html/rfc2397)) that allows to embed data into a URI. The static `DataUrl` class allows 
