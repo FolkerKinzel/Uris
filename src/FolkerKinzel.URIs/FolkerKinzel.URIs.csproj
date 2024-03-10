@@ -14,7 +14,7 @@
     <PackageVersion>5.2.1</PackageVersion>
     <FileVersion>5.2.1.2</FileVersion>
     <AssemblyVersion>5.0.0.0</AssemblyVersion>
-    <Description>.NET library that supports working with URIs</Description>
+    <Description>.NET library that supports working with "data" URLs (RFC 2397)</Description>
     <PackageTags>URI URL C# .NET</PackageTags>
     <PackageReleaseNotes>https://github.com/FolkerKinzel/Uris/releases/tag/v5.2.1</PackageReleaseNotes>
     <PackageIconUrl />
